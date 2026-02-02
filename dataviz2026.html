@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Data Viz Playground 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #fff;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .nav {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #fff;
+            position: sticky;
+            top: 64px;
+            z-index: 99;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-btn {
+            flex-shrink: 0;
+            padding: 10px 20px;
+            border: none;
+            background: #e8e8ed;
+            color: #1d1d1f;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active {
+            background: #007aff;
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 16px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+            touch-action: none;
+        }
+
+        .controls {
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #e8e8ed;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 44px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e8e8ed;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px;
+            border: 1px solid #e8e8ed;
+            background: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: #007aff;
+            color: #fff;
+            border-color: #007aff;
+        }
+
+        .value-display {
+            display: inline-block;
+            float: right;
+            color: #1d1d1f;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Data Viz Playground</h1>
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn active" data-tab="live">Live Chart</button>
+        <button class="nav-btn" data-tab="pie">Pie/Donut</button>
+        <button class="nav-btn" data-tab="bar">Bar Race</button>
+        <button class="nav-btn" data-tab="scatter">Scatter Plot</button>
+        <button class="nav-btn" data-tab="radar">Radar/Spider</button>
+    </div>
+
+    <!-- Live Chart Tab -->
+    <div class="tab-content active" id="live">
+        <canvas id="liveCanvas" width="800" height="400"></canvas>
+        <div class="controls">
+            <div class="control-group">
+                <label>Speed <span class="value-display" id="speedValue">50 ms</span></label>
+                <input type="range" id="speedSlider" min="20" max="200" value="50">
+            </div>
+            <div class="control-group">
+                <label>Volatility <span class="value-display" id="volatilityValue">10</span></label>
+                <input type="range" id="volatilitySlider" min="5" max="50" value="10">
+            </div>
+            <div class="control-group">
+                <label>Chart Style</label>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" data-style="line">Line</button>
+                    <button class="toggle-btn" data-style="area">Area</button>
+                    <button class="toggle-btn" data-style="dots">Dots</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Color</label>
+                <input type="color" id="lineColor" value="#007aff">
+            </div>
+            <div class="control-group">
+                <label>Grid</label>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" data-grid="on">Show</button>
+                    <button class="toggle-btn" data-grid="off">Hide</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie/Donut Tab -->
+    <div class="tab-content" id="pie">
+        <canvas id="pieCanvas" width="800" height="600"></canvas>
+        <div class="controls">
+            <div class="control-group">
+                <label>Donut Hole <span class="value-display" id="holeValue">0.0</span></label>
+                <input type="range" id="holeSlider" min="0" max="70" value="0">
+            </div>
+            <div class="control-group">
+                <label>Segments <span class="value-display" id="segmentsValue">5</span></label>
+                <input type="range" id="segmentsSlider" min="3" max="8" value="5">
+            </div>
+            <div class="control-group">
+                <label>Animation</label>
+                <select id="pieAnimation">
+                    <option value="spin">Spin In</option>
+                    <option value="fade">Fade</option>
+                    <option value="grow">Grow</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Labels</label>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" data-labels="on">Show</button>
+                    <button class="toggle-btn" data-labels="off">Hide</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bar Race Tab -->
+    <div class="tab-content" id="bar">
+        <canvas id="barCanvas" width="800" height="600"></canvas>
+        <div class="controls">
+            <div class="control-group">
+                <label>Speed <span class="value-display" id="barSpeedValue">500 ms</span></label>
+                <input type="range" id="barSpeedSlider" min="200" max="2000" value="500">
+            </div>
+            <div class="control-group">
+                <label>Bar Count <span class="value-display" id="barCountValue">10</span></label>
+                <input type="range" id="barCountSlider" min="5" max="15" value="10">
+            </div>
+            <div class="control-group">
+                <label>Playback</label>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" data-play="play">Play</button>
+                    <button class="toggle-btn" data-play="pause">Pause</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Color Scheme</label>
+                <select id="barColorScheme">
+                    <option value="vibrant">Vibrant</option>
+                    <option value="pastel">Pastel</option>
+                    <option value="professional">Professional</option>
+                    <option value="gradient">Gradient</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scatter Plot Tab -->
+    <div class="tab-content" id="scatter">
+        <canvas id="scatterCanvas" width="800" height="600"></canvas>
+        <div class="controls">
+            <div class="control-group">
+                <label>Clusters <span class="value-display" id="clusterValue">3</span></label>
+                <input type="range" id="clusterSlider" min="2" max="6" value="3">
+            </div>
+            <div class="control-group">
+                <label>Point Size <span class="value-display" id="pointSizeValue">6</span></label>
+                <input type="range" id="pointSizeSlider" min="3" max="12" value="6">
+            </div>
+            <div class="control-group">
+                <label>Trend Line</label>
+                <div class="toggle-group">
+                    <button class="toggle-btn" data-trend="on">Show</button>
+                    <button class="toggle-btn active" data-trend="off">Hide</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Convex Hull</label>
+                <div class="toggle-group">
+                    <button class="toggle-btn" data-hull="on">Show</button>
+                    <button class="toggle-btn active" data-hull="off">Hide</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Radar/Spider Tab -->
+    <div class="tab-content" id="radar">
+        <canvas id="radarCanvas" width="800" height="600"></canvas>
+        <div class="controls">
+            <div class="control-group">
+                <label>Axes <span class="value-display" id="axesValue">6</span></label>
+                <input type="range" id="axesSlider" min="5" max="8" value="6">
+            </div>
+            <div class="control-group">
+                <label>Fill Opacity <span class="value-display" id="opacityValue">0.3</span></label>
+                <input type="range" id="opacitySlider" min="0" max="100" value="30">
+            </div>
+            <div class="control-group">
+                <label>Animation</label>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" data-animate="on">On</button>
+                    <button class="toggle-btn" data-animate="off">Off</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Utility functions
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+
+        // Tab navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tab).classList.add('active');
+            });
+        });
+
+        // ============ LIVE CHART ============
+        const liveCanvas = document.getElementById('liveCanvas');
+        const liveCtx = liveCanvas.getContext('2d');
+        let liveData = [];
+        let liveValue = 50;
+        let liveInterval = null;
+        let liveConfig = {
+            speed: 50,
+            volatility: 10,
+            style: 'line',
+            color: '#007aff',
+            grid: true
+        };
+
+        function initLiveChart() {
+            for (let i = 0; i < 50; i++) {
+                liveData.push(50 + Math.random() * 20 - 10);
+            }
+            startLiveChart();
+        }
+
+        function startLiveChart() {
+            if (liveInterval) clearInterval(liveInterval);
+            liveInterval = setInterval(() => {
+                liveValue += (Math.random() - 0.5) * liveConfig.volatility;
+                liveValue = clamp(liveValue, 10, 90);
+                liveData.push(liveValue);
+                if (liveData.length > 50) liveData.shift();
+                drawLiveChart();
+            }, liveConfig.speed);
+        }
+
+        function drawLiveChart() {
+            const w = liveCanvas.width;
+            const h = liveCanvas.height;
+            const padding = 40;
+            const chartW = w - padding * 2;
+            const chartH = h - padding * 2;
+
+            liveCtx.clearRect(0, 0, w, h);
+
+            // Grid
+            if (liveConfig.grid) {
+                liveCtx.strokeStyle = '#e8e8ed';
+                liveCtx.lineWidth = 1;
+                for (let i = 0; i <= 5; i++) {
+                    const y = padding + (chartH / 5) * i;
+                    liveCtx.beginPath();
+                    liveCtx.moveTo(padding, y);
+                    liveCtx.lineTo(w - padding, y);
+                    liveCtx.stroke();
+
+                    liveCtx.fillStyle = '#86868b';
+                    liveCtx.font = '12px system-ui';
+                    liveCtx.textAlign = 'right';
+                    liveCtx.fillText((100 - i * 20).toFixed(0), padding - 10, y + 4);
+                }
+            }
+
+            // Data
+            const stepX = chartW / (liveData.length - 1);
+
+            if (liveConfig.style === 'area') {
+                liveCtx.fillStyle = liveConfig.color + '40';
+                liveCtx.beginPath();
+                liveCtx.moveTo(padding, h - padding);
+                liveData.forEach((val, i) => {
+                    const x = padding + i * stepX;
+                    const y = padding + chartH - (val / 100) * chartH;
+                    liveCtx.lineTo(x, y);
+                });
+                liveCtx.lineTo(w - padding, h - padding);
+                liveCtx.closePath();
+                liveCtx.fill();
+            }
+
+            if (liveConfig.style === 'line' || liveConfig.style === 'area') {
+                liveCtx.strokeStyle = liveConfig.color;
+                liveCtx.lineWidth = 2.5;
+                liveCtx.beginPath();
+                liveData.forEach((val, i) => {
+                    const x = padding + i * stepX;
+                    const y = padding + chartH - (val / 100) * chartH;
+                    if (i === 0) liveCtx.moveTo(x, y);
+                    else liveCtx.lineTo(x, y);
+                });
+                liveCtx.stroke();
+            }
+
+            if (liveConfig.style === 'dots') {
+                liveCtx.fillStyle = liveConfig.color;
+                liveData.forEach((val, i) => {
+                    const x = padding + i * stepX;
+                    const y = padding + chartH - (val / 100) * chartH;
+                    liveCtx.beginPath();
+                    liveCtx.arc(x, y, 4, 0, Math.PI * 2);
+                    liveCtx.fill();
+                });
+            }
+        }
+
+        // Live chart controls
+        document.getElementById('speedSlider').addEventListener('input', e => {
+            liveConfig.speed = parseInt(e.target.value);
+            document.getElementById('speedValue').textContent = liveConfig.speed + ' ms';
+            startLiveChart();
+        });
+
+        document.getElementById('volatilitySlider').addEventListener('input', e => {
+            liveConfig.volatility = parseInt(e.target.value);
+            document.getElementById('volatilityValue').textContent = liveConfig.volatility;
+        });
+
+        document.querySelectorAll('[data-style]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-style]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                liveConfig.style = btn.dataset.style;
+                drawLiveChart();
+            });
+        });
+
+        document.getElementById('lineColor').addEventListener('input', e => {
+            liveConfig.color = e.target.value;
+            drawLiveChart();
+        });
+
+        document.querySelectorAll('[data-grid]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-grid]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                liveConfig.grid = btn.dataset.grid === 'on';
+                drawLiveChart();
+            });
+        });
+
+        initLiveChart();
+
+        // ============ PIE/DONUT CHART ============
+        const pieCanvas = document.getElementById('pieCanvas');
+        const pieCtx = pieCanvas.getContext('2d');
+        let pieConfig = {
+            hole: 0,
+            segments: 5,
+            animation: 'spin',
+            labels: true,
+            exploded: new Set()
+        };
+        let pieData = [];
+        let pieAnimProgress = 0;
+        const pieColors = ['#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#007aff', '#5856d6', '#af52de', '#ff2d55'];
+        const pieLabels = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta'];
+
+        function generatePieData() {
+            pieData = [];
+            let total = 0;
+            for (let i = 0; i < pieConfig.segments; i++) {
+                const val = Math.random() * 100 + 50;
+                pieData.push(val);
+                total += val;
+            }
+            pieData = pieData.map(v => v / total);
+            pieAnimProgress = 0;
+            animatePie();
+        }
+
+        function animatePie() {
+            if (pieAnimProgress < 1) {
+                pieAnimProgress += 0.02;
+                drawPie();
+                requestAnimationFrame(animatePie);
+            } else {
+                drawPie();
+            }
+        }
+
+        function drawPie() {
+            const w = pieCanvas.width;
+            const h = pieCanvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            const radius = Math.min(w, h) / 2 - 80;
+
+            pieCtx.clearRect(0, 0, w, h);
+
+            let startAngle = -Math.PI / 2;
+            const animEase = pieAnimProgress * pieAnimProgress * (3 - 2 * pieAnimProgress);
+
+            pieData.forEach((value, i) => {
+                const angle = value * Math.PI * 2;
+                const endAngle = startAngle + angle;
+                const midAngle = startAngle + angle / 2;
+
+                let offsetX = 0, offsetY = 0;
+                if (pieConfig.exploded.has(i)) {
+                    offsetX = Math.cos(midAngle) * 20;
+                    offsetY = Math.sin(midAngle) * 20;
+                }
+
+                let drawRadius = radius;
+                let alpha = 1;
+
+                if (pieConfig.animation === 'spin') {
+                    const spinAngle = (1 - animEase) * Math.PI * 2;
+                    startAngle += spinAngle / pieData.length;
+                } else if (pieConfig.animation === 'grow') {
+                    drawRadius = radius * animEase;
+                } else if (pieConfig.animation === 'fade') {
+                    alpha = animEase;
+                }
+
+                pieCtx.save();
+                pieCtx.globalAlpha = alpha;
+                pieCtx.fillStyle = pieColors[i % pieColors.length];
+                pieCtx.beginPath();
+                pieCtx.moveTo(cx + offsetX, cy + offsetY);
+                pieCtx.arc(cx + offsetX, cy + offsetY, drawRadius, startAngle, endAngle);
+                pieCtx.closePath();
+                pieCtx.fill();
+
+                // Inner hole
+                if (pieConfig.hole > 0) {
+                    pieCtx.fillStyle = '#f5f5f7';
+                    pieCtx.beginPath();
+                    pieCtx.arc(cx + offsetX, cy + offsetY, drawRadius * pieConfig.hole, 0, Math.PI * 2);
+                    pieCtx.fill();
+                }
+
+                // Labels
+                if (pieConfig.labels) {
+                    const labelRadius = drawRadius * (pieConfig.hole > 0 ? (1 + pieConfig.hole) / 2 : 0.7);
+                    const labelX = cx + offsetX + Math.cos(midAngle) * labelRadius;
+                    const labelY = cy + offsetY + Math.sin(midAngle) * labelRadius;
+
+                    pieCtx.fillStyle = '#fff';
+                    pieCtx.font = 'bold 14px system-ui';
+                    pieCtx.textAlign = 'center';
+                    pieCtx.textBaseline = 'middle';
+                    pieCtx.fillText(pieLabels[i], labelX, labelY - 8);
+                    pieCtx.fillText((value * 100).toFixed(1) + '%', labelX, labelY + 8);
+                }
+
+                pieCtx.restore();
+                startAngle = endAngle;
+            });
+        }
+
+        pieCanvas.addEventListener('click', e => {
+            const rect = pieCanvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (pieCanvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (pieCanvas.height / rect.height);
+
+            const cx = pieCanvas.width / 2;
+            const cy = pieCanvas.height / 2;
+            const dx = x - cx;
+            const dy = y - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) + Math.PI / 2;
+            const normalizedAngle = (angle + Math.PI * 2) % (Math.PI * 2);
+
+            const radius = Math.min(pieCanvas.width, pieCanvas.height) / 2 - 80;
+            const innerRadius = radius * pieConfig.hole;
+
+            if (dist >= innerRadius && dist <= radius) {
+                let cumAngle = 0;
+                for (let i = 0; i < pieData.length; i++) {
+                    cumAngle += pieData[i] * Math.PI * 2;
+                    if (normalizedAngle <= cumAngle) {
+                        if (pieConfig.exploded.has(i)) {
+                            pieConfig.exploded.delete(i);
+                        } else {
+                            pieConfig.exploded.add(i);
+                        }
+                        drawPie();
+                        break;
+                    }
+                }
+            }
+        });
+
+        document.getElementById('holeSlider').addEventListener('input', e => {
+            pieConfig.hole = parseInt(e.target.value) / 100;
+            document.getElementById('holeValue').textContent = pieConfig.hole.toFixed(1);
+            drawPie();
+        });
+
+        document.getElementById('segmentsSlider').addEventListener('input', e => {
+            pieConfig.segments = parseInt(e.target.value);
+            document.getElementById('segmentsValue').textContent = pieConfig.segments;
+            pieConfig.exploded.clear();
+            generatePieData();
+        });
+
+        document.getElementById('pieAnimation').addEventListener('change', e => {
+            pieConfig.animation = e.target.value;
+            pieAnimProgress = 0;
+            animatePie();
+        });
+
+        document.querySelectorAll('[data-labels]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-labels]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                pieConfig.labels = btn.dataset.labels === 'on';
+                drawPie();
+            });
+        });
+
+        generatePieData();
+
+        // ============ BAR RACE ============
+        const barCanvas = document.getElementById('barCanvas');
+        const barCtx = barCanvas.getContext('2d');
+        let barConfig = {
+            speed: 500,
+            count: 10,
+            playing: true,
+            colorScheme: 'vibrant'
+        };
+        let barData = [];
+        let barTargetData = [];
+        let barInterval = null;
+        const companies = ['TechCorp', 'DataFlow', 'CloudNine', 'ByteWorks', 'QuantumLabs', 'NeuralNet', 'CyberDyne', 'FusionAI', 'VectorPro', 'MatrixHub', 'CodeForge', 'PixelFarm', 'LogicTree', 'StreamEdge', 'BlockMesh'];
+
+        const colorSchemes = {
+            vibrant: ['#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#007aff', '#5856d6', '#af52de', '#ff2d55'],
+            pastel: ['#ffb3ba', '#ffdfba', '#ffffba', '#baffc9', '#bae1ff', '#e0bbff', '#ffc6ff', '#ffd4e5'],
+            professional: ['#1f77b4', '#2ca02c', '#d62728', '#ff7f0e', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f'],
+            gradient: []
+        };
+
+        function getBarColor(index, scheme) {
+            if (scheme === 'gradient') {
+                const hue = (index / barConfig.count) * 280;
+                return `hsl(${hue}, 70%, 55%)`;
+            }
+            const colors = colorSchemes[scheme];
+            return colors[index % colors.length];
+        }
+
+        function generateBarData() {
+            barData = [];
+            barTargetData = [];
+            for (let i = 0; i < barConfig.count; i++) {
+                const val = Math.random() * 80 + 20;
+                barData.push({ name: companies[i], value: val, color: getBarColor(i, barConfig.colorScheme) });
+                barTargetData.push({ name: companies[i], value: val, color: getBarColor(i, barConfig.colorScheme) });
+            }
+            barData.sort((a, b) => b.value - a.value);
+            startBarRace();
+        }
+
+        function startBarRace() {
+            if (barInterval) clearInterval(barInterval);
+            if (!barConfig.playing) return;
+
+            barInterval = setInterval(() => {
+                barTargetData.forEach((d, i) => {
+                    d.value = Math.random() * 80 + 20;
+                    d.color = getBarColor(i, barConfig.colorScheme);
+                });
+                barTargetData.sort((a, b) => b.value - a.value);
+                animateBarRace();
+            }, barConfig.speed);
+        }
+
+        function animateBarRace() {
+            let steps = 20;
+            let step = 0;
+            const interval = setInterval(() => {
+                step++;
+                barData.forEach((d, i) => {
+                    const target = barTargetData.find(t => t.name === d.name);
+                    d.value = lerp(d.value, target.value, 0.2);
+                    d.color = target.color;
+                });
+                barData.sort((a, b) => b.value - a.value);
+                drawBarRace();
+                if (step >= steps) clearInterval(interval);
+            }, barConfig.speed / steps);
+        }
+
+        function drawBarRace() {
+            const w = barCanvas.width;
+            const h = barCanvas.height;
+            const padding = 60;
+            const chartH = h - padding * 2;
+            const barHeight = chartH / barConfig.count;
+            const maxValue = Math.max(...barData.map(d => d.value));
+
+            barCtx.clearRect(0, 0, w, h);
+
+            barData.forEach((d, i) => {
+                const y = padding + i * barHeight;
+                const barW = ((w - padding * 2) * d.value) / maxValue;
+
+                // Bar
+                barCtx.fillStyle = d.color;
+                barCtx.fillRect(padding, y + 8, barW, barHeight - 16);
+
+                // Label
+                barCtx.fillStyle = '#1d1d1f';
+                barCtx.font = 'bold 14px system-ui';
+                barCtx.textAlign = 'right';
+                barCtx.textBaseline = 'middle';
+                barCtx.fillText(d.name, padding - 10, y + barHeight / 2);
+
+                // Value
+                barCtx.fillStyle = '#fff';
+                barCtx.textAlign = 'left';
+                barCtx.fillText(d.value.toFixed(1) + 'B', padding + barW + 10, y + barHeight / 2);
+
+                // Rank
+                barCtx.fillStyle = '#1d1d1f';
+                barCtx.font = 'bold 20px system-ui';
+                barCtx.textAlign = 'left';
+                barCtx.fillText('#' + (i + 1), 10, y + barHeight / 2);
+            });
+        }
+
+        document.getElementById('barSpeedSlider').addEventListener('input', e => {
+            barConfig.speed = parseInt(e.target.value);
+            document.getElementById('barSpeedValue').textContent = barConfig.speed + ' ms';
+            if (barConfig.playing) startBarRace();
+        });
+
+        document.getElementById('barCountSlider').addEventListener('input', e => {
+            barConfig.count = parseInt(e.target.value);
+            document.getElementById('barCountValue').textContent = barConfig.count;
+            generateBarData();
+        });
+
+        document.querySelectorAll('[data-play]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-play]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                barConfig.playing = btn.dataset.play === 'play';
+                if (barConfig.playing) {
+                    startBarRace();
+                } else {
+                    if (barInterval) clearInterval(barInterval);
+                }
+            });
+        });
+
+        document.getElementById('barColorScheme').addEventListener('change', e => {
+            barConfig.colorScheme = e.target.value;
+            barData.forEach((d, i) => {
+                d.color = getBarColor(i, barConfig.colorScheme);
+            });
+            barTargetData.forEach((d, i) => {
+                d.color = getBarColor(i, barConfig.colorScheme);
+            });
+            drawBarRace();
+        });
+
+        generateBarData();
+
+        // ============ SCATTER PLOT ============
+        const scatterCanvas = document.getElementById('scatterCanvas');
+        const scatterCtx = scatterCanvas.getContext('2d');
+        let scatterConfig = {
+            clusters: 3,
+            pointSize: 6,
+            trendLine: false,
+            hull: false
+        };
+        let scatterPoints = [];
+        const clusterColors = ['#ff3b30', '#34c759', '#007aff', '#ff9500', '#af52de', '#ffcc00'];
+
+        function generateScatterData() {
+            scatterPoints = [];
+            const w = scatterCanvas.width;
+            const h = scatterCanvas.height;
+            const padding = 60;
+
+            for (let c = 0; c < scatterConfig.clusters; c++) {
+                const centerX = padding + Math.random() * (w - padding * 2);
+                const centerY = padding + Math.random() * (h - padding * 2);
+                const pointCount = 20 + Math.floor(Math.random() * 20);
+
+                for (let i = 0; i < pointCount; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * 80;
+                    scatterPoints.push({
+                        x: centerX + Math.cos(angle) * dist,
+                        y: centerY + Math.sin(angle) * dist,
+                        cluster: c,
+                        scale: 0,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2
+                    });
+                }
+            }
+            animateScatter();
+        }
+
+        function animateScatter() {
+            let progress = 0;
+            const animate = () => {
+                progress += 0.05;
+                scatterPoints.forEach(p => {
+                    if (p.scale < 1) {
+                        p.scale = Math.min(1, p.scale + 0.05);
+                        p.x += p.vx * (1 - p.scale);
+                        p.y += p.vy * (1 - p.scale);
+                    }
+                });
+                drawScatter();
+                if (progress < 1) requestAnimationFrame(animate);
+            };
+            animate();
+        }
+
+        function convexHull(points) {
+            if (points.length < 3) return points;
+            points.sort((a, b) => a.x - b.x || a.y - b.y);
+
+            const cross = (o, a, b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+
+            const lower = [];
+            for (const p of points) {
+                while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) {
+                    lower.pop();
+                }
+                lower.push(p);
+            }
+
+            const upper = [];
+            for (let i = points.length - 1; i >= 0; i--) {
+                const p = points[i];
+                while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) {
+                    upper.pop();
+                }
+                upper.push(p);
+            }
+
+            upper.pop();
+            lower.pop();
+            return lower.concat(upper);
+        }
+
+        function linearRegression(points) {
+            const n = points.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            points.forEach(p => {
+                sumX += p.x;
+                sumY += p.y;
+                sumXY += p.x * p.y;
+                sumX2 += p.x * p.x;
+            });
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            return { slope, intercept };
+        }
+
+        function drawScatter() {
+            const w = scatterCanvas.width;
+            const h = scatterCanvas.height;
+            const padding = 60;
+
+            scatterCtx.clearRect(0, 0, w, h);
+
+            // Grid
+            scatterCtx.strokeStyle = '#e8e8ed';
+            scatterCtx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const x = padding + ((w - padding * 2) / 5) * i;
+                scatterCtx.beginPath();
+                scatterCtx.moveTo(x, padding);
+                scatterCtx.lineTo(x, h - padding);
+                scatterCtx.stroke();
+
+                const y = padding + ((h - padding * 2) / 5) * i;
+                scatterCtx.beginPath();
+                scatterCtx.moveTo(padding, y);
+                scatterCtx.lineTo(w - padding, y);
+                scatterCtx.stroke();
+            }
+
+            // Convex hulls
+            if (scatterConfig.hull) {
+                for (let c = 0; c < scatterConfig.clusters; c++) {
+                    const clusterPoints = scatterPoints.filter(p => p.cluster === c && p.scale === 1);
+                    if (clusterPoints.length < 3) continue;
+                    const hull = convexHull(clusterPoints);
+                    scatterCtx.fillStyle = clusterColors[c] + '20';
+                    scatterCtx.strokeStyle = clusterColors[c] + '80';
+                    scatterCtx.lineWidth = 2;
+                    scatterCtx.beginPath();
+                    hull.forEach((p, i) => {
+                        if (i === 0) scatterCtx.moveTo(p.x, p.y);
+                        else scatterCtx.lineTo(p.x, p.y);
+                    });
+                    scatterCtx.closePath();
+                    scatterCtx.fill();
+                    scatterCtx.stroke();
+                }
+            }
+
+            // Trend line
+            if (scatterConfig.trendLine) {
+                const fullPoints = scatterPoints.filter(p => p.scale === 1);
+                if (fullPoints.length > 1) {
+                    const { slope, intercept } = linearRegression(fullPoints);
+                    scatterCtx.strokeStyle = '#1d1d1f';
+                    scatterCtx.lineWidth = 2;
+                    scatterCtx.setLineDash([5, 5]);
+                    scatterCtx.beginPath();
+                    scatterCtx.moveTo(padding, slope * padding + intercept);
+                    scatterCtx.lineTo(w - padding, slope * (w - padding) + intercept);
+                    scatterCtx.stroke();
+                    scatterCtx.setLineDash([]);
+                }
+            }
+
+            // Points
+            scatterPoints.forEach(p => {
+                scatterCtx.fillStyle = clusterColors[p.cluster];
+                scatterCtx.beginPath();
+                scatterCtx.arc(p.x, p.y, scatterConfig.pointSize * p.scale, 0, Math.PI * 2);
+                scatterCtx.fill();
+            });
+        }
+
+        scatterCanvas.addEventListener('click', e => {
+            const rect = scatterCanvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (scatterCanvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (scatterCanvas.height / rect.height);
+
+            const cluster = Math.floor(Math.random() * scatterConfig.clusters);
+            scatterPoints.push({
+                x, y,
+                cluster,
+                scale: 0,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4
+            });
+
+            animateScatter();
+        });
+
+        document.getElementById('clusterSlider').addEventListener('input', e => {
+            scatterConfig.clusters = parseInt(e.target.value);
+            document.getElementById('clusterValue').textContent = scatterConfig.clusters;
+            generateScatterData();
+        });
+
+        document.getElementById('pointSizeSlider').addEventListener('input', e => {
+            scatterConfig.pointSize = parseInt(e.target.value);
+            document.getElementById('pointSizeValue').textContent = scatterConfig.pointSize;
+            drawScatter();
+        });
+
+        document.querySelectorAll('[data-trend]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-trend]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                scatterConfig.trendLine = btn.dataset.trend === 'on';
+                drawScatter();
+            });
+        });
+
+        document.querySelectorAll('[data-hull]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-hull]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                scatterConfig.hull = btn.dataset.hull === 'on';
+                drawScatter();
+            });
+        });
+
+        generateScatterData();
+
+        // ============ RADAR/SPIDER CHART ============
+        const radarCanvas = document.getElementById('radarCanvas');
+        const radarCtx = radarCanvas.getContext('2d');
+        let radarConfig = {
+            axes: 6,
+            opacity: 0.3,
+            animate: true
+        };
+        let radarData = [];
+        let radarTargetData = [];
+        const radarColors = ['#ff3b30', '#34c759', '#007aff'];
+        const radarItems = ['Product A', 'Product B', 'Product C'];
+        const radarMetrics = ['Performance', 'Reliability', 'Efficiency', 'Design', 'Value', 'Support', 'Innovation', 'Sustainability'];
+
+        function generateRadarData() {
+            radarData = [];
+            radarTargetData = [];
+            for (let i = 0; i < 3; i++) {
+                const values = [];
+                const targets = [];
+                for (let j = 0; j < radarConfig.axes; j++) {
+                    const val = Math.random() * 60 + 40;
+                    values.push(val);
+                    targets.push(val);
+                }
+                radarData.push({ name: radarItems[i], values, color: radarColors[i] });
+                radarTargetData.push({ name: radarItems[i], values: targets, color: radarColors[i] });
+            }
+            if (radarConfig.animate) animateRadar();
+            else drawRadar();
+        }
+
+        function animateRadar() {
+            let progress = 0;
+            const animate = () => {
+                progress += 0.03;
+                radarData.forEach((d, i) => {
+                    d.values.forEach((v, j) => {
+                        d.values[j] = lerp(0, radarTargetData[i].values[j], Math.min(1, progress));
+                    });
+                });
+                drawRadar();
+                if (progress < 1.2) requestAnimationFrame(animate);
+            };
+            animate();
+        }
+
+        function drawRadar() {
+            const w = radarCanvas.width;
+            const h = radarCanvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            const radius = Math.min(w, h) / 2 - 100;
+            const levels = 5;
+
+            radarCtx.clearRect(0, 0, w, h);
+
+            // Grid
+            radarCtx.strokeStyle = '#e8e8ed';
+            radarCtx.lineWidth = 1;
+            for (let level = 1; level <= levels; level++) {
+                radarCtx.beginPath();
+                for (let i = 0; i <= radarConfig.axes; i++) {
+                    const angle = (Math.PI * 2 * i) / radarConfig.axes - Math.PI / 2;
+                    const r = (radius / levels) * level;
+                    const x = cx + Math.cos(angle) * r;
+                    const y = cy + Math.sin(angle) * r;
+                    if (i === 0) radarCtx.moveTo(x, y);
+                    else radarCtx.lineTo(x, y);
+                }
+                radarCtx.closePath();
+                radarCtx.stroke();
+
+                // Level labels
+                if (level === levels) {
+                    radarCtx.fillStyle = '#86868b';
+                    radarCtx.font = '11px system-ui';
+                    radarCtx.textAlign = 'center';
+                    radarCtx.fillText('100', cx, cy - radius - 10);
+                }
+            }
+
+            // Axes
+            for (let i = 0; i < radarConfig.axes; i++) {
+                const angle = (Math.PI * 2 * i) / radarConfig.axes - Math.PI / 2;
+                radarCtx.strokeStyle = '#e8e8ed';
+                radarCtx.beginPath();
+                radarCtx.moveTo(cx, cy);
+                radarCtx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius);
+                radarCtx.stroke();
+
+                // Metric labels
+                const labelDist = radius + 30;
+                const labelX = cx + Math.cos(angle) * labelDist;
+                const labelY = cy + Math.sin(angle) * labelDist;
+                radarCtx.fillStyle = '#1d1d1f';
+                radarCtx.font = 'bold 13px system-ui';
+                radarCtx.textAlign = 'center';
+                radarCtx.textBaseline = 'middle';
+                radarCtx.fillText(radarMetrics[i], labelX, labelY);
+            }
+
+            // Data
+            radarData.forEach((d, idx) => {
+                // Fill
+                radarCtx.fillStyle = d.color + Math.floor(radarConfig.opacity * 255).toString(16).padStart(2, '0');
+                radarCtx.strokeStyle = d.color;
+                radarCtx.lineWidth = 2;
+                radarCtx.beginPath();
+                for (let i = 0; i <= radarConfig.axes; i++) {
+                    const angle = (Math.PI * 2 * i) / radarConfig.axes - Math.PI / 2;
+                    const value = d.values[i % radarConfig.axes];
+                    const r = (radius * value) / 100;
+                    const x = cx + Math.cos(angle) * r;
+                    const y = cy + Math.sin(angle) * r;
+                    if (i === 0) radarCtx.moveTo(x, y);
+                    else radarCtx.lineTo(x, y);
+                }
+                radarCtx.closePath();
+                radarCtx.fill();
+                radarCtx.stroke();
+
+                // Points
+                d.values.forEach((value, i) => {
+                    const angle = (Math.PI * 2 * i) / radarConfig.axes - Math.PI / 2;
+                    const r = (radius * value) / 100;
+                    const x = cx + Math.cos(angle) * r;
+                    const y = cy + Math.sin(angle) * r;
+                    radarCtx.fillStyle = d.color;
+                    radarCtx.beginPath();
+                    radarCtx.arc(x, y, 4, 0, Math.PI * 2);
+                    radarCtx.fill();
+                });
+            });
+
+            // Legend
+            radarData.forEach((d, i) => {
+                const legendY = 20 + i * 25;
+                radarCtx.fillStyle = d.color;
+                radarCtx.fillRect(20, legendY, 40, 15);
+                radarCtx.fillStyle = '#1d1d1f';
+                radarCtx.font = '13px system-ui';
+                radarCtx.textAlign = 'left';
+                radarCtx.fillText(d.name, 70, legendY + 11);
+            });
+        }
+
+        radarCanvas.addEventListener('click', e => {
+            const rect = radarCanvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (radarCanvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (radarCanvas.height / rect.height);
+
+            const cx = radarCanvas.width / 2;
+            const cy = radarCanvas.height / 2;
+            const dx = x - cx;
+            const dy = y - cy;
+            const angle = Math.atan2(dy, dx) + Math.PI / 2;
+            const normalizedAngle = (angle + Math.PI * 2) % (Math.PI * 2);
+            const anglePerAxis = (Math.PI * 2) / radarConfig.axes;
+            const axisIndex = Math.floor(normalizedAngle / anglePerAxis);
+
+            const randomItem = Math.floor(Math.random() * 3);
+            radarTargetData[randomItem].values[axisIndex] = Math.min(100, radarTargetData[randomItem].values[axisIndex] + 15);
+
+            let progress = 0;
+            const animate = () => {
+                progress += 0.05;
+                radarData[randomItem].values[axisIndex] = lerp(
+                    radarData[randomItem].values[axisIndex],
+                    radarTargetData[randomItem].values[axisIndex],
+                    0.2
+                );
+                drawRadar();
+                if (progress < 1) requestAnimationFrame(animate);
+            };
+            animate();
+        });
+
+        document.getElementById('axesSlider').addEventListener('input', e => {
+            radarConfig.axes = parseInt(e.target.value);
+            document.getElementById('axesValue').textContent = radarConfig.axes;
+            generateRadarData();
+        });
+
+        document.getElementById('opacitySlider').addEventListener('input', e => {
+            radarConfig.opacity = parseInt(e.target.value) / 100;
+            document.getElementById('opacityValue').textContent = radarConfig.opacity.toFixed(1);
+            drawRadar();
+        });
+
+        document.querySelectorAll('[data-animate]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-animate]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                radarConfig.animate = btn.dataset.animate === 'on';
+                if (radarConfig.animate) {
+                    radarData.forEach(d => d.values = d.values.map(() => 0));
+                    animateRadar();
+                }
+            });
+        });
+
+        generateRadarData();
+
+        // Handle canvas sizing
+        function resizeCanvases() {
+            const canvases = [liveCanvas, pieCanvas, barCanvas, scatterCanvas, radarCanvas];
+            canvases.forEach(canvas => {
+                const container = canvas.parentElement;
+                const rect = container.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+
+                if (canvas === liveCanvas) {
+                    canvas.style.height = '400px';
+                } else {
+                    canvas.style.height = '600px';
+                }
+            });
+        }
+
+        window.addEventListener('resize', resizeCanvases);
+        resizeCanvases();
+    </script>
+</body>
+</html>

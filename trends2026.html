@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 Web Trends</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f7;color:#1a1a2e;min-height:100vh}
+nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid #e0e0e0;position:sticky;top:0;z-index:100;-webkit-overflow-scrolling:touch}
+nav button{flex:none;padding:12px 16px;background:none;border:none;color:#666;font-size:13px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav button.active{color:#6c5ce7;border-bottom-color:#6c5ce7}
+.panel{display:none;flex-direction:column;min-height:calc(100vh - 49px)}
+.panel.active{display:flex}
+.controls{display:flex;flex-wrap:wrap;gap:10px;padding:12px;background:#fff;border-bottom:1px solid #e0e0e0;align-items:center}
+.controls label{font-size:12px;color:#555;display:flex;align-items:center;gap:4px;font-weight:500}
+.controls select{background:#f0f0f5;border:1px solid #ccc;color:#333;border-radius:6px;padding:4px 8px;font-size:12px}
+.controls input[type=range]{width:80px;accent-color:#6c5ce7}
+.val{font-size:11px;color:#6c5ce7;font-weight:700;min-width:24px}
+.preview{flex:1;padding:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.prompt-bar{background:#fff;border-top:2px solid #e0e0e0;padding:12px;display:flex;gap:8px;align-items:flex-start}
+.prompt-bar pre{flex:1;font-size:11px;font-family:monospace;color:#555;white-space:pre-wrap;line-height:1.4;max-height:70px;overflow-y:auto}
+.copy-btn{background:#6c5ce7;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer}
+
+/* BENTO */
+.bento-grid{display:grid;gap:10px;width:100%}
+.bento-item{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:16px;min-height:70px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:all .3s}
+.bento-item:active{transform:scale(.97);border-color:#6c5ce7}
+.bento-item .icon{font-size:24px;margin-bottom:8px}
+.bento-item h3{font-size:13px;font-weight:700;color:#1a1a2e}
+.bento-item p{font-size:11px;color:#888;margin-top:2px}
+
+/* CARDS */
+.cards-area{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;perspective:1000px}
+.flip-card{width:160px;height:220px;cursor:pointer;perspective:1000px}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.flip-front{background:#fff;border:1px solid #e0e0e0;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.flip-back{background:linear-gradient(135deg,#6c5ce7,#a29bfe);transform:rotateY(180deg);color:#fff;border-radius:14px}
+.flip-front .card-icon{font-size:40px;margin-bottom:10px}
+.flip-front h3{font-size:14px;color:#1a1a2e}
+.flip-front p{font-size:11px;color:#888;margin-top:6px}
+.flip-back p{font-size:12px;line-height:1.5}
+
+/* GLASS */
+.glass-scene{position:relative;width:100%;max-width:500px;height:340px;border-radius:16px;overflow:hidden}
+.glass-bg{position:absolute;inset:0}
+.glass-blob{position:absolute;border-radius:50%;filter:blur(50px);animation:blobmove 6s ease-in-out infinite alternate}
+@keyframes blobmove{0%{transform:translate(0,0) scale(1)}100%{transform:translate(20px,-15px) scale(1.1)}}
+.glass-card{position:absolute;border-radius:14px;padding:20px;color:#fff}
+.glass-card h3{font-size:15px;font-weight:700;margin-bottom:6px}
+.glass-card p{font-size:11px;opacity:.9;line-height:1.5}
+
+/* SCROLL */
+.scroll-demo{width:100%;max-width:440px;height:320px;overflow-y:auto;border-radius:12px;border:1px solid #e0e0e0;background:#fff;position:relative;scroll-behavior:smooth}
+.scroll-demo::-webkit-scrollbar{width:3px}
+.scroll-demo::-webkit-scrollbar-thumb{background:#6c5ce7;border-radius:2px}
+.scroll-section{min-height:260px;padding:32px 24px;display:flex;flex-direction:column;justify-content:center}
+.scroll-section h2{font-size:20px;font-weight:800;color:#1a1a2e;margin-bottom:10px;transform:translateY(30px);opacity:0;transition:all .6s ease}
+.scroll-section p{font-size:12px;color:#666;line-height:1.6;transform:translateY(30px);opacity:0;transition:all .6s ease .15s}
+.scroll-section.visible h2,.scroll-section.visible p{transform:translateY(0);opacity:1}
+.scroll-progress{position:sticky;top:0;height:3px;background:#6c5ce7;z-index:10;transition:width .1s;border-radius:2px}
+
+/* MOTION */
+.motion-area{display:flex;flex-direction:column;gap:16px;width:100%;max-width:500px}
+.motion-card{width:100%;padding:24px;background:#fff;border:1px solid #e0e0e0;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer;transition:all .4s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.motion-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(108,92,231,.12),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.motion-card:active::after{opacity:1}
+.motion-card:active{transform:scale(.98)}
+.motion-card h3{font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:6px}
+.motion-card p{font-size:12px;color:#666;line-height:1.5}
+.motion-btn{display:inline-block;margin-top:12px;padding:10px 20px;background:#6c5ce7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="active" onclick="show(0)">Bento Grid</button>
+  <button onclick="show(1)">Card Play</button>
+  <button onclick="show(2)">Glassmorphism</button>
+  <button onclick="show(3)">Scroll Anim</button>
+  <button onclick="show(4)">Motion</button>
+</nav>
+
+<div class="panel active" id="p0">
+  <div class="controls">
+    <label>Cols <select id="bentoCols" onchange="updateBento()"><option>2</option><option selected>3</option><option>4</option></select></label>
+    <label>Gap <input type="range" id="bentoGap" min="4" max="20" value="10" oninput="updateBento()"><span class="val" id="bentoGapV">10</span></label>
+    <label>Radius <input type="range" id="bentoRad" min="0" max="24" value="12" oninput="updateBento()"><span class="val" id="bentoRadV">12</span></label>
+  </div>
+  <div class="preview"><div class="bento-grid" id="bentoGrid"></div></div>
+  <div class="prompt-bar"><pre id="prompt0"></pre><button class="copy-btn" onclick="copyP(0)">Copy</button></div>
+</div>
+
+<div class="panel" id="p1">
+  <div class="controls">
+    <label>Tap to flip cards</label>
+  </div>
+  <div class="preview"><div class="cards-area" id="cardsArea"></div></div>
+  <div class="prompt-bar"><pre id="prompt1"></pre><button class="copy-btn" onclick="copyP(1)">Copy</button></div>
+</div>
+
+<div class="panel" id="p2">
+  <div class="controls">
+    <label>Blur <input type="range" id="glassBlur" min="4" max="40" value="16" oninput="updateGlass()"><span class="val" id="glassBlurV">16</span></label>
+    <label>Tint <input type="range" id="glassOpacity" min="5" max="50" value="20" oninput="updateGlass()"><span class="val" id="glassOpV">20%</span></label>
+    <label>Color <select id="glassPal" onchange="updateGlass()"><option value="purple">Purple</option><option value="ocean">Ocean</option><option value="sunset">Sunset</option><option value="neon">Neon</option></select></label>
+  </div>
+  <div class="preview"><div class="glass-scene" id="glassScene"></div></div>
+  <div class="prompt-bar"><pre id="prompt2"></pre><button class="copy-btn" onclick="copyP(2)">Copy</button></div>
+</div>
+
+<div class="panel" id="p3">
+  <div class="controls">
+    <label>Scroll down inside the box to see animations</label>
+  </div>
+  <div class="preview"><div class="scroll-demo" id="scrollDemo"></div></div>
+  <div class="prompt-bar"><pre id="prompt3"></pre><button class="copy-btn" onclick="copyP(3)">Copy</button></div>
+</div>
+
+<div class="panel" id="p4">
+  <div class="controls">
+    <label>Tap cards to see motion effects</label>
+  </div>
+  <div class="preview"><div class="motion-area" id="motionArea"></div></div>
+  <div class="prompt-bar"><pre id="prompt4"></pre><button class="copy-btn" onclick="copyP(4)">Copy</button></div>
+</div>
+
+<script>
+var panels=document.querySelectorAll('.panel'),navBtns=document.querySelectorAll('nav button');
+function show(i){panels.forEach(function(p,j){p.classList.toggle('active',j===i);navBtns[j].classList.toggle('active',j===i)});if(i===3)setTimeout(initScroll,100)}
+function copyP(i){var t=document.getElementById('prompt'+i).textContent;navigator.clipboard.writeText(t).then(function(){var b=document.querySelectorAll('.copy-btn')[i];b.textContent='Copied!';setTimeout(function(){b.textContent='Copy'},1500)})}
+
+// BENTO
+var bentoItems=[
+{icon:'📊',title:'Analytics',desc:'Real-time metrics',w:2,h:2},
+{icon:'🎯',title:'Goals',desc:'Track progress',w:1,h:1},
+{icon:'💬',title:'Messages',desc:'12 unread',w:1,h:1},
+{icon:'📁',title:'Projects',desc:'8 active',w:2,h:1},
+{icon:'⚡',title:'Quick Actions',desc:'Shortcuts',w:1,h:1},
+{icon:'🔔',title:'Alerts',desc:'3 new',w:1,h:1},
+{icon:'📅',title:'Calendar',desc:'This week',w:2,h:1},
+{icon:'🏆',title:'Achievements',desc:'Level 5',w:1,h:1}
+];
+function updateBento(){
+var cols=+document.getElementById('bentoCols').value,gap=+document.getElementById('bentoGap').value,rad=+document.getElementById('bentoRad').value;
+document.getElementById('bentoGapV').textContent=gap;
+document.getElementById('bentoRadV').textContent=rad;
+var g=document.getElementById('bentoGrid');
+g.style.gridTemplateColumns='repeat('+cols+',1fr)';
+g.style.gap=gap+'px';
+g.innerHTML=bentoItems.map(function(it){var sc=Math.min(it.w,cols);return '<div class="bento-item" style="grid-column:span '+sc+';grid-row:span '+it.h+';border-radius:'+rad+'px"><div class="icon">'+it.icon+'</div><h3>'+it.title+'</h3><p>'+it.desc+'</p></div>'}).join('');
+document.getElementById('prompt0').textContent='Create a bento grid with '+cols+' columns, '+gap+'px gap, '+rad+'px radius. Use asymmetric card sizes spanning multiple columns/rows for visual hierarchy. Add tap feedback with scale animation.';
+}
+updateBento();
+
+// CARDS
+var cardData=[
+{icon:'🚀',title:'Launch',desc:'Ship fast',back:'Move quickly and iterate. Speed is a feature.'},
+{icon:'🎨',title:'Design',desc:'Craft beauty',back:'Every pixel matters. Design is how it works.'},
+{icon:'🔮',title:'Explore',desc:'Discover new',back:'Curiosity drives innovation. Keep exploring.'}
+];
+function initCards(){
+var area=document.getElementById('cardsArea');
+area.innerHTML=cardData.map(function(c,i){return '<div class="flip-card" id="fc'+i+'" onclick="document.getElementById(\'fc'+i+'\').classList.toggle(\'flipped\')"><div class="flip-inner"><div class="flip-front"><div class="card-icon">'+c.icon+'</div><h3>'+c.title+'</h3><p>'+c.desc+'</p></div><div class="flip-back"><p>'+c.back+'</p></div></div></div>'}).join('');
+document.getElementById('prompt1').textContent='Create interactive flip cards that rotate 180deg on tap/click to reveal back content. Use perspective, preserve-3d, and backface-visibility. Smooth cubic-bezier transition. Cards have icon, title, description on front and detail text on back.';
+}
+initCards();
+
+// GLASS
+var palettes={purple:['#6c5ce7','#e84393','#a29bfe'],ocean:['#0984e3','#00cec9','#74b9ff'],sunset:['#e17055','#fdcb6e','#e84393'],neon:['#00ff88','#ff006e','#8338ec']};
+function updateGlass(){
+var blur=+document.getElementById('glassBlur').value,opacity=+document.getElementById('glassOpacity').value,pal=document.getElementById('glassPal').value;
+document.getElementById('glassBlurV').textContent=blur;
+document.getElementById('glassOpV').textContent=opacity+'%';
+var c=palettes[pal],scene=document.getElementById('glassScene');
+var cs='backdrop-filter:blur('+blur+'px);-webkit-backdrop-filter:blur('+blur+'px);background:rgba(255,255,255,'+(opacity/100)+');border:1px solid rgba(255,255,255,0.4);border-radius:14px;';
+scene.innerHTML='<div class="glass-bg" style="background:linear-gradient(135deg,'+c[0]+'44,'+c[2]+'44)"><div class="glass-blob" style="width:180px;height:180px;background:'+c[0]+';top:15%;left:8%"></div><div class="glass-blob" style="width:140px;height:140px;background:'+c[1]+';top:45%;left:50%;animation-delay:-3s"></div><div class="glass-blob" style="width:100px;height:100px;background:'+c[2]+';top:10%;left:60%;animation-delay:-5s"></div></div><div class="glass-card" style="'+cs+';top:30px;left:20px;width:220px"><h3>Dashboard</h3><p>Overview with real-time stats and alerts.</p></div><div class="glass-card" style="'+cs+';top:150px;left:140px;width:240px"><h3>Activity</h3><p>Recent updates from your team and projects.</p></div>';
+document.getElementById('prompt2').textContent='Create glassmorphism UI with backdrop-filter blur('+blur+'px), background rgba(255,255,255,'+(opacity/100).toFixed(2)+'), '+pal+' color palette. Animated gradient blobs behind frosted glass cards.';
+}
+updateGlass();
+
+// SCROLL
+var scrollData=[
+{title:'Start with Why',text:'Every great product begins with a purpose. Define yours first.'},
+{title:'Design the Experience',text:'Think in journeys, not screens. Map the emotional arc.'},
+{title:'Build with Care',text:'Performance is a feature. Accessibility is a requirement.'},
+{title:'Ship and Learn',text:'Launch, measure, iterate. The feedback loop is everything.'},
+{title:'Scale with Intent',text:'Growth without direction is just sprawl.'}
+];
+function initScroll(){
+var demo=document.getElementById('scrollDemo');
+demo.innerHTML='<div class="scroll-progress" id="scrollProg" style="width:0%"></div>'+scrollData.map(function(s,i){return '<div class="scroll-section" data-i="'+i+'"><h2>'+s.title+'</h2><p>'+s.text+'</p></div>'}).join('');
+demo.onscroll=function(){
+var prog=demo.scrollTop/(demo.scrollHeight-demo.clientHeight)*100;
+document.getElementById('scrollProg').style.width=prog+'%';
+demo.querySelectorAll('.scroll-section').forEach(function(sec){
+var r=sec.getBoundingClientRect(),dr=demo.getBoundingClientRect();
+sec.classList.toggle('visible',r.top<dr.bottom-60&&r.bottom>dr.top+60);
+});
+};
+setTimeout(function(){var f=demo.querySelector('.scroll-section');if(f)f.classList.add('visible')},300);
+document.getElementById('prompt3').textContent='Create scroll-driven reveal animations. Sections fade and slide up as they enter viewport. Sticky progress bar at top shows scroll position. Use IntersectionObserver for production.';
+}
+initScroll();
+
+// MOTION
+var motionItems=[
+{title:'Cursor-Aware Glow',desc:'Cards respond to touch/mouse with a radial gradient that follows contact point.'},
+{title:'Ripple Buttons',desc:'Tap triggers an expanding circle from point of contact.'},
+{title:'Staggered Entrance',desc:'Elements cascade into view with intentional timing.'}
+];
+function initMotion(){
+var area=document.getElementById('motionArea');
+area.innerHTML=motionItems.map(function(m,i){return '<div class="motion-card" style="transform:translateY(20px);opacity:0" ontouchmove="var r=this.getBoundingClientRect();this.style.setProperty(\'--mx\',((event.touches[0].clientX-r.left)/this.offsetWidth*100)+\'%\');this.style.setProperty(\'--my\',((event.touches[0].clientY-r.top)/this.offsetHeight*100)+\'%\');this.querySelector(\'.motion-card::after\')"><h3>'+m.title+'</h3><p>'+m.desc+'</p><button class="motion-btn">Explore</button></div>'}).join('');
+area.querySelectorAll('.motion-card').forEach(function(c,i){setTimeout(function(){c.style.transform='';c.style.opacity='1'},200*i)});
+document.getElementById('prompt4').textContent='Create motion narrative cards with touch-tracking radial glow, staggered entrance animation, and ripple effect buttons. Cards scale down slightly on press for tactile feedback.';
+}
+initMotion();
+</script>
+</body>
+</html>

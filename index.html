@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playgrounds Collection</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f7;color:#1a1a2e;min-height:100vh;padding:20px}
+h1{font-size:28px;font-weight:800;text-align:center;margin-bottom:4px}
+.sub{text-align:center;font-size:13px;color:#888;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;max-width:700px;margin:0 auto}
+.card{background:#fff;border:1px solid #e0e0e0;border-radius:14px;padding:20px 16px;text-align:center;text-decoration:none;color:#1a1a2e;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:all .3s}
+.card:active{transform:scale(.96);border-color:#e84393}
+.card .icon{font-size:36px;margin-bottom:10px;display:block}
+.card h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.card p{font-size:11px;color:#888;line-height:1.4}
+.tag{display:inline-block;font-size:10px;background:#f0e6ff;color:#6c5ce7;padding:2px 8px;border-radius:10px;margin-top:8px;font-weight:600}
+footer{text-align:center;margin-top:32px;font-size:11px;color:#aaa}
+</style>
+</head>
+<body>
+<h1>Playgrounds</h1>
+<p class="sub">12 interactive web experiments. Zero dependencies. Tap to explore.</p>
+<div class="grid">
+  <a class="card" href="trends2026.html"><span class="icon">🎨</span><h3>Web Trends</h3><p>Bento grids, glassmorphism, scroll animation, card play</p><span class="tag">Design</span></a>
+  <a class="card" href="coolstuff2026.html"><span class="icon">✨</span><h3>Cool Effects</h3><p>Particles, morphing shapes, gradients, typewriter, buttons</p><span class="tag">Effects</span></a>
+  <a class="card" href="physics2026.html"><span class="icon">🍎</span><h3>Physics</h3><p>Gravity balls, pendulums, springs, cloth simulation</p><span class="tag">Simulation</span></a>
+  <a class="card" href="audio2026.html"><span class="icon">🎵</span><h3>Audio</h3><p>Waveforms, visualizer, theremin, beat pad, sequencer</p><span class="tag">Sound</span></a>
+  <a class="card" href="genart2026.html"><span class="icon">🌀</span><h3>Generative Art</h3><p>Flow fields, spirograph, fractal trees, voronoi, circle packing</p><span class="tag">Art</span></a>
+  <a class="card" href="dataviz2026.html"><span class="icon">📊</span><h3>Data Viz</h3><p>Live charts, pie/donut, bar race, scatter plot, radar</p><span class="tag">Data</span></a>
+  <a class="card" href="3dworld2026.html"><span class="icon">🧊</span><h3>3D World</h3><p>Rotating cube, starfield, terrain, metaballs, tunnel</p><span class="tag">3D</span></a>
+  <a class="card" href="games2026.html"><span class="icon">🎮</span><h3>Mini Games</h3><p>Snake, breakout, flappy, memory match, reaction timer</p><span class="tag">Games</span></a>
+  <a class="card" href="cssart2026.html"><span class="icon">💅</span><h3>CSS Art</h3><p>Lava lamp, neon signs, spinners, gradients, hover zoo</p><span class="tag">CSS</span></a>
+  <a class="card" href="mathviz2026.html"><span class="icon">📐</span><h3>Math Viz</h3><p>Fourier, chaos game, Lissajous, Mandelbrot, wave interference</p><span class="tag">Math</span></a>
+  <a class="card" href="colortools2026.html"><span class="icon">🎯</span><h3>Color Tools</h3><p>Palette gen, contrast checker, shadows, color blindness sim</p><span class="tag">Tools</span></a>
+  <a class="card" href="nature2026.html"><span class="icon">🌿</span><h3>Nature</h3><p>Rain, fire, flocking, galaxy, aurora, ocean waves</p><span class="tag">Nature</span></a>
+</div>
+<footer>Built with Claude. Zero dependencies. 100% vanilla HTML/CSS/JS.</footer>
+</body>
+</html>

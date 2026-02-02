@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Math Visualizer 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #d2d2d7;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            background: #ffffff;
+            border-bottom: 1px solid #d2d2d7;
+            position: sticky;
+            top: 57px;
+            z-index: 99;
+            scrollbar-width: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            flex-shrink: 0;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            border-bottom-color: #007aff;
+            color: #007aff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 16px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        canvas {
+            display: block;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            touch-action: none;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .controls {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .control-group {
+            margin-bottom: 14px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #6e6e73;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 28px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+            width: 100%;
+            height: 4px;
+            background: #e5e5ea;
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+            margin-top: -8px;
+        }
+
+        input[type="range"]::-moz-range-track {
+            width: 100%;
+            height: 4px;
+            background: #e5e5ea;
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            display: inline-block;
+            font-size: 13px;
+            color: #1d1d1f;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        button {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+
+        button:active {
+            background: #0051d5;
+        }
+
+        button.secondary {
+            background: #e5e5ea;
+            color: #1d1d1f;
+        }
+
+        button.secondary:active {
+            background: #d1d1d6;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #ffffff;
+            color: #1d1d1f;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #86868b;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .canvas-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Math Visualizer 2026</h1>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="fourier">Fourier Drawing</div>
+        <div class="tab" data-tab="chaos">Chaos Game</div>
+        <div class="tab" data-tab="lissajous">Lissajous</div>
+        <div class="tab" data-tab="mandelbrot">Mandelbrot</div>
+        <div class="tab" data-tab="wave">Wave Interference</div>
+    </div>
+
+    <div id="fourier" class="tab-content active">
+        <div class="canvas-container">
+            <canvas id="fourierCanvas" width="800" height="600"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Circles: <span class="value-display" id="circlesValue">50</span></label>
+                <input type="range" id="circlesSlider" min="5" max="100" value="50">
+            </div>
+            <div class="control-group">
+                <label>Speed: <span class="value-display" id="speedValue">1.0x</span></label>
+                <input type="range" id="speedSlider" min="0.1" max="3" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <label>Trail Fade: <span class="value-display" id="fadeValue">200</span></label>
+                <input type="range" id="fadeSlider" min="50" max="500" value="200">
+            </div>
+            <button id="showCirclesBtn">Hide Circles</button>
+            <button class="secondary" id="clearFourierBtn">Clear & Draw New</button>
+            <div class="hint">Draw a shape on the canvas, then watch it get reconstructed by Fourier epicycles</div>
+        </div>
+    </div>
+
+    <div id="chaos" class="tab-content">
+        <div class="canvas-container">
+            <canvas id="chaosCanvas" width="800" height="800"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Vertices: <span class="value-display" id="verticesValue">3</span></label>
+                <input type="range" id="verticesSlider" min="3" max="6" value="3">
+            </div>
+            <div class="control-group">
+                <label>Jump Ratio: <span class="value-display" id="ratioValue">0.5</span></label>
+                <input type="range" id="ratioSlider" min="0.3" max="0.7" step="0.01" value="0.5">
+            </div>
+            <div class="control-group">
+                <label>Speed: <span class="value-display" id="chaosSpeedValue">100</span></label>
+                <input type="range" id="chaosSpeedSlider" min="10" max="500" value="100">
+            </div>
+            <div class="control-group">
+                <label>Dot Size: <span class="value-display" id="dotSizeValue">1</span></label>
+                <input type="range" id="dotSizeSlider" min="1" max="5" value="1">
+            </div>
+            <button class="secondary" id="resetChaosBtn">Reset</button>
+            <div class="hint">Chaos game: 3 vertices = Sierpinski triangle, 4 = square fractal, 5 = pentagon fractal</div>
+        </div>
+    </div>
+
+    <div id="lissajous" class="tab-content">
+        <div class="canvas-container">
+            <canvas id="lissajousCanvas" width="800" height="800"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Frequency A: <span class="value-display" id="freqAValue">3</span></label>
+                <input type="range" id="freqASlider" min="1" max="10" value="3">
+            </div>
+            <div class="control-group">
+                <label>Frequency B: <span class="value-display" id="freqBValue">2</span></label>
+                <input type="range" id="freqBSlider" min="1" max="10" value="2">
+            </div>
+            <div class="control-group">
+                <label>Phase: <span class="value-display" id="phaseValue">0.0</span></label>
+                <input type="range" id="phaseSlider" min="0" max="6.28" step="0.01" value="0">
+            </div>
+            <div class="control-group">
+                <label>Trail Length: <span class="value-display" id="trailValue">100</span></label>
+                <input type="range" id="trailSlider" min="20" max="500" value="100">
+            </div>
+            <div class="control-group">
+                <label>Color</label>
+                <select id="colorSelect">
+                    <option value="#007aff">Blue</option>
+                    <option value="#ff3b30">Red</option>
+                    <option value="#34c759">Green</option>
+                    <option value="#ff9500">Orange</option>
+                    <option value="#af52de">Purple</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="mandelbrot" class="tab-content">
+        <div class="canvas-container">
+            <canvas id="mandelbrotCanvas" width="800" height="800"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Max Iterations: <span class="value-display" id="iterValue">100</span></label>
+                <input type="range" id="iterSlider" min="50" max="500" step="10" value="100">
+            </div>
+            <div class="control-group">
+                <label>Color Scheme</label>
+                <select id="schemeSelect">
+                    <option value="classic">Classic</option>
+                    <option value="fire">Fire</option>
+                    <option value="ice">Ice</option>
+                    <option value="psychedelic">Psychedelic</option>
+                </select>
+            </div>
+            <button class="secondary" id="resetMandelbrotBtn">Reset View</button>
+            <div class="hint">Pinch to zoom, drag to pan. Tap to recenter and zoom in.</div>
+        </div>
+    </div>
+
+    <div id="wave" class="tab-content">
+        <div class="canvas-container">
+            <canvas id="waveCanvas" width="800" height="800"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Wavelength: <span class="value-display" id="wavelengthValue">30</span></label>
+                <input type="range" id="wavelengthSlider" min="10" max="100" value="30">
+            </div>
+            <div class="control-group">
+                <label>Amplitude: <span class="value-display" id="amplitudeValue">1.0</span></label>
+                <input type="range" id="amplitudeSlider" min="0.1" max="2" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <label>Decay: <span class="value-display" id="decayValue">0.02</span></label>
+                <input type="range" id="decaySlider" min="0.01" max="0.1" step="0.01" value="0.02">
+            </div>
+            <div class="control-group">
+                <label>Wave Color</label>
+                <select id="waveColorSelect">
+                    <option value="blue">Blue</option>
+                    <option value="red">Red</option>
+                    <option value="green">Green</option>
+                </select>
+            </div>
+            <button class="secondary" id="clearWaveBtn">Clear Sources</button>
+            <div class="hint">Tap on the canvas to place wave sources (max 2). Watch interference patterns emerge.</div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ============= FOURIER DRAWING =============
+        const fourierCanvas = document.getElementById('fourierCanvas');
+        const fourierCtx = fourierCanvas.getContext('2d');
+        let fourierDrawing = [];
+        let fourierPath = [];
+        let fourierTime = 0;
+        let fourierCoefficients = [];
+        let showCircles = true;
+        let isDrawing = false;
+
+        const circlesSlider = document.getElementById('circlesSlider');
+        const speedSlider = document.getElementById('speedSlider');
+        const fadeSlider = document.getElementById('fadeSlider');
+        const showCirclesBtn = document.getElementById('showCirclesBtn');
+        const clearFourierBtn = document.getElementById('clearFourierBtn');
+
+        circlesSlider.oninput = () => {
+            document.getElementById('circlesValue').textContent = circlesSlider.value;
+            if (fourierDrawing.length > 0) computeFourierCoefficients();
+        };
+        speedSlider.oninput = () => {
+            document.getElementById('speedValue').textContent = speedSlider.value + 'x';
+        };
+        fadeSlider.oninput = () => {
+            document.getElementById('fadeValue').textContent = fadeSlider.value;
+        };
+
+        showCirclesBtn.onclick = () => {
+            showCircles = !showCircles;
+            showCirclesBtn.textContent = showCircles ? 'Hide Circles' : 'Show Circles';
+        };
+
+        clearFourierBtn.onclick = () => {
+            fourierDrawing = [];
+            fourierPath = [];
+            fourierTime = 0;
+            fourierCoefficients = [];
+            fourierCtx.clearRect(0, 0, fourierCanvas.width, fourierCanvas.height);
+        };
+
+        function startFourierDrawing(e) {
+            isDrawing = true;
+            fourierDrawing = [];
+            fourierPath = [];
+            fourierTime = 0;
+            const rect = fourierCanvas.getBoundingClientRect();
+            const scaleX = fourierCanvas.width / rect.width;
+            const scaleY = fourierCanvas.height / rect.height;
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            fourierDrawing.push({x: x * scaleX, y: y * scaleY});
+        }
+
+        function continueFourierDrawing(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const rect = fourierCanvas.getBoundingClientRect();
+            const scaleX = fourierCanvas.width / rect.width;
+            const scaleY = fourierCanvas.height / rect.height;
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            fourierDrawing.push({x: x * scaleX, y: y * scaleY});
+        }
+
+        function endFourierDrawing() {
+            if (isDrawing && fourierDrawing.length > 0) {
+                computeFourierCoefficients();
+            }
+            isDrawing = false;
+        }
+
+        fourierCanvas.addEventListener('mousedown', startFourierDrawing);
+        fourierCanvas.addEventListener('mousemove', continueFourierDrawing);
+        fourierCanvas.addEventListener('mouseup', endFourierDrawing);
+        fourierCanvas.addEventListener('touchstart', startFourierDrawing);
+        fourierCanvas.addEventListener('touchmove', continueFourierDrawing);
+        fourierCanvas.addEventListener('touchend', endFourierDrawing);
+
+        function dft(signal) {
+            const N = signal.length;
+            const numCircles = parseInt(circlesSlider.value);
+            const coeffs = [];
+
+            for (let k = 0; k < numCircles; k++) {
+                let re = 0, im = 0;
+                const freq = k - Math.floor(numCircles / 2);
+
+                for (let n = 0; n < N; n++) {
+                    const phi = (2 * Math.PI * freq * n) / N;
+                    re += signal[n].x * Math.cos(phi) + signal[n].y * Math.sin(phi);
+                    im += -signal[n].x * Math.sin(phi) + signal[n].y * Math.cos(phi);
+                }
+
+                re /= N;
+                im /= N;
+
+                const amp = Math.sqrt(re * re + im * im);
+                const phase = Math.atan2(im, re);
+                coeffs.push({freq, amp, phase});
+            }
+
+            coeffs.sort((a, b) => b.amp - a.amp);
+            return coeffs;
+        }
+
+        function computeFourierCoefficients() {
+            if (fourierDrawing.length < 3) return;
+            fourierCoefficients = dft(fourierDrawing);
+            fourierTime = 0;
+            fourierPath = [];
+        }
+
+        function animateFourier() {
+            fourierCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            fourierCtx.fillRect(0, 0, fourierCanvas.width, fourierCanvas.height);
+
+            if (fourierCoefficients.length === 0) {
+                requestAnimationFrame(animateFourier);
+                return;
+            }
+
+            const dt = (2 * Math.PI) / fourierDrawing.length;
+            const speed = parseFloat(speedSlider.value);
+
+            let x = fourierCanvas.width / 2;
+            let y = fourierCanvas.height / 2;
+
+            if (showCircles) {
+                fourierCtx.strokeStyle = 'rgba(0, 122, 255, 0.3)';
+                fourierCtx.lineWidth = 1;
+            }
+
+            for (let i = 0; i < fourierCoefficients.length; i++) {
+                const {freq, amp, phase} = fourierCoefficients[i];
+                const angle = freq * fourierTime + phase;
+
+                const prevX = x;
+                const prevY = y;
+
+                x += amp * Math.cos(angle);
+                y += amp * Math.sin(angle);
+
+                if (showCircles) {
+                    fourierCtx.beginPath();
+                    fourierCtx.arc(prevX, prevY, amp, 0, Math.PI * 2);
+                    fourierCtx.stroke();
+
+                    fourierCtx.beginPath();
+                    fourierCtx.moveTo(prevX, prevY);
+                    fourierCtx.lineTo(x, y);
+                    fourierCtx.stroke();
+                }
+            }
+
+            fourierPath.push({x, y});
+
+            const maxTrail = parseInt(fadeSlider.value);
+            if (fourierPath.length > maxTrail) {
+                fourierPath.shift();
+            }
+
+            fourierCtx.strokeStyle = '#007aff';
+            fourierCtx.lineWidth = 2;
+            fourierCtx.beginPath();
+            for (let i = 0; i < fourierPath.length; i++) {
+                if (i === 0) {
+                    fourierCtx.moveTo(fourierPath[i].x, fourierPath[i].y);
+                } else {
+                    fourierCtx.lineTo(fourierPath[i].x, fourierPath[i].y);
+                }
+            }
+            fourierCtx.stroke();
+
+            fourierTime += dt * speed;
+            if (fourierTime > 2 * Math.PI) {
+                fourierTime = 0;
+                fourierPath = [];
+            }
+
+            requestAnimationFrame(animateFourier);
+        }
+
+        animateFourier();
+
+        // ============= CHAOS GAME =============
+        const chaosCanvas = document.getElementById('chaosCanvas');
+        const chaosCtx = chaosCanvas.getContext('2d');
+        let chaosVertices = [];
+        let chaosPoint = null;
+        let chaosAnimationId = null;
+
+        const verticesSlider = document.getElementById('verticesSlider');
+        const ratioSlider = document.getElementById('ratioSlider');
+        const chaosSpeedSlider = document.getElementById('chaosSpeedSlider');
+        const dotSizeSlider = document.getElementById('dotSizeSlider');
+        const resetChaosBtn = document.getElementById('resetChaosBtn');
+
+        verticesSlider.oninput = () => {
+            document.getElementById('verticesValue').textContent = verticesSlider.value;
+            resetChaos();
+        };
+        ratioSlider.oninput = () => {
+            document.getElementById('ratioValue').textContent = parseFloat(ratioSlider.value).toFixed(2);
+        };
+        chaosSpeedSlider.oninput = () => {
+            document.getElementById('chaosSpeedValue').textContent = chaosSpeedSlider.value;
+        };
+        dotSizeSlider.oninput = () => {
+            document.getElementById('dotSizeValue').textContent = dotSizeSlider.value;
+        };
+        resetChaosBtn.onclick = resetChaos;
+
+        function resetChaos() {
+            chaosCtx.fillStyle = '#ffffff';
+            chaosCtx.fillRect(0, 0, chaosCanvas.width, chaosCanvas.height);
+
+            const n = parseInt(verticesSlider.value);
+            const centerX = chaosCanvas.width / 2;
+            const centerY = chaosCanvas.height / 2;
+            const radius = Math.min(centerX, centerY) * 0.85;
+
+            chaosVertices = [];
+            for (let i = 0; i < n; i++) {
+                const angle = (2 * Math.PI * i) / n - Math.PI / 2;
+                chaosVertices.push({
+                    x: centerX + radius * Math.cos(angle),
+                    y: centerY + radius * Math.sin(angle)
+                });
+            }
+
+            chaosPoint = {
+                x: centerX + (Math.random() - 0.5) * radius * 0.5,
+                y: centerY + (Math.random() - 0.5) * radius * 0.5
+            };
+
+            chaosCtx.fillStyle = '#007aff';
+            chaosVertices.forEach(v => {
+                chaosCtx.beginPath();
+                chaosCtx.arc(v.x, v.y, 5, 0, Math.PI * 2);
+                chaosCtx.fill();
+            });
+        }
+
+        function animateChaos() {
+            const speed = parseInt(chaosSpeedSlider.value);
+            const ratio = parseFloat(ratioSlider.value);
+            const dotSize = parseInt(dotSizeSlider.value);
+
+            chaosCtx.fillStyle = '#1d1d1f';
+
+            for (let i = 0; i < speed; i++) {
+                const vertex = chaosVertices[Math.floor(Math.random() * chaosVertices.length)];
+                chaosPoint.x += (vertex.x - chaosPoint.x) * ratio;
+                chaosPoint.y += (vertex.y - chaosPoint.y) * ratio;
+
+                chaosCtx.fillRect(chaosPoint.x, chaosPoint.y, dotSize, dotSize);
+            }
+
+            requestAnimationFrame(animateChaos);
+        }
+
+        resetChaos();
+        animateChaos();
+
+        // ============= LISSAJOUS =============
+        const lissajousCanvas = document.getElementById('lissajousCanvas');
+        const lissajousCtx = lissajousCanvas.getContext('2d');
+        let lissajousT = 0;
+        let lissajousTrail = [];
+
+        const freqASlider = document.getElementById('freqASlider');
+        const freqBSlider = document.getElementById('freqBSlider');
+        const phaseSlider = document.getElementById('phaseSlider');
+        const trailSlider = document.getElementById('trailSlider');
+        const colorSelect = document.getElementById('colorSelect');
+
+        freqASlider.oninput = () => {
+            document.getElementById('freqAValue').textContent = freqASlider.value;
+            lissajousTrail = [];
+        };
+        freqBSlider.oninput = () => {
+            document.getElementById('freqBValue').textContent = freqBSlider.value;
+            lissajousTrail = [];
+        };
+        phaseSlider.oninput = () => {
+            document.getElementById('phaseValue').textContent = parseFloat(phaseSlider.value).toFixed(2);
+            lissajousTrail = [];
+        };
+        trailSlider.oninput = () => {
+            document.getElementById('trailValue').textContent = trailSlider.value;
+        };
+        colorSelect.onchange = () => {
+            lissajousTrail = [];
+        };
+
+        function animateLissajous() {
+            lissajousCtx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            lissajousCtx.fillRect(0, 0, lissajousCanvas.width, lissajousCanvas.height);
+
+            const a = parseInt(freqASlider.value);
+            const b = parseInt(freqBSlider.value);
+            const phase = parseFloat(phaseSlider.value);
+            const centerX = lissajousCanvas.width / 2;
+            const centerY = lissajousCanvas.height / 2;
+            const scale = Math.min(centerX, centerY) * 0.8;
+
+            const x = centerX + scale * Math.sin(a * lissajousT);
+            const y = centerY + scale * Math.sin(b * lissajousT + phase);
+
+            lissajousTrail.push({x, y});
+            const maxTrail = parseInt(trailSlider.value);
+            if (lissajousTrail.length > maxTrail) {
+                lissajousTrail.shift();
+            }
+
+            lissajousCtx.strokeStyle = colorSelect.value;
+            lissajousCtx.lineWidth = 2;
+            lissajousCtx.beginPath();
+            for (let i = 0; i < lissajousTrail.length; i++) {
+                if (i === 0) {
+                    lissajousCtx.moveTo(lissajousTrail[i].x, lissajousTrail[i].y);
+                } else {
+                    lissajousCtx.lineTo(lissajousTrail[i].x, lissajousTrail[i].y);
+                }
+            }
+            lissajousCtx.stroke();
+
+            lissajousCtx.fillStyle = colorSelect.value;
+            lissajousCtx.beginPath();
+            lissajousCtx.arc(x, y, 4, 0, Math.PI * 2);
+            lissajousCtx.fill();
+
+            lissajousT += 0.02;
+
+            requestAnimationFrame(animateLissajous);
+        }
+
+        animateLissajous();
+
+        // ============= MANDELBROT =============
+        const mandelbrotCanvas = document.getElementById('mandelbrotCanvas');
+        const mandelbrotCtx = mandelbrotCanvas.getContext('2d');
+        let mandelbrotView = {
+            centerX: -0.5,
+            centerY: 0,
+            scale: 3
+        };
+        let mandelbrotTouches = [];
+        let mandelbrotInitialDistance = 0;
+        let mandelbrotInitialScale = 1;
+        let mandelbrotDragging = false;
+        let mandelbrotDragStart = null;
+
+        const iterSlider = document.getElementById('iterSlider');
+        const schemeSelect = document.getElementById('schemeSelect');
+        const resetMandelbrotBtn = document.getElementById('resetMandelbrotBtn');
+
+        iterSlider.oninput = () => {
+            document.getElementById('iterValue').textContent = iterSlider.value;
+            renderMandelbrot();
+        };
+        schemeSelect.onchange = () => {
+            renderMandelbrot();
+        };
+        resetMandelbrotBtn.onclick = () => {
+            mandelbrotView = {centerX: -0.5, centerY: 0, scale: 3};
+            renderMandelbrot();
+        };
+
+        function getColorScheme(iterations, maxIter, scheme) {
+            if (iterations === maxIter) return [0, 0, 0];
+
+            const t = iterations / maxIter;
+
+            switch(scheme) {
+                case 'classic':
+                    return [
+                        Math.floor(9 * (1 - t) * t * t * t * 255),
+                        Math.floor(15 * (1 - t) * (1 - t) * t * t * 255),
+                        Math.floor(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255)
+                    ];
+                case 'fire':
+                    return [
+                        Math.floor(255 * t),
+                        Math.floor(255 * t * t),
+                        Math.floor(50 * t * t * t)
+                    ];
+                case 'ice':
+                    return [
+                        Math.floor(100 * t * t),
+                        Math.floor(150 * t),
+                        Math.floor(255 * Math.sqrt(t))
+                    ];
+                case 'psychedelic':
+                    return [
+                        Math.floor(128 + 127 * Math.sin(t * Math.PI * 4)),
+                        Math.floor(128 + 127 * Math.sin(t * Math.PI * 4 + 2)),
+                        Math.floor(128 + 127 * Math.sin(t * Math.PI * 4 + 4))
+                    ];
+                default:
+                    return [0, 0, 0];
+            }
+        }
+
+        function mandelbrot(cx, cy, maxIter) {
+            let x = 0, y = 0;
+            let iter = 0;
+
+            while (x * x + y * y <= 4 && iter < maxIter) {
+                const xTemp = x * x - y * y + cx;
+                y = 2 * x * y + cy;
+                x = xTemp;
+                iter++;
+            }
+
+            return iter;
+        }
+
+        function renderMandelbrot() {
+            const maxIter = parseInt(iterSlider.value);
+            const scheme = schemeSelect.value;
+            const imageData = mandelbrotCtx.createImageData(mandelbrotCanvas.width, mandelbrotCanvas.height);
+            const data = imageData.data;
+
+            const {centerX, centerY, scale} = mandelbrotView;
+
+            for (let py = 0; py < mandelbrotCanvas.height; py++) {
+                for (let px = 0; px < mandelbrotCanvas.width; px++) {
+                    const x = centerX + (px - mandelbrotCanvas.width / 2) * (scale / mandelbrotCanvas.width);
+                    const y = centerY + (py - mandelbrotCanvas.height / 2) * (scale / mandelbrotCanvas.height);
+
+                    const iterations = mandelbrot(x, y, maxIter);
+                    const [r, g, b] = getColorScheme(iterations, maxIter, scheme);
+
+                    const idx = (py * mandelbrotCanvas.width + px) * 4;
+                    data[idx] = r;
+                    data[idx + 1] = g;
+                    data[idx + 2] = b;
+                    data[idx + 3] = 255;
+                }
+            }
+
+            mandelbrotCtx.putImageData(imageData, 0, 0);
+        }
+
+        mandelbrotCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            mandelbrotTouches = Array.from(e.touches);
+
+            if (mandelbrotTouches.length === 2) {
+                const dx = mandelbrotTouches[0].clientX - mandelbrotTouches[1].clientX;
+                const dy = mandelbrotTouches[0].clientY - mandelbrotTouches[1].clientY;
+                mandelbrotInitialDistance = Math.sqrt(dx * dx + dy * dy);
+                mandelbrotInitialScale = mandelbrotView.scale;
+            } else if (mandelbrotTouches.length === 1) {
+                mandelbrotDragging = true;
+                const rect = mandelbrotCanvas.getBoundingClientRect();
+                mandelbrotDragStart = {
+                    x: mandelbrotTouches[0].clientX - rect.left,
+                    y: mandelbrotTouches[0].clientY - rect.top,
+                    centerX: mandelbrotView.centerX,
+                    centerY: mandelbrotView.centerY
+                };
+            }
+        });
+
+        mandelbrotCanvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            mandelbrotTouches = Array.from(e.touches);
+
+            if (mandelbrotTouches.length === 2) {
+                const dx = mandelbrotTouches[0].clientX - mandelbrotTouches[1].clientX;
+                const dy = mandelbrotTouches[0].clientY - mandelbrotTouches[1].clientY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const scaleFactor = mandelbrotInitialDistance / distance;
+                mandelbrotView.scale = mandelbrotInitialScale * scaleFactor;
+                renderMandelbrot();
+            } else if (mandelbrotTouches.length === 1 && mandelbrotDragging) {
+                const rect = mandelbrotCanvas.getBoundingClientRect();
+                const x = mandelbrotTouches[0].clientX - rect.left;
+                const y = mandelbrotTouches[0].clientY - rect.top;
+                const dx = (x - mandelbrotDragStart.x) * (mandelbrotView.scale / mandelbrotCanvas.width);
+                const dy = (y - mandelbrotDragStart.y) * (mandelbrotView.scale / mandelbrotCanvas.height);
+                mandelbrotView.centerX = mandelbrotDragStart.centerX - dx;
+                mandelbrotView.centerY = mandelbrotDragStart.centerY - dy;
+                renderMandelbrot();
+            }
+        });
+
+        mandelbrotCanvas.addEventListener('touchend', (e) => {
+            if (e.touches.length === 0) {
+                if (!mandelbrotDragging && mandelbrotTouches.length === 1) {
+                    const rect = mandelbrotCanvas.getBoundingClientRect();
+                    const x = mandelbrotTouches[0].clientX - rect.left;
+                    const y = mandelbrotTouches[0].clientY - rect.top;
+                    mandelbrotView.centerX += (x - mandelbrotCanvas.width / 2) * (mandelbrotView.scale / mandelbrotCanvas.width);
+                    mandelbrotView.centerY += (y - mandelbrotCanvas.height / 2) * (mandelbrotView.scale / mandelbrotCanvas.height);
+                    mandelbrotView.scale *= 0.5;
+                    renderMandelbrot();
+                }
+                mandelbrotDragging = false;
+                mandelbrotDragStart = null;
+            }
+            mandelbrotTouches = Array.from(e.touches);
+        });
+
+        renderMandelbrot();
+
+        // ============= WAVE INTERFERENCE =============
+        const waveCanvas = document.getElementById('waveCanvas');
+        const waveCtx = waveCanvas.getContext('2d');
+        let waveSources = [];
+        let waveTime = 0;
+
+        const wavelengthSlider = document.getElementById('wavelengthSlider');
+        const amplitudeSlider = document.getElementById('amplitudeSlider');
+        const decaySlider = document.getElementById('decaySlider');
+        const waveColorSelect = document.getElementById('waveColorSelect');
+        const clearWaveBtn = document.getElementById('clearWaveBtn');
+
+        wavelengthSlider.oninput = () => {
+            document.getElementById('wavelengthValue').textContent = wavelengthSlider.value;
+        };
+        amplitudeSlider.oninput = () => {
+            document.getElementById('amplitudeValue').textContent = parseFloat(amplitudeSlider.value).toFixed(1);
+        };
+        decaySlider.oninput = () => {
+            document.getElementById('decayValue').textContent = parseFloat(decaySlider.value).toFixed(2);
+        };
+        clearWaveBtn.onclick = () => {
+            waveSources = [];
+        };
+
+        waveCanvas.addEventListener('click', (e) => {
+            if (waveSources.length >= 2) {
+                waveSources = [];
+            }
+            const rect = waveCanvas.getBoundingClientRect();
+            const scaleX = waveCanvas.width / rect.width;
+            const scaleY = waveCanvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            waveSources.push({x, y});
+        });
+
+        waveCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (waveSources.length >= 2) {
+                waveSources = [];
+            }
+            const rect = waveCanvas.getBoundingClientRect();
+            const scaleX = waveCanvas.width / rect.width;
+            const scaleY = waveCanvas.height / rect.height;
+            const x = (e.touches[0].clientX - rect.left) * scaleX;
+            const y = (e.touches[0].clientY - rect.top) * scaleY;
+            waveSources.push({x, y});
+        });
+
+        function animateWave() {
+            waveCtx.fillStyle = '#ffffff';
+            waveCtx.fillRect(0, 0, waveCanvas.width, waveCanvas.height);
+
+            if (waveSources.length === 0) {
+                waveCtx.fillStyle = '#86868b';
+                waveCtx.font = '16px -apple-system, system-ui';
+                waveCtx.textAlign = 'center';
+                waveCtx.fillText('Tap to place wave sources', waveCanvas.width / 2, waveCanvas.height / 2);
+                requestAnimationFrame(animateWave);
+                return;
+            }
+
+            const wavelength = parseFloat(wavelengthSlider.value);
+            const amplitude = parseFloat(amplitudeSlider.value);
+            const decay = parseFloat(decaySlider.value);
+            const waveColor = waveColorSelect.value;
+
+            const imageData = waveCtx.createImageData(waveCanvas.width, waveCanvas.height);
+            const data = imageData.data;
+
+            const step = 4;
+            for (let y = 0; y < waveCanvas.height; y += step) {
+                for (let x = 0; x < waveCanvas.width; x += step) {
+                    let sum = 0;
+
+                    for (const source of waveSources) {
+                        const dx = x - source.x;
+                        const dy = y - source.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const wave = amplitude * Math.sin(2 * Math.PI * (dist / wavelength) - waveTime) * Math.exp(-decay * dist / wavelength);
+                        sum += wave;
+                    }
+
+                    const intensity = Math.max(0, Math.min(1, (sum + 2) / 4));
+
+                    let r, g, b;
+                    if (waveColor === 'blue') {
+                        r = Math.floor(255 * (1 - intensity * 0.5));
+                        g = Math.floor(255 * (1 - intensity * 0.3));
+                        b = 255;
+                    } else if (waveColor === 'red') {
+                        r = 255;
+                        g = Math.floor(255 * (1 - intensity * 0.3));
+                        b = Math.floor(255 * (1 - intensity * 0.5));
+                    } else {
+                        r = Math.floor(255 * (1 - intensity * 0.5));
+                        g = 255;
+                        b = Math.floor(255 * (1 - intensity * 0.3));
+                    }
+
+                    for (let dy = 0; dy < step; dy++) {
+                        for (let dx = 0; dx < step; dx++) {
+                            const idx = ((y + dy) * waveCanvas.width + (x + dx)) * 4;
+                            if (idx < data.length) {
+                                data[idx] = r;
+                                data[idx + 1] = g;
+                                data[idx + 2] = b;
+                                data[idx + 3] = 255;
+                            }
+                        }
+                    }
+                }
+            }
+
+            waveCtx.putImageData(imageData, 0, 0);
+
+            waveCtx.fillStyle = '#007aff';
+            for (const source of waveSources) {
+                waveCtx.beginPath();
+                waveCtx.arc(source.x, source.y, 6, 0, Math.PI * 2);
+                waveCtx.fill();
+            }
+
+            waveTime += 0.1;
+
+            requestAnimationFrame(animateWave);
+        }
+
+        animateWave();
+
+        // Resize canvases on orientation change
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                const canvases = [fourierCanvas, chaosCanvas, lissajousCanvas, mandelbrotCanvas, waveCanvas];
+                canvases.forEach(canvas => {
+                    const rect = canvas.getBoundingClientRect();
+                    if (canvas === fourierCanvas) {
+                        canvas.width = Math.floor(rect.width * window.devicePixelRatio);
+                        canvas.height = Math.floor(rect.width * 0.75 * window.devicePixelRatio);
+                    } else {
+                        canvas.width = Math.floor(rect.width * window.devicePixelRatio);
+                        canvas.height = Math.floor(rect.width * window.devicePixelRatio);
+                    }
+                });
+
+                if (mandelbrotView) renderMandelbrot();
+                if (chaosVertices.length > 0) resetChaos();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

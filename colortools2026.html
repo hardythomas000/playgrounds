@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Color Tools 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            padding-bottom: 2rem;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        header {
+            background: white;
+            padding: 1.5rem 1rem 0;
+            border-bottom: 1px solid #d2d2d7;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 1rem;
+        }
+
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            background: #f5f5f7;
+            border: none;
+            padding: 0.625rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1d1d1f;
+        }
+
+        .tab-btn.active {
+            background: #0071e3;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1.5rem 1rem;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .control-group {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #86868b;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 32px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            margin: 0.5rem 0;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+            width: 100%;
+            height: 4px;
+            background: #d2d2d7;
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #0071e3;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -10px;
+        }
+
+        input[type="range"]::-moz-range-track {
+            width: 100%;
+            height: 4px;
+            background: #d2d2d7;
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #0071e3;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            font-family: inherit;
+        }
+
+        .value-display {
+            display: inline-block;
+            float: right;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .color-swatch {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .color-swatch:active {
+            transform: scale(0.95);
+        }
+
+        .color-swatch-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .contrast-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .color-picker-group {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .color-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #d2d2d7;
+        }
+
+        .contrast-result {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .ratio-display {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #0071e3;
+        }
+
+        .wcag-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .wcag-badge {
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .wcag-badge.pass {
+            background: #d1f4e0;
+            color: #0a6e31;
+        }
+
+        .wcag-badge.fail {
+            background: #ffe5e5;
+            color: #c41e3a;
+        }
+
+        .text-preview {
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .text-preview p {
+            margin-bottom: 0.5rem;
+        }
+
+        .shadow-preview {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+        }
+
+        .shadow-card {
+            width: 200px;
+            height: 150px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #86868b;
+        }
+
+        .css-output {
+            background: #1d1d1f;
+            color: #f5f5f7;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: #0071e3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .btn:active {
+            background: #0051a8;
+        }
+
+        .btn-secondary {
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .btn-secondary:active {
+            background: #e5e5e7;
+        }
+
+        .sim-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .sim-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .sim-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .sim-preview {
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .sim-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .noise-preview {
+            width: 100%;
+            height: 250px;
+            border-radius: 12px;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .noise-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1d1d1f;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .hue-slider::-webkit-slider-track {
+            background: linear-gradient(to right,
+                hsl(0, 100%, 50%),
+                hsl(60, 100%, 50%),
+                hsl(120, 100%, 50%),
+                hsl(180, 100%, 50%),
+                hsl(240, 100%, 50%),
+                hsl(300, 100%, 50%),
+                hsl(360, 100%, 50%)
+            );
+        }
+
+        .hue-slider::-moz-range-track {
+            background: linear-gradient(to right,
+                hsl(0, 100%, 50%),
+                hsl(60, 100%, 50%),
+                hsl(120, 100%, 50%),
+                hsl(180, 100%, 50%),
+                hsl(240, 100%, 50%),
+                hsl(300, 100%, 50%),
+                hsl(360, 100%, 50%)
+            );
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Color Tools 2026</h1>
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="palette">Palette Generator</button>
+            <button class="tab-btn" data-tab="contrast">Contrast Checker</button>
+            <button class="tab-btn" data-tab="shadows">Shadows</button>
+            <button class="tab-btn" data-tab="colorblind">Color Blindness</button>
+            <button class="tab-btn" data-tab="noise">Noise Textures</button>
+        </nav>
+    </header>
+
+    <div id="palette" class="tab-content active">
+        <div class="control-group">
+            <label>Base Hue <span class="value-display" id="hue-val">180</span></label>
+            <input type="range" id="hue" class="hue-slider" min="0" max="360" value="180">
+        </div>
+
+        <div class="control-group">
+            <label>Harmony Type</label>
+            <select id="harmony">
+                <option value="complementary">Complementary</option>
+                <option value="analogous">Analogous</option>
+                <option value="triadic">Triadic</option>
+                <option value="split-complementary">Split-Complementary</option>
+                <option value="tetradic">Tetradic</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Saturation <span class="value-display" id="sat-val">70%</span></label>
+            <input type="range" id="saturation" min="0" max="100" value="70">
+        </div>
+
+        <div class="control-group">
+            <label>Lightness <span class="value-display" id="light-val">50%</span></label>
+            <input type="range" id="lightness" min="0" max="100" value="50">
+        </div>
+
+        <div class="palette-grid" id="palette-grid"></div>
+    </div>
+
+    <div id="contrast" class="tab-content">
+        <div class="contrast-grid">
+            <div class="color-picker-group">
+                <label>Foreground</label>
+                <div class="color-preview" id="fg-preview" style="background: #1d1d1f;"></div>
+                <label>Hue <span class="value-display" id="fg-hue-val">0</span></label>
+                <input type="range" class="hue-slider" id="fg-hue" min="0" max="360" value="0">
+                <label>Saturation <span class="value-display" id="fg-sat-val">0%</span></label>
+                <input type="range" id="fg-sat" min="0" max="100" value="0">
+                <label>Lightness <span class="value-display" id="fg-light-val">11%</span></label>
+                <input type="range" id="fg-light" min="0" max="100" value="11">
+            </div>
+
+            <div class="color-picker-group">
+                <label>Background</label>
+                <div class="color-preview" id="bg-preview" style="background: #ffffff;"></div>
+                <label>Hue <span class="value-display" id="bg-hue-val">0</span></label>
+                <input type="range" class="hue-slider" id="bg-hue" min="0" max="360" value="0">
+                <label>Saturation <span class="value-display" id="bg-sat-val">0%</span></label>
+                <input type="range" id="bg-sat" min="0" max="100" value="0">
+                <label>Lightness <span class="value-display" id="bg-light-val">100%</span></label>
+                <input type="range" id="bg-light" min="0" max="100" value="100">
+            </div>
+        </div>
+
+        <button class="btn btn-secondary" id="swap-colors">Swap Colors</button>
+
+        <div class="contrast-result">
+            <div class="ratio-display" id="ratio-display">21:1</div>
+            <div class="wcag-grid">
+                <div class="wcag-badge pass">
+                    <div>AA Normal</div>
+                    <div style="font-size: 0.875rem; margin-top: 0.25rem;">PASS</div>
+                </div>
+                <div class="wcag-badge pass">
+                    <div>AA Large</div>
+                    <div style="font-size: 0.875rem; margin-top: 0.25rem;">PASS</div>
+                </div>
+                <div class="wcag-badge pass" id="aaa-normal">
+                    <div>AAA Normal</div>
+                    <div style="font-size: 0.875rem; margin-top: 0.25rem;">PASS</div>
+                </div>
+                <div class="wcag-badge pass" id="aaa-large">
+                    <div>AAA Large</div>
+                    <div style="font-size: 0.875rem; margin-top: 0.25rem;">PASS</div>
+                </div>
+            </div>
+            <div class="text-preview" id="text-preview">
+                <p style="font-size: 1rem;">Normal text example (16px)</p>
+                <p style="font-size: 1.25rem; font-weight: 600;">Large text example (18px bold)</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="shadows" class="tab-content">
+        <div class="shadow-preview">
+            <div class="shadow-card" id="shadow-card">Shadow Preview</div>
+        </div>
+
+        <div class="control-group">
+            <label>X Offset <span class="value-display" id="shadow-x-val">0px</span></label>
+            <input type="range" id="shadow-x" min="-50" max="50" value="0">
+        </div>
+
+        <div class="control-group">
+            <label>Y Offset <span class="value-display" id="shadow-y-val">4px</span></label>
+            <input type="range" id="shadow-y" min="-50" max="50" value="4">
+        </div>
+
+        <div class="control-group">
+            <label>Blur <span class="value-display" id="shadow-blur-val">12px</span></label>
+            <input type="range" id="shadow-blur" min="0" max="100" value="12">
+        </div>
+
+        <div class="control-group">
+            <label>Spread <span class="value-display" id="shadow-spread-val">0px</span></label>
+            <input type="range" id="shadow-spread" min="-20" max="20" value="0">
+        </div>
+
+        <div class="control-group">
+            <label>Shadow Hue <span class="value-display" id="shadow-hue-val">0</span></label>
+            <input type="range" class="hue-slider" id="shadow-hue" min="0" max="360" value="0">
+        </div>
+
+        <div class="control-group">
+            <label>Opacity <span class="value-display" id="shadow-opacity-val">0.1</span></label>
+            <input type="range" id="shadow-opacity" min="0" max="100" value="10">
+        </div>
+
+        <div class="css-output" id="shadow-css">box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);</div>
+        <button class="btn" id="copy-shadow">Copy CSS</button>
+    </div>
+
+    <div id="colorblind" class="tab-content">
+        <div class="control-group">
+            <label>Test Palette Colors</label>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
+                <div>
+                    <label style="font-size: 0.75rem;">Color 1 Hue</label>
+                    <input type="range" class="hue-slider" id="cb-hue1" min="0" max="360" value="0" style="margin: 0.25rem 0;">
+                </div>
+                <div>
+                    <label style="font-size: 0.75rem;">Color 2 Hue</label>
+                    <input type="range" class="hue-slider" id="cb-hue2" min="0" max="360" value="120" style="margin: 0.25rem 0;">
+                </div>
+                <div>
+                    <label style="font-size: 0.75rem;">Color 3 Hue</label>
+                    <input type="range" class="hue-slider" id="cb-hue3" min="0" max="360" value="240" style="margin: 0.25rem 0;">
+                </div>
+                <div>
+                    <label style="font-size: 0.75rem;">Color 4 Hue</label>
+                    <input type="range" class="hue-slider" id="cb-hue4" min="0" max="360" value="60" style="margin: 0.25rem 0;">
+                </div>
+            </div>
+        </div>
+
+        <div class="sim-grid" id="sim-grid"></div>
+    </div>
+
+    <div id="noise" class="tab-content">
+        <div class="noise-preview">
+            <canvas class="noise-canvas" id="noise-canvas"></canvas>
+        </div>
+
+        <div class="control-group">
+            <label>Pattern Type</label>
+            <select id="noise-type">
+                <option value="dots">Dots</option>
+                <option value="lines">Lines</option>
+                <option value="crosshatch">Crosshatch</option>
+                <option value="grain">Grain</option>
+                <option value="waves">Waves</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Density <span class="value-display" id="noise-density-val">50</span></label>
+            <input type="range" id="noise-density" min="10" max="100" value="50">
+        </div>
+
+        <div class="control-group">
+            <label>Color Hue <span class="value-display" id="noise-hue-val">0</span></label>
+            <input type="range" class="hue-slider" id="noise-hue" min="0" max="360" value="0">
+        </div>
+
+        <div class="control-group">
+            <label>Opacity <span class="value-display" id="noise-opacity-val">0.5</span></label>
+            <input type="range" id="noise-opacity" min="0" max="100" value="50">
+        </div>
+
+        <div class="css-output" id="noise-css">/* CSS pattern code will appear here */</div>
+        <button class="btn" id="copy-noise">Copy CSS</button>
+    </div>
+
+    <div class="toast" id="toast">Copied to clipboard!</div>
+
+    <script>
+        // Utility functions
+        function hslToRgb(h, s, l) {
+            h = h / 360;
+            s = s / 100;
+            l = l / 100;
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+
+            return {
+                r: Math.round(r * 255),
+                g: Math.round(g * 255),
+                b: Math.round(b * 255)
+            };
+        }
+
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => {
+                const hex = x.toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+
+        function hslToHex(h, s, l) {
+            const rgb = hslToRgb(h, s, l);
+            return rgbToHex(rgb.r, rgb.g, rgb.b);
+        }
+
+        function getLuminance(r, g, b) {
+            const [rs, gs, bs] = [r, g, b].map(c => {
+                c = c / 255;
+                return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+            });
+            return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+        }
+
+        function getContrastRatio(fg, bg) {
+            const l1 = getLuminance(fg.r, fg.g, fg.b);
+            const l2 = getLuminance(bg.r, bg.g, bg.b);
+            const lighter = Math.max(l1, l2);
+            const darker = Math.min(l1, l2);
+            return (lighter + 0.05) / (darker + 0.05);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast('Copied to clipboard!');
+            } catch (err) {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('Copied to clipboard!');
+            }
+        }
+
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tab).classList.add('active');
+            });
+        });
+
+        // Palette Generator
+        const paletteHue = document.getElementById('hue');
+        const paletteHarmony = document.getElementById('harmony');
+        const paletteSat = document.getElementById('saturation');
+        const paletteLight = document.getElementById('lightness');
+        const paletteGrid = document.getElementById('palette-grid');
+
+        function generatePalette() {
+            const baseHue = parseInt(paletteHue.value);
+            const harmony = paletteHarmony.value;
+            const sat = parseInt(paletteSat.value);
+            const light = parseInt(paletteLight.value);
+
+            let hues = [];
+            switch(harmony) {
+                case 'complementary':
+                    hues = [baseHue, (baseHue + 180) % 360, (baseHue + 30) % 360, (baseHue + 330) % 360, baseHue];
+                    break;
+                case 'analogous':
+                    hues = [(baseHue - 60) % 360, (baseHue - 30) % 360, baseHue, (baseHue + 30) % 360, (baseHue + 60) % 360];
+                    break;
+                case 'triadic':
+                    hues = [baseHue, (baseHue + 120) % 360, (baseHue + 240) % 360, baseHue, (baseHue + 60) % 360];
+                    break;
+                case 'split-complementary':
+                    hues = [baseHue, (baseHue + 150) % 360, (baseHue + 210) % 360, (baseHue + 30) % 360, (baseHue + 330) % 360];
+                    break;
+                case 'tetradic':
+                    hues = [baseHue, (baseHue + 90) % 360, (baseHue + 180) % 360, (baseHue + 270) % 360, baseHue];
+                    break;
+            }
+
+            paletteGrid.innerHTML = '';
+            hues.forEach((hue, i) => {
+                const adjustedHue = hue < 0 ? hue + 360 : hue;
+                const hex = hslToHex(adjustedHue, sat, light);
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.background = hex;
+                swatch.innerHTML = `<div class="color-swatch-label">${hex.toUpperCase()}</div>`;
+                swatch.addEventListener('click', () => copyToClipboard(hex.toUpperCase()));
+                paletteGrid.appendChild(swatch);
+            });
+        }
+
+        paletteHue.addEventListener('input', (e) => {
+            document.getElementById('hue-val').textContent = e.target.value;
+            generatePalette();
+        });
+        paletteHarmony.addEventListener('change', generatePalette);
+        paletteSat.addEventListener('input', (e) => {
+            document.getElementById('sat-val').textContent = e.target.value + '%';
+            generatePalette();
+        });
+        paletteLight.addEventListener('input', (e) => {
+            document.getElementById('light-val').textContent = e.target.value + '%';
+            generatePalette();
+        });
+
+        generatePalette();
+
+        // Contrast Checker
+        const fgHue = document.getElementById('fg-hue');
+        const fgSat = document.getElementById('fg-sat');
+        const fgLight = document.getElementById('fg-light');
+        const bgHue = document.getElementById('bg-hue');
+        const bgSat = document.getElementById('bg-sat');
+        const bgLight = document.getElementById('bg-light');
+
+        function updateContrast() {
+            const fgH = parseInt(fgHue.value);
+            const fgS = parseInt(fgSat.value);
+            const fgL = parseInt(fgLight.value);
+            const bgH = parseInt(bgHue.value);
+            const bgS = parseInt(bgSat.value);
+            const bgL = parseInt(bgLight.value);
+
+            document.getElementById('fg-hue-val').textContent = fgH;
+            document.getElementById('fg-sat-val').textContent = fgS + '%';
+            document.getElementById('fg-light-val').textContent = fgL + '%';
+            document.getElementById('bg-hue-val').textContent = bgH;
+            document.getElementById('bg-sat-val').textContent = bgS + '%';
+            document.getElementById('bg-light-val').textContent = bgL + '%';
+
+            const fgColor = hslToRgb(fgH, fgS, fgL);
+            const bgColor = hslToRgb(bgH, bgS, bgL);
+            const fgHex = rgbToHex(fgColor.r, fgColor.g, fgColor.b);
+            const bgHex = rgbToHex(bgColor.r, bgColor.g, bgColor.b);
+
+            document.getElementById('fg-preview').style.background = fgHex;
+            document.getElementById('bg-preview').style.background = bgHex;
+
+            const ratio = getContrastRatio(fgColor, bgColor);
+            document.getElementById('ratio-display').textContent = ratio.toFixed(2) + ':1';
+
+            const textPreview = document.getElementById('text-preview');
+            textPreview.style.background = bgHex;
+            textPreview.style.color = fgHex;
+
+            // WCAG criteria
+            const aaNormal = ratio >= 4.5;
+            const aaLarge = ratio >= 3;
+            const aaaNormal = ratio >= 7;
+            const aaaLarge = ratio >= 4.5;
+
+            const badges = document.querySelectorAll('.wcag-badge');
+            badges[0].className = 'wcag-badge ' + (aaNormal ? 'pass' : 'fail');
+            badges[0].querySelector('div:last-child').textContent = aaNormal ? 'PASS' : 'FAIL';
+            badges[1].className = 'wcag-badge ' + (aaLarge ? 'pass' : 'fail');
+            badges[1].querySelector('div:last-child').textContent = aaLarge ? 'PASS' : 'FAIL';
+            badges[2].className = 'wcag-badge ' + (aaaNormal ? 'pass' : 'fail');
+            badges[2].querySelector('div:last-child').textContent = aaaNormal ? 'PASS' : 'FAIL';
+            badges[3].className = 'wcag-badge ' + (aaaLarge ? 'pass' : 'fail');
+            badges[3].querySelector('div:last-child').textContent = aaaLarge ? 'PASS' : 'FAIL';
+        }
+
+        [fgHue, fgSat, fgLight, bgHue, bgSat, bgLight].forEach(input => {
+            input.addEventListener('input', updateContrast);
+        });
+
+        document.getElementById('swap-colors').addEventListener('click', () => {
+            [fgHue.value, bgHue.value] = [bgHue.value, fgHue.value];
+            [fgSat.value, bgSat.value] = [bgSat.value, fgSat.value];
+            [fgLight.value, bgLight.value] = [bgLight.value, fgLight.value];
+            updateContrast();
+        });
+
+        updateContrast();
+
+        // Shadow Designer
+        const shadowX = document.getElementById('shadow-x');
+        const shadowY = document.getElementById('shadow-y');
+        const shadowBlur = document.getElementById('shadow-blur');
+        const shadowSpread = document.getElementById('shadow-spread');
+        const shadowHue = document.getElementById('shadow-hue');
+        const shadowOpacity = document.getElementById('shadow-opacity');
+        const shadowCard = document.getElementById('shadow-card');
+        const shadowCss = document.getElementById('shadow-css');
+
+        function updateShadow() {
+            const x = shadowX.value;
+            const y = shadowY.value;
+            const blur = shadowBlur.value;
+            const spread = shadowSpread.value;
+            const hue = shadowHue.value;
+            const opacity = (shadowOpacity.value / 100).toFixed(2);
+
+            document.getElementById('shadow-x-val').textContent = x + 'px';
+            document.getElementById('shadow-y-val').textContent = y + 'px';
+            document.getElementById('shadow-blur-val').textContent = blur + 'px';
+            document.getElementById('shadow-spread-val').textContent = spread + 'px';
+            document.getElementById('shadow-hue-val').textContent = hue;
+            document.getElementById('shadow-opacity-val').textContent = opacity;
+
+            const rgb = hslToRgb(hue, 0, 0);
+            const shadow = `${x}px ${y}px ${blur}px ${spread}px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+            shadowCard.style.boxShadow = shadow;
+            shadowCss.textContent = `box-shadow: ${shadow};`;
+        }
+
+        [shadowX, shadowY, shadowBlur, shadowSpread, shadowHue, shadowOpacity].forEach(input => {
+            input.addEventListener('input', updateShadow);
+        });
+
+        document.getElementById('copy-shadow').addEventListener('click', () => {
+            copyToClipboard(shadowCss.textContent);
+        });
+
+        updateShadow();
+
+        // Color Blindness Simulator
+        const cbHue1 = document.getElementById('cb-hue1');
+        const cbHue2 = document.getElementById('cb-hue2');
+        const cbHue3 = document.getElementById('cb-hue3');
+        const cbHue4 = document.getElementById('cb-hue4');
+        const simGrid = document.getElementById('sim-grid');
+
+        const colorBlindMatrices = {
+            normal: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+            protanopia: [0.567, 0.433, 0, 0.558, 0.442, 0, 0, 0.242, 0.758],
+            deuteranopia: [0.625, 0.375, 0, 0.7, 0.3, 0, 0, 0.3, 0.7],
+            tritanopia: [0.95, 0.05, 0, 0, 0.433, 0.567, 0, 0.475, 0.525],
+            achromatopsia: [0.299, 0.587, 0.114, 0.299, 0.587, 0.114, 0.299, 0.587, 0.114]
+        };
+
+        function applyColorBlindMatrix(rgb, matrix) {
+            const r = rgb.r * matrix[0] + rgb.g * matrix[1] + rgb.b * matrix[2];
+            const g = rgb.r * matrix[3] + rgb.g * matrix[4] + rgb.b * matrix[5];
+            const b = rgb.r * matrix[6] + rgb.g * matrix[7] + rgb.b * matrix[8];
+            return {
+                r: Math.min(255, Math.max(0, Math.round(r))),
+                g: Math.min(255, Math.max(0, Math.round(g))),
+                b: Math.min(255, Math.max(0, Math.round(b)))
+            };
+        }
+
+        function updateColorBlindSim() {
+            const hues = [
+                parseInt(cbHue1.value),
+                parseInt(cbHue2.value),
+                parseInt(cbHue3.value),
+                parseInt(cbHue4.value)
+            ];
+
+            const colors = hues.map(h => hslToRgb(h, 70, 50));
+
+            simGrid.innerHTML = '';
+
+            Object.entries(colorBlindMatrices).forEach(([name, matrix]) => {
+                const card = document.createElement('div');
+                card.className = 'sim-card';
+
+                const title = document.createElement('div');
+                title.className = 'sim-title';
+                title.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+                card.appendChild(title);
+
+                const preview = document.createElement('div');
+                preview.className = 'sim-preview';
+                preview.style.background = '#f5f5f7';
+
+                colors.forEach(color => {
+                    const simColor = applyColorBlindMatrix(color, matrix);
+                    const hex = rgbToHex(simColor.r, simColor.g, simColor.b);
+                    const dot = document.createElement('div');
+                    dot.className = 'sim-dot';
+                    dot.style.background = hex;
+                    preview.appendChild(dot);
+                });
+
+                card.appendChild(preview);
+                simGrid.appendChild(card);
+            });
+        }
+
+        [cbHue1, cbHue2, cbHue3, cbHue4].forEach(input => {
+            input.addEventListener('input', updateColorBlindSim);
+        });
+
+        updateColorBlindSim();
+
+        // Noise Textures
+        const noiseCanvas = document.getElementById('noise-canvas');
+        const noiseType = document.getElementById('noise-type');
+        const noiseDensity = document.getElementById('noise-density');
+        const noiseHue = document.getElementById('noise-hue');
+        const noiseOpacity = document.getElementById('noise-opacity');
+        const noiseCss = document.getElementById('noise-css');
+
+        function updateNoise() {
+            const type = noiseType.value;
+            const density = parseInt(noiseDensity.value);
+            const hue = parseInt(noiseHue.value);
+            const opacity = (noiseOpacity.value / 100).toFixed(2);
+
+            document.getElementById('noise-density-val').textContent = density;
+            document.getElementById('noise-hue-val').textContent = hue;
+            document.getElementById('noise-opacity-val').textContent = opacity;
+
+            const canvas = noiseCanvas;
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * 2;
+            canvas.height = rect.height * 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const rgb = hslToRgb(hue, 70, 50);
+            const color = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+
+            switch(type) {
+                case 'dots':
+                    const dotSpacing = 100 - density;
+                    for(let x = 0; x < canvas.width; x += dotSpacing) {
+                        for(let y = 0; y < canvas.height; y += dotSpacing) {
+                            ctx.fillStyle = color;
+                            ctx.beginPath();
+                            ctx.arc(x + Math.random() * dotSpacing/2, y + Math.random() * dotSpacing/2, density/20, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    break;
+
+                case 'lines':
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 2;
+                    const lineSpacing = 100 - density;
+                    for(let y = 0; y < canvas.height; y += lineSpacing) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(canvas.width, y);
+                        ctx.stroke();
+                    }
+                    break;
+
+                case 'crosshatch':
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1;
+                    const hatchSpacing = 100 - density;
+                    for(let i = 0; i < canvas.width; i += hatchSpacing) {
+                        ctx.beginPath();
+                        ctx.moveTo(i, 0);
+                        ctx.lineTo(i, canvas.height);
+                        ctx.stroke();
+                    }
+                    for(let i = 0; i < canvas.height; i += hatchSpacing) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, i);
+                        ctx.lineTo(canvas.width, i);
+                        ctx.stroke();
+                    }
+                    break;
+
+                case 'grain':
+                    const grainDensity = density * 10;
+                    for(let i = 0; i < grainDensity; i++) {
+                        const x = Math.random() * canvas.width;
+                        const y = Math.random() * canvas.height;
+                        ctx.fillStyle = color;
+                        ctx.fillRect(x, y, 1, 1);
+                    }
+                    break;
+
+                case 'waves':
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 2;
+                    const waveSpacing = 100 - density;
+                    for(let y = 0; y < canvas.height; y += waveSpacing) {
+                        ctx.beginPath();
+                        for(let x = 0; x < canvas.width; x++) {
+                            const wave = Math.sin(x / 20) * 10;
+                            if(x === 0) {
+                                ctx.moveTo(x, y + wave);
+                            } else {
+                                ctx.lineTo(x, y + wave);
+                            }
+                        }
+                        ctx.stroke();
+                    }
+                    break;
+            }
+
+            // Generate CSS description
+            const cssMap = {
+                dots: `background-image: radial-gradient(circle, ${color} ${density/20}px, transparent ${density/20}px);\nbackground-size: ${100-density}px ${100-density}px;`,
+                lines: `background-image: repeating-linear-gradient(0deg, ${color} 0px, ${color} 2px, transparent 2px, transparent ${100-density}px);`,
+                crosshatch: `background-image: \n  repeating-linear-gradient(0deg, ${color} 0px, ${color} 1px, transparent 1px, transparent ${100-density}px),\n  repeating-linear-gradient(90deg, ${color} 0px, ${color} 1px, transparent 1px, transparent ${100-density}px);`,
+                grain: `/* Use canvas-based rendering or SVG filter for grain */\nbackground-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity});`,
+                waves: `/* Use SVG or canvas for wave patterns */\nbackground: linear-gradient(to bottom, ${color}, transparent);`
+            };
+
+            noiseCss.textContent = cssMap[type];
+        }
+
+        [noiseType, noiseDensity, noiseHue, noiseOpacity].forEach(input => {
+            input.addEventListener('input', updateNoise);
+            input.addEventListener('change', updateNoise);
+        });
+
+        document.getElementById('copy-noise').addEventListener('click', () => {
+            copyToClipboard(noiseCss.textContent);
+        });
+
+        updateNoise();
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', () => {
+            if(document.getElementById('noise').classList.contains('active')) {
+                updateNoise();
+            }
+        });
+    </script>
+</body>
+</html>

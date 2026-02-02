@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Audio 2026 - Sound Visualizer Playground</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        header {
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        nav {
+            background: white;
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            scrollbar-width: none;
+        }
+
+        nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        nav button {
+            display: inline-block;
+            padding: 14px 20px;
+            border: none;
+            background: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6e6e73;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        nav button.active {
+            color: #007aff;
+            border-bottom-color: #007aff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            background: #fafafa;
+            touch-action: none;
+        }
+
+        .controls {
+            margin-top: 16px;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e5e7;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+            border: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+            color: #1d1d1f;
+        }
+
+        button.btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+
+        button.btn-primary {
+            background: #007aff;
+            color: white;
+        }
+
+        button.btn-primary:active {
+            background: #0051d5;
+            transform: scale(0.98);
+        }
+
+        button.btn-secondary {
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        button.btn-secondary:active {
+            background: #e5e5e7;
+            transform: scale(0.98);
+        }
+
+        .value-display {
+            display: inline-block;
+            float: right;
+            font-weight: 400;
+            color: #6e6e73;
+        }
+
+        .beat-pad-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .pad {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.1s;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .pad:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        .pad.playing {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .sequencer {
+            margin-top: 20px;
+        }
+
+        .sequencer-grid {
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .seq-cell {
+            aspect-ratio: 1;
+            border: 1px solid #d2d2d7;
+            border-radius: 4px;
+            cursor: pointer;
+            background: white;
+            transition: all 0.1s;
+        }
+
+        .seq-cell.active {
+            background: #007aff;
+        }
+
+        .seq-cell.current {
+            border-color: #ff3b30;
+            border-width: 2px;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #6e6e73;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        .theremin-info {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 16px;
+            color: #007aff;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .radio-group label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 400;
+        }
+
+        .radio-group input[type="radio"] {
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Audio 2026</h1>
+    </header>
+
+    <nav>
+        <button class="tab-btn active" data-tab="waveform">Waveform Art</button>
+        <button class="tab-btn" data-tab="frequency">Frequency Bars</button>
+        <button class="tab-btn" data-tab="theremin">Theremin</button>
+        <button class="tab-btn" data-tab="beatpad">Beat Pad</button>
+    </nav>
+
+    <!-- Waveform Art Tab -->
+    <div id="waveform" class="tab-content active">
+        <div class="card">
+            <h2>Waveform Art</h2>
+            <canvas id="waveformCanvas"></canvas>
+            <div class="controls">
+                <div class="control-group">
+                    <label>
+                        Frequency: <span class="value-display" id="freqValue">440 Hz</span>
+                    </label>
+                    <input type="range" id="frequency" min="20" max="2000" value="440">
+                </div>
+                <div class="control-group">
+                    <label>Waveform Type</label>
+                    <select id="waveType">
+                        <option value="sine">Sine</option>
+                        <option value="square">Square</option>
+                        <option value="sawtooth">Sawtooth</option>
+                        <option value="triangle">Triangle</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>
+                        Amplitude: <span class="value-display" id="ampValue">0.3</span>
+                    </label>
+                    <input type="range" id="amplitude" min="0" max="1" step="0.01" value="0.3">
+                </div>
+                <button class="btn btn-primary" id="playWaveform">Play</button>
+            </div>
+            <p class="info-text">Tap Play to hear the waveform. Adjust frequency and type to see and hear different wave shapes.</p>
+        </div>
+    </div>
+
+    <!-- Frequency Bars Tab -->
+    <div id="frequency" class="tab-content">
+        <div class="card">
+            <h2>Frequency Bars</h2>
+            <canvas id="frequencyCanvas"></canvas>
+            <div class="controls">
+                <div class="control-group">
+                    <label>
+                        Bar Count: <span class="value-display" id="barCountValue">64</span>
+                    </label>
+                    <input type="range" id="barCount" min="16" max="128" value="64">
+                </div>
+                <div class="control-group">
+                    <label>Color Scheme</label>
+                    <select id="colorScheme">
+                        <option value="neon">Neon</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="ocean">Ocean</option>
+                        <option value="mono">Mono</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Bar Style</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="barStyle" value="bars" checked> Bars</label>
+                        <label><input type="radio" name="barStyle" value="circles"> Circles</label>
+                        <label><input type="radio" name="barStyle" value="wave"> Wave</label>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="startMic">Use Microphone</button>
+                <button class="btn btn-secondary" id="useToneGen">Use Tone Generator</button>
+            </div>
+            <p class="info-text">Use your microphone or the tone generator to visualize audio frequencies in real-time.</p>
+        </div>
+    </div>
+
+    <!-- Theremin Tab -->
+    <div id="theremin" class="tab-content">
+        <div class="card">
+            <h2>Theremin</h2>
+            <canvas id="thereminCanvas"></canvas>
+            <div class="theremin-info" id="thereminInfo">
+                Touch to play
+            </div>
+            <p class="info-text">Touch and drag across the canvas. X-axis controls pitch (left=low, right=high), Y-axis controls volume (top=loud, bottom=quiet).</p>
+        </div>
+    </div>
+
+    <!-- Beat Pad Tab -->
+    <div id="beatpad" class="tab-content">
+        <div class="card">
+            <h2>Beat Pad</h2>
+            <div class="beat-pad-grid" id="beatPadGrid"></div>
+        </div>
+
+        <div class="card sequencer">
+            <h2>Sequencer</h2>
+            <div class="sequencer-grid" id="sequencerGrid"></div>
+            <button class="btn btn-primary" id="seqPlay">Play Sequence</button>
+            <button class="btn btn-secondary" id="seqClear">Clear</button>
+            <div class="control-group" style="margin-top: 16px;">
+                <label>
+                    BPM: <span class="value-display" id="bpmValue">120</span>
+                </label>
+                <input type="range" id="bpm" min="60" max="200" value="120">
+            </div>
+            <p class="info-text">Tap pads to play sounds. Toggle cells in the sequencer and hit Play to create a loop.</p>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let audioContexts = {};
+        let currentTab = 'waveform';
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tab).classList.add('active');
+                currentTab = tab;
+            });
+        });
+
+        // =========================
+        // WAVEFORM ART
+        // =========================
+        const waveformState = {
+            oscillator: null,
+            gainNode: null,
+            isPlaying: false,
+            frequency: 440,
+            waveType: 'sine',
+            amplitude: 0.3
+        };
+
+        const waveCanvas = document.getElementById('waveformCanvas');
+        const waveCtx = waveCanvas.getContext('2d');
+        const freqSlider = document.getElementById('frequency');
+        const waveTypeSelect = document.getElementById('waveType');
+        const ampSlider = document.getElementById('amplitude');
+        const playBtn = document.getElementById('playWaveform');
+
+        function resizeCanvas(canvas) {
+            canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+            canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+        }
+
+        resizeCanvas(waveCanvas);
+
+        function drawWaveform() {
+            const width = waveCanvas.width;
+            const height = waveCanvas.height;
+            const centerY = height / 2;
+            const amplitude = waveformState.amplitude * (height / 2 - 20);
+
+            waveCtx.clearRect(0, 0, width, height);
+            waveCtx.strokeStyle = '#007aff';
+            waveCtx.lineWidth = 3;
+            waveCtx.beginPath();
+
+            const cycles = 3;
+            const points = 1000;
+
+            for (let i = 0; i <= points; i++) {
+                const x = (i / points) * width;
+                const t = (i / points) * cycles * Math.PI * 2;
+                let y;
+
+                switch (waveformState.waveType) {
+                    case 'sine':
+                        y = Math.sin(t);
+                        break;
+                    case 'square':
+                        y = Math.sin(t) >= 0 ? 1 : -1;
+                        break;
+                    case 'sawtooth':
+                        y = 2 * (t / (Math.PI * 2) % 1) - 1;
+                        break;
+                    case 'triangle':
+                        const mod = (t / (Math.PI * 2)) % 1;
+                        y = mod < 0.5 ? 4 * mod - 1 : 3 - 4 * mod;
+                        break;
+                }
+
+                y = centerY - y * amplitude;
+                if (i === 0) waveCtx.moveTo(x, y);
+                else waveCtx.lineTo(x, y);
+            }
+
+            waveCtx.stroke();
+        }
+
+        drawWaveform();
+
+        freqSlider.addEventListener('input', (e) => {
+            waveformState.frequency = parseFloat(e.target.value);
+            document.getElementById('freqValue').textContent = waveformState.frequency + ' Hz';
+            if (waveformState.oscillator) {
+                waveformState.oscillator.frequency.setValueAtTime(waveformState.frequency, audioContexts.waveform.currentTime);
+            }
+        });
+
+        waveTypeSelect.addEventListener('change', (e) => {
+            waveformState.waveType = e.target.value;
+            drawWaveform();
+            if (waveformState.oscillator) {
+                waveformState.oscillator.type = waveformState.waveType;
+            }
+        });
+
+        ampSlider.addEventListener('input', (e) => {
+            waveformState.amplitude = parseFloat(e.target.value);
+            document.getElementById('ampValue').textContent = waveformState.amplitude;
+            drawWaveform();
+            if (waveformState.gainNode) {
+                waveformState.gainNode.gain.setValueAtTime(waveformState.amplitude, audioContexts.waveform.currentTime);
+            }
+        });
+
+        playBtn.addEventListener('click', () => {
+            if (!audioContexts.waveform) {
+                audioContexts.waveform = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (!waveformState.isPlaying) {
+                waveformState.oscillator = audioContexts.waveform.createOscillator();
+                waveformState.gainNode = audioContexts.waveform.createGain();
+
+                waveformState.oscillator.type = waveformState.waveType;
+                waveformState.oscillator.frequency.value = waveformState.frequency;
+                waveformState.gainNode.gain.value = waveformState.amplitude;
+
+                waveformState.oscillator.connect(waveformState.gainNode);
+                waveformState.gainNode.connect(audioContexts.waveform.destination);
+
+                waveformState.oscillator.start();
+                waveformState.isPlaying = true;
+                playBtn.textContent = 'Stop';
+                playBtn.classList.remove('btn-primary');
+                playBtn.classList.add('btn-secondary');
+            } else {
+                waveformState.oscillator.stop();
+                waveformState.isPlaying = false;
+                playBtn.textContent = 'Play';
+                playBtn.classList.remove('btn-secondary');
+                playBtn.classList.add('btn-primary');
+            }
+        });
+
+        // =========================
+        // FREQUENCY BARS
+        // =========================
+        const freqCanvas = document.getElementById('frequencyCanvas');
+        const freqCtx = freqCanvas.getContext('2d');
+        resizeCanvas(freqCanvas);
+
+        const freqState = {
+            analyser: null,
+            dataArray: null,
+            source: null,
+            animationId: null,
+            barCount: 64,
+            colorScheme: 'neon',
+            barStyle: 'bars'
+        };
+
+        document.getElementById('barCount').addEventListener('input', (e) => {
+            freqState.barCount = parseInt(e.target.value);
+            document.getElementById('barCountValue').textContent = freqState.barCount;
+        });
+
+        document.getElementById('colorScheme').addEventListener('change', (e) => {
+            freqState.colorScheme = e.target.value;
+        });
+
+        document.querySelectorAll('input[name="barStyle"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                freqState.barStyle = e.target.value;
+            });
+        });
+
+        function getColor(index, total, scheme) {
+            const ratio = index / total;
+            switch (scheme) {
+                case 'neon':
+                    return `hsl(${ratio * 360}, 100%, 50%)`;
+                case 'sunset':
+                    return `hsl(${320 - ratio * 80}, 100%, 60%)`;
+                case 'ocean':
+                    return `hsl(${200 + ratio * 60}, 80%, 50%)`;
+                case 'mono':
+                    return '#007aff';
+                default:
+                    return '#007aff';
+            }
+        }
+
+        function drawFrequencyBars() {
+            if (!freqState.analyser) return;
+
+            freqState.analyser.getByteFrequencyData(freqState.dataArray);
+
+            const width = freqCanvas.width;
+            const height = freqCanvas.height;
+
+            freqCtx.clearRect(0, 0, width, height);
+
+            const barCount = freqState.barCount;
+            const barWidth = width / barCount;
+
+            if (freqState.barStyle === 'bars') {
+                for (let i = 0; i < barCount; i++) {
+                    const barHeight = (freqState.dataArray[i] / 255) * height;
+                    const x = i * barWidth;
+                    const y = height - barHeight;
+
+                    freqCtx.fillStyle = getColor(i, barCount, freqState.colorScheme);
+                    freqCtx.fillRect(x, y, barWidth - 2, barHeight);
+                }
+            } else if (freqState.barStyle === 'circles') {
+                for (let i = 0; i < barCount; i++) {
+                    const radius = (freqState.dataArray[i] / 255) * (height / 4);
+                    const x = (i + 0.5) * barWidth;
+                    const y = height / 2;
+
+                    freqCtx.fillStyle = getColor(i, barCount, freqState.colorScheme);
+                    freqCtx.beginPath();
+                    freqCtx.arc(x, y, radius, 0, Math.PI * 2);
+                    freqCtx.fill();
+                }
+            } else if (freqState.barStyle === 'wave') {
+                freqCtx.strokeStyle = getColor(barCount / 2, barCount, freqState.colorScheme);
+                freqCtx.lineWidth = 4;
+                freqCtx.beginPath();
+
+                for (let i = 0; i < barCount; i++) {
+                    const amplitude = (freqState.dataArray[i] / 255) * (height / 2);
+                    const x = (i / barCount) * width;
+                    const y = height / 2 - amplitude;
+
+                    if (i === 0) freqCtx.moveTo(x, y);
+                    else freqCtx.lineTo(x, y);
+                }
+                freqCtx.stroke();
+            }
+
+            freqState.animationId = requestAnimationFrame(drawFrequencyBars);
+        }
+
+        document.getElementById('startMic').addEventListener('click', async () => {
+            try {
+                if (!audioContexts.frequency) {
+                    audioContexts.frequency = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                if (freqState.animationId) {
+                    cancelAnimationFrame(freqState.animationId);
+                }
+
+                freqState.analyser = audioContexts.frequency.createAnalyser();
+                freqState.analyser.fftSize = 256;
+                freqState.dataArray = new Uint8Array(freqState.analyser.frequencyBinCount);
+
+                freqState.source = audioContexts.frequency.createMediaStreamSource(stream);
+                freqState.source.connect(freqState.analyser);
+
+                drawFrequencyBars();
+            } catch (err) {
+                alert('Microphone access denied. Use Tone Generator instead.');
+            }
+        });
+
+        document.getElementById('useToneGen').addEventListener('click', () => {
+            if (!audioContexts.frequency) {
+                audioContexts.frequency = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (freqState.animationId) {
+                cancelAnimationFrame(freqState.animationId);
+            }
+
+            freqState.analyser = audioContexts.frequency.createAnalyser();
+            freqState.analyser.fftSize = 256;
+            freqState.dataArray = new Uint8Array(freqState.analyser.frequencyBinCount);
+
+            // Create multiple oscillators for interesting visualization
+            const osc1 = audioContexts.frequency.createOscillator();
+            const osc2 = audioContexts.frequency.createOscillator();
+            const osc3 = audioContexts.frequency.createOscillator();
+            const gain = audioContexts.frequency.createGain();
+
+            osc1.frequency.value = 220;
+            osc2.frequency.value = 440;
+            osc3.frequency.value = 880;
+            osc1.type = 'sine';
+            osc2.type = 'square';
+            osc3.type = 'sawtooth';
+            gain.gain.value = 0.1;
+
+            osc1.connect(gain);
+            osc2.connect(gain);
+            osc3.connect(gain);
+            gain.connect(freqState.analyser);
+            freqState.analyser.connect(audioContexts.frequency.destination);
+
+            osc1.start();
+            osc2.start();
+            osc3.start();
+
+            // Modulate frequencies
+            setInterval(() => {
+                osc1.frequency.value = 220 + Math.random() * 100;
+                osc2.frequency.value = 440 + Math.random() * 200;
+                osc3.frequency.value = 880 + Math.random() * 400;
+            }, 500);
+
+            drawFrequencyBars();
+        });
+
+        // =========================
+        // THEREMIN
+        // =========================
+        const thereminCanvas = document.getElementById('thereminCanvas');
+        const thereminCtx = thereminCanvas.getContext('2d');
+        resizeCanvas(thereminCanvas);
+
+        const thereminState = {
+            oscillator: null,
+            gainNode: null,
+            isPlaying: false,
+            trail: []
+        };
+
+        function drawThereminTrail() {
+            const width = thereminCanvas.width;
+            const height = thereminCanvas.height;
+
+            thereminCtx.clearRect(0, 0, width, height);
+
+            // Draw trail
+            for (let i = 0; i < thereminState.trail.length; i++) {
+                const point = thereminState.trail[i];
+                const alpha = (i / thereminState.trail.length) * 0.5;
+                const size = 20 - (i / thereminState.trail.length) * 15;
+
+                thereminCtx.fillStyle = `rgba(0, 122, 255, ${alpha})`;
+                thereminCtx.beginPath();
+                thereminCtx.arc(point.x, point.y, size, 0, Math.PI * 2);
+                thereminCtx.fill();
+            }
+
+            // Draw current position
+            if (thereminState.trail.length > 0) {
+                const current = thereminState.trail[thereminState.trail.length - 1];
+                thereminCtx.fillStyle = '#007aff';
+                thereminCtx.beginPath();
+                thereminCtx.arc(current.x, current.y, 25, 0, Math.PI * 2);
+                thereminCtx.fill();
+            }
+        }
+
+        function handleThereminTouch(e) {
+            e.preventDefault();
+
+            if (!audioContexts.theremin) {
+                audioContexts.theremin = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            const rect = thereminCanvas.getBoundingClientRect();
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+            const canvasX = (x / rect.width) * thereminCanvas.width;
+            const canvasY = (y / rect.height) * thereminCanvas.height;
+
+            // X axis: frequency (200 Hz to 2000 Hz)
+            const frequency = 200 + (x / rect.width) * 1800;
+            // Y axis: volume (0 to 0.5, inverted)
+            const volume = 0.5 - (y / rect.height) * 0.5;
+
+            if (!thereminState.isPlaying) {
+                thereminState.oscillator = audioContexts.theremin.createOscillator();
+                thereminState.gainNode = audioContexts.theremin.createGain();
+
+                thereminState.oscillator.type = 'sine';
+                thereminState.oscillator.connect(thereminState.gainNode);
+                thereminState.gainNode.connect(audioContexts.theremin.destination);
+                thereminState.oscillator.start();
+                thereminState.isPlaying = true;
+            }
+
+            thereminState.oscillator.frequency.setValueAtTime(frequency, audioContexts.theremin.currentTime);
+            thereminState.gainNode.gain.setValueAtTime(volume, audioContexts.theremin.currentTime);
+
+            // Update trail
+            thereminState.trail.push({ x: canvasX, y: canvasY });
+            if (thereminState.trail.length > 20) {
+                thereminState.trail.shift();
+            }
+
+            drawThereminTrail();
+
+            // Update info
+            document.getElementById('thereminInfo').textContent =
+                `${Math.round(frequency)} Hz - Volume: ${Math.round(volume * 100)}%`;
+        }
+
+        function stopTheremin() {
+            if (thereminState.oscillator) {
+                thereminState.oscillator.stop();
+                thereminState.isPlaying = false;
+                thereminState.trail = [];
+                drawThereminTrail();
+                document.getElementById('thereminInfo').textContent = 'Touch to play';
+            }
+        }
+
+        thereminCanvas.addEventListener('touchstart', handleThereminTouch);
+        thereminCanvas.addEventListener('touchmove', handleThereminTouch);
+        thereminCanvas.addEventListener('touchend', stopTheremin);
+        thereminCanvas.addEventListener('mousedown', handleThereminTouch);
+        thereminCanvas.addEventListener('mousemove', (e) => {
+            if (e.buttons === 1) handleThereminTouch(e);
+        });
+        thereminCanvas.addEventListener('mouseup', stopTheremin);
+        thereminCanvas.addEventListener('mouseleave', stopTheremin);
+
+        // =========================
+        // BEAT PAD
+        // =========================
+        const beatPads = [
+            { name: 'KICK', color: '#ff3b30', sound: 'kick' },
+            { name: 'SNARE', color: '#ff9500', sound: 'snare' },
+            { name: 'HIHAT', color: '#ffcc00', sound: 'hihat' },
+            { name: 'CLAP', color: '#34c759', sound: 'clap' },
+            { name: 'TOM 1', color: '#00c7be', sound: 'tom1' },
+            { name: 'TOM 2', color: '#32ade6', sound: 'tom2' },
+            { name: 'CYMBAL', color: '#007aff', sound: 'cymbal' },
+            { name: 'PERC', color: '#5856d6', sound: 'perc' },
+            { name: 'BASS', color: '#af52de', sound: 'bass' },
+            { name: 'LEAD', color: '#ff2d55', sound: 'lead' },
+            { name: 'CHORD', color: '#a2845e', sound: 'chord' },
+            { name: 'FX', color: '#8e8e93', sound: 'fx' },
+            { name: 'RIM', color: '#ff6482', sound: 'rim' },
+            { name: 'COWBELL', color: '#64d2ff', sound: 'cowbell' },
+            { name: 'SHAKER', color: '#ffd60a', sound: 'shaker' },
+            { name: 'LASER', color: '#bf5af2', sound: 'laser' }
+        ];
+
+        const beatPadGrid = document.getElementById('beatPadGrid');
+
+        beatPads.forEach((pad, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'pad';
+            btn.textContent = pad.name;
+            btn.style.background = pad.color;
+            btn.addEventListener('click', () => playSound(pad.sound, btn));
+            beatPadGrid.appendChild(btn);
+        });
+
+        function playSound(type, element) {
+            if (!audioContexts.beatpad) {
+                audioContexts.beatpad = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            const ctx = audioContexts.beatpad;
+            const now = ctx.currentTime;
+
+            element.classList.add('playing');
+            setTimeout(() => element.classList.remove('playing'), 100);
+
+            switch (type) {
+                case 'kick':
+                    const kickOsc = ctx.createOscillator();
+                    const kickGain = ctx.createGain();
+                    kickOsc.frequency.setValueAtTime(150, now);
+                    kickOsc.frequency.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    kickGain.gain.setValueAtTime(1, now);
+                    kickGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    kickOsc.connect(kickGain).connect(ctx.destination);
+                    kickOsc.start(now);
+                    kickOsc.stop(now + 0.5);
+                    break;
+
+                case 'snare':
+                    const snareOsc = ctx.createOscillator();
+                    const snareNoise = ctx.createBufferSource();
+                    const snareBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
+                    const snareData = snareBuffer.getChannelData(0);
+                    for (let i = 0; i < snareData.length; i++) {
+                        snareData[i] = Math.random() * 2 - 1;
+                    }
+                    snareNoise.buffer = snareBuffer;
+                    const snareFilter = ctx.createBiquadFilter();
+                    snareFilter.type = 'highpass';
+                    snareFilter.frequency.value = 1000;
+                    const snareGain = ctx.createGain();
+                    snareOsc.frequency.value = 100;
+                    snareGain.gain.setValueAtTime(0.5, now);
+                    snareGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    snareOsc.connect(snareGain);
+                    snareNoise.connect(snareFilter).connect(snareGain);
+                    snareGain.connect(ctx.destination);
+                    snareOsc.start(now);
+                    snareNoise.start(now);
+                    snareOsc.stop(now + 0.2);
+                    break;
+
+                case 'hihat':
+                    const hihatNoise = ctx.createBufferSource();
+                    const hihatBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+                    const hihatData = hihatBuffer.getChannelData(0);
+                    for (let i = 0; i < hihatData.length; i++) {
+                        hihatData[i] = Math.random() * 2 - 1;
+                    }
+                    hihatNoise.buffer = hihatBuffer;
+                    const hihatFilter = ctx.createBiquadFilter();
+                    hihatFilter.type = 'highpass';
+                    hihatFilter.frequency.value = 7000;
+                    const hihatGain = ctx.createGain();
+                    hihatGain.gain.setValueAtTime(0.3, now);
+                    hihatGain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    hihatNoise.connect(hihatFilter).connect(hihatGain).connect(ctx.destination);
+                    hihatNoise.start(now);
+                    break;
+
+                case 'clap':
+                    for (let i = 0; i < 3; i++) {
+                        const clapNoise = ctx.createBufferSource();
+                        const clapBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+                        const clapData = clapBuffer.getChannelData(0);
+                        for (let j = 0; j < clapData.length; j++) {
+                            clapData[j] = Math.random() * 2 - 1;
+                        }
+                        clapNoise.buffer = clapBuffer;
+                        const clapGain = ctx.createGain();
+                        clapGain.gain.value = 0.3;
+                        clapNoise.connect(clapGain).connect(ctx.destination);
+                        clapNoise.start(now + i * 0.02);
+                    }
+                    break;
+
+                case 'tom1':
+                    const tom1Osc = ctx.createOscillator();
+                    const tom1Gain = ctx.createGain();
+                    tom1Osc.frequency.setValueAtTime(200, now);
+                    tom1Osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+                    tom1Gain.gain.setValueAtTime(0.7, now);
+                    tom1Gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    tom1Osc.connect(tom1Gain).connect(ctx.destination);
+                    tom1Osc.start(now);
+                    tom1Osc.stop(now + 0.3);
+                    break;
+
+                case 'tom2':
+                    const tom2Osc = ctx.createOscillator();
+                    const tom2Gain = ctx.createGain();
+                    tom2Osc.frequency.setValueAtTime(150, now);
+                    tom2Osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+                    tom2Gain.gain.setValueAtTime(0.7, now);
+                    tom2Gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    tom2Osc.connect(tom2Gain).connect(ctx.destination);
+                    tom2Osc.start(now);
+                    tom2Osc.stop(now + 0.3);
+                    break;
+
+                case 'cymbal':
+                    const cymbalOsc1 = ctx.createOscillator();
+                    const cymbalOsc2 = ctx.createOscillator();
+                    const cymbalGain = ctx.createGain();
+                    cymbalOsc1.frequency.value = 2000;
+                    cymbalOsc2.frequency.value = 3000;
+                    cymbalOsc1.type = 'square';
+                    cymbalOsc2.type = 'square';
+                    cymbalGain.gain.setValueAtTime(0.2, now);
+                    cymbalGain.gain.exponentialRampToValueAtTime(0.01, now + 1);
+                    cymbalOsc1.connect(cymbalGain);
+                    cymbalOsc2.connect(cymbalGain);
+                    cymbalGain.connect(ctx.destination);
+                    cymbalOsc1.start(now);
+                    cymbalOsc2.start(now);
+                    cymbalOsc1.stop(now + 1);
+                    cymbalOsc2.stop(now + 1);
+                    break;
+
+                case 'perc':
+                    const percOsc = ctx.createOscillator();
+                    const percGain = ctx.createGain();
+                    percOsc.frequency.setValueAtTime(800, now);
+                    percOsc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+                    percGain.gain.setValueAtTime(0.4, now);
+                    percGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    percOsc.connect(percGain).connect(ctx.destination);
+                    percOsc.start(now);
+                    percOsc.stop(now + 0.1);
+                    break;
+
+                case 'bass':
+                    const bassOsc = ctx.createOscillator();
+                    const bassGain = ctx.createGain();
+                    bassOsc.type = 'sawtooth';
+                    bassOsc.frequency.value = 55;
+                    bassGain.gain.setValueAtTime(0.3, now);
+                    bassGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    bassOsc.connect(bassGain).connect(ctx.destination);
+                    bassOsc.start(now);
+                    bassOsc.stop(now + 0.5);
+                    break;
+
+                case 'lead':
+                    const leadOsc = ctx.createOscillator();
+                    const leadGain = ctx.createGain();
+                    leadOsc.type = 'square';
+                    leadOsc.frequency.value = 440;
+                    leadGain.gain.setValueAtTime(0.2, now);
+                    leadGain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    leadOsc.connect(leadGain).connect(ctx.destination);
+                    leadOsc.start(now);
+                    leadOsc.stop(now + 0.3);
+                    break;
+
+                case 'chord':
+                    [261.63, 329.63, 392.00].forEach(freq => {
+                        const chordOsc = ctx.createOscillator();
+                        const chordGain = ctx.createGain();
+                        chordOsc.type = 'sine';
+                        chordOsc.frequency.value = freq;
+                        chordGain.gain.setValueAtTime(0.1, now);
+                        chordGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                        chordOsc.connect(chordGain).connect(ctx.destination);
+                        chordOsc.start(now);
+                        chordOsc.stop(now + 0.5);
+                    });
+                    break;
+
+                case 'fx':
+                    const fxOsc = ctx.createOscillator();
+                    const fxGain = ctx.createGain();
+                    fxOsc.frequency.setValueAtTime(1000, now);
+                    fxOsc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+                    fxGain.gain.setValueAtTime(0.3, now);
+                    fxGain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    fxOsc.connect(fxGain).connect(ctx.destination);
+                    fxOsc.start(now);
+                    fxOsc.stop(now + 0.3);
+                    break;
+
+                case 'rim':
+                    const rimOsc = ctx.createOscillator();
+                    const rimGain = ctx.createGain();
+                    rimOsc.frequency.value = 400;
+                    rimGain.gain.setValueAtTime(0.3, now);
+                    rimGain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    rimOsc.connect(rimGain).connect(ctx.destination);
+                    rimOsc.start(now);
+                    rimOsc.stop(now + 0.05);
+                    break;
+
+                case 'cowbell':
+                    const cowbellOsc1 = ctx.createOscillator();
+                    const cowbellOsc2 = ctx.createOscillator();
+                    const cowbellGain = ctx.createGain();
+                    cowbellOsc1.frequency.value = 800;
+                    cowbellOsc2.frequency.value = 540;
+                    cowbellOsc1.type = 'square';
+                    cowbellOsc2.type = 'square';
+                    cowbellGain.gain.setValueAtTime(0.3, now);
+                    cowbellGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    cowbellOsc1.connect(cowbellGain);
+                    cowbellOsc2.connect(cowbellGain);
+                    cowbellGain.connect(ctx.destination);
+                    cowbellOsc1.start(now);
+                    cowbellOsc2.start(now);
+                    cowbellOsc1.stop(now + 0.2);
+                    cowbellOsc2.stop(now + 0.2);
+                    break;
+
+                case 'shaker':
+                    const shakerNoise = ctx.createBufferSource();
+                    const shakerBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.03, ctx.sampleRate);
+                    const shakerData = shakerBuffer.getChannelData(0);
+                    for (let i = 0; i < shakerData.length; i++) {
+                        shakerData[i] = Math.random() * 2 - 1;
+                    }
+                    shakerNoise.buffer = shakerBuffer;
+                    const shakerFilter = ctx.createBiquadFilter();
+                    shakerFilter.type = 'highpass';
+                    shakerFilter.frequency.value = 5000;
+                    const shakerGain = ctx.createGain();
+                    shakerGain.gain.value = 0.2;
+                    shakerNoise.connect(shakerFilter).connect(shakerGain).connect(ctx.destination);
+                    shakerNoise.start(now);
+                    break;
+
+                case 'laser':
+                    const laserOsc = ctx.createOscillator();
+                    const laserGain = ctx.createGain();
+                    laserOsc.frequency.setValueAtTime(2000, now);
+                    laserOsc.frequency.exponentialRampToValueAtTime(50, now + 0.5);
+                    laserGain.gain.setValueAtTime(0.3, now);
+                    laserGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    laserOsc.connect(laserGain).connect(ctx.destination);
+                    laserOsc.start(now);
+                    laserOsc.stop(now + 0.5);
+                    break;
+            }
+        }
+
+        // =========================
+        // SEQUENCER
+        // =========================
+        const sequencerGrid = document.getElementById('sequencerGrid');
+        const seqState = {
+            pattern: Array(16).fill().map(() => Array(16).fill(false)),
+            isPlaying: false,
+            currentStep: 0,
+            intervalId: null,
+            bpm: 120
+        };
+
+        // Create 16x16 grid
+        for (let row = 0; row < 16; row++) {
+            for (let col = 0; col < 16; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'seq-cell';
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+                cell.addEventListener('click', () => {
+                    seqState.pattern[row][col] = !seqState.pattern[row][col];
+                    cell.classList.toggle('active');
+                });
+                sequencerGrid.appendChild(cell);
+            }
+        }
+
+        function playSequencerStep() {
+            const cells = sequencerGrid.querySelectorAll('.seq-cell');
+
+            // Remove current highlighting
+            cells.forEach(cell => cell.classList.remove('current'));
+
+            // Highlight current column
+            for (let row = 0; row < 16; row++) {
+                const cell = sequencerGrid.querySelector(`[data-row="${row}"][data-col="${seqState.currentStep}"]`);
+                cell.classList.add('current');
+
+                // Play sound if cell is active
+                if (seqState.pattern[row][seqState.currentStep]) {
+                    const padBtn = beatPadGrid.children[row];
+                    playSound(beatPads[row].sound, padBtn);
+                }
+            }
+
+            seqState.currentStep = (seqState.currentStep + 1) % 16;
+        }
+
+        document.getElementById('seqPlay').addEventListener('click', function() {
+            if (!seqState.isPlaying) {
+                const interval = (60 / seqState.bpm) * 1000 / 4; // 16th notes
+                seqState.intervalId = setInterval(playSequencerStep, interval);
+                seqState.isPlaying = true;
+                this.textContent = 'Stop';
+                this.classList.remove('btn-primary');
+                this.classList.add('btn-secondary');
+            } else {
+                clearInterval(seqState.intervalId);
+                seqState.isPlaying = false;
+                seqState.currentStep = 0;
+                this.textContent = 'Play Sequence';
+                this.classList.remove('btn-secondary');
+                this.classList.add('btn-primary');
+
+                // Remove current highlighting
+                sequencerGrid.querySelectorAll('.seq-cell').forEach(cell => {
+                    cell.classList.remove('current');
+                });
+            }
+        });
+
+        document.getElementById('seqClear').addEventListener('click', () => {
+            seqState.pattern = Array(16).fill().map(() => Array(16).fill(false));
+            sequencerGrid.querySelectorAll('.seq-cell').forEach(cell => {
+                cell.classList.remove('active');
+            });
+        });
+
+        document.getElementById('bpm').addEventListener('input', (e) => {
+            seqState.bpm = parseInt(e.target.value);
+            document.getElementById('bpmValue').textContent = seqState.bpm;
+
+            // Restart sequencer with new tempo if playing
+            if (seqState.isPlaying) {
+                clearInterval(seqState.intervalId);
+                const interval = (60 / seqState.bpm) * 1000 / 4;
+                seqState.intervalId = setInterval(playSequencerStep, interval);
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            resizeCanvas(waveCanvas);
+            resizeCanvas(freqCanvas);
+            resizeCanvas(thereminCanvas);
+            drawWaveform();
+        });
+    </script>
+</body>
+</html>

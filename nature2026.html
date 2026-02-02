@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nature Playground 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        #container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #canvas {
+            flex: 1;
+            display: block;
+            width: 100%;
+            height: calc(100vh - 180px);
+        }
+
+        #controls {
+            background: #f5f5f7;
+            padding: 12px 16px 20px;
+            border-top: 1px solid #d1d1d6;
+            position: relative;
+        }
+
+        #tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        #tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            background: #fff;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background: #007aff;
+            color: #fff;
+            border-color: #007aff;
+        }
+
+        .control-panel {
+            display: none;
+        }
+
+        .control-panel.active {
+            display: block;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #1d1d1f;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #d1d1d6;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+            border: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            background: #fff;
+            font-family: inherit;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .value-display {
+            display: inline-block;
+            font-size: 13px;
+            color: #86868b;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+        <div id="controls">
+            <div id="tabs">
+                <div class="tab active" data-sim="rain">Rain</div>
+                <div class="tab" data-sim="fire">Fire</div>
+                <div class="tab" data-sim="flock">Flock</div>
+                <div class="tab" data-sim="galaxy">Galaxy</div>
+                <div class="tab" data-sim="aurora">Aurora</div>
+                <div class="tab" data-sim="ocean">Ocean Waves</div>
+            </div>
+
+            <div id="rain-controls" class="control-panel active">
+                <div class="control-group">
+                    <label>Intensity</label>
+                    <select id="rain-intensity">
+                        <option value="light">Light</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="heavy">Heavy</option>
+                        <option value="storm">Storm</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Wind <span class="value-display" id="rain-wind-val">0</span></label>
+                    <input type="range" id="rain-wind" min="-50" max="50" value="0">
+                </div>
+                <div class="control-group">
+                    <label>Drop Size <span class="value-display" id="rain-size-val">1</span></label>
+                    <input type="range" id="rain-size" min="0.5" max="2" step="0.1" value="1">
+                </div>
+                <div class="control-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="rain-splash" checked>
+                        <label for="rain-splash" style="margin: 0">Splash Effects</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="fire-controls" class="control-panel">
+                <div class="control-group">
+                    <label>Intensity <span class="value-display" id="fire-intensity-val">50</span></label>
+                    <input type="range" id="fire-intensity" min="10" max="100" value="50">
+                </div>
+                <div class="control-group">
+                    <label>Ember Count <span class="value-display" id="fire-embers-val">100</span></label>
+                    <input type="range" id="fire-embers" min="50" max="300" value="100">
+                </div>
+                <div class="control-group">
+                    <label>Color</label>
+                    <select id="fire-color">
+                        <option value="orange" selected>Orange</option>
+                        <option value="blue">Blue</option>
+                        <option value="green">Green</option>
+                        <option value="white">White</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="fire-smoke" checked>
+                        <label for="fire-smoke" style="margin: 0">Smoke</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="flock-controls" class="control-panel">
+                <div class="control-group">
+                    <label>Boid Count <span class="value-display" id="flock-count-val">80</span></label>
+                    <input type="range" id="flock-count" min="20" max="200" value="80">
+                </div>
+                <div class="control-group">
+                    <label>Speed <span class="value-display" id="flock-speed-val">2</span></label>
+                    <input type="range" id="flock-speed" min="1" max="5" step="0.5" value="2">
+                </div>
+                <div class="control-group">
+                    <label>Separation <span class="value-display" id="flock-sep-val">25</span></label>
+                    <input type="range" id="flock-sep" min="15" max="50" value="25">
+                </div>
+                <div class="control-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="flock-trails">
+                        <label for="flock-trails" style="margin: 0">Show Trails</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="galaxy-controls" class="control-panel">
+                <div class="control-group">
+                    <label>Star Count <span class="value-display" id="galaxy-stars-val">2000</span></label>
+                    <input type="range" id="galaxy-stars" min="500" max="5000" step="100" value="2000">
+                </div>
+                <div class="control-group">
+                    <label>Spiral Arms <span class="value-display" id="galaxy-arms-val">4</span></label>
+                    <input type="range" id="galaxy-arms" min="2" max="6" value="4">
+                </div>
+                <div class="control-group">
+                    <label>Rotation Speed <span class="value-display" id="galaxy-speed-val">1</span></label>
+                    <input type="range" id="galaxy-speed" min="0.1" max="3" step="0.1" value="1">
+                </div>
+                <div class="control-group">
+                    <label>Color</label>
+                    <select id="galaxy-color">
+                        <option value="white" selected>White</option>
+                        <option value="blue">Blue</option>
+                        <option value="multicolor">Multicolor</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="aurora-controls" class="control-panel">
+                <div class="control-group">
+                    <label>Intensity <span class="value-display" id="aurora-intensity-val">50</span></label>
+                    <input type="range" id="aurora-intensity" min="20" max="100" value="50">
+                </div>
+                <div class="control-group">
+                    <label>Color Scheme</label>
+                    <select id="aurora-color">
+                        <option value="green" selected>Green</option>
+                        <option value="purple">Purple</option>
+                        <option value="multicolor">Multicolor</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Wave Speed <span class="value-display" id="aurora-speed-val">1</span></label>
+                    <input type="range" id="aurora-speed" min="0.5" max="3" step="0.1" value="1">
+                </div>
+                <div class="control-group">
+                    <label>Star Density <span class="value-display" id="aurora-stars-val">100</span></label>
+                    <input type="range" id="aurora-stars" min="50" max="300" value="100">
+                </div>
+            </div>
+
+            <div id="ocean-controls" class="control-panel">
+                <div class="control-group">
+                    <label>Wave Layers <span class="value-display" id="ocean-count-val">5</span></label>
+                    <input type="range" id="ocean-count" min="3" max="8" value="5">
+                </div>
+                <div class="control-group">
+                    <label>Speed <span class="value-display" id="ocean-speed-val">1</span></label>
+                    <input type="range" id="ocean-speed" min="0.5" max="3" step="0.1" value="1">
+                </div>
+                <div class="control-group">
+                    <label>Color</label>
+                    <select id="ocean-color">
+                        <option value="blue" selected>Blue</option>
+                        <option value="teal">Teal</option>
+                        <option value="sunset">Sunset</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Amplitude <span class="value-display" id="ocean-amp-val">50</span></label>
+                    <input type="range" id="ocean-amp" min="20" max="100" value="50">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let currentSim = 'rain';
+        let animationId;
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight - 180;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.control-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                const sim = tab.dataset.sim;
+                document.getElementById(`${sim}-controls`).classList.add('active');
+                if (animationId) cancelAnimationFrame(animationId);
+                currentSim = sim;
+                initSimulation(sim);
+            });
+        });
+
+        // Value display updates
+        function updateValueDisplay(inputId, displayId, suffix = '') {
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(displayId);
+            const update = () => display.textContent = input.value + suffix;
+            input.addEventListener('input', update);
+            update();
+        }
+
+        updateValueDisplay('rain-wind', 'rain-wind-val');
+        updateValueDisplay('rain-size', 'rain-size-val');
+        updateValueDisplay('fire-intensity', 'fire-intensity-val');
+        updateValueDisplay('fire-embers', 'fire-embers-val');
+        updateValueDisplay('flock-count', 'flock-count-val');
+        updateValueDisplay('flock-speed', 'flock-speed-val');
+        updateValueDisplay('flock-sep', 'flock-sep-val');
+        updateValueDisplay('galaxy-stars', 'galaxy-stars-val');
+        updateValueDisplay('galaxy-arms', 'galaxy-arms-val');
+        updateValueDisplay('galaxy-speed', 'galaxy-speed-val');
+        updateValueDisplay('aurora-intensity', 'aurora-intensity-val');
+        updateValueDisplay('aurora-speed', 'aurora-speed-val');
+        updateValueDisplay('aurora-stars', 'aurora-stars-val');
+        updateValueDisplay('ocean-count', 'ocean-count-val');
+        updateValueDisplay('ocean-speed', 'ocean-speed-val');
+        updateValueDisplay('ocean-amp', 'ocean-amp-val');
+
+        // Touch/Mouse handling
+        let touches = [];
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            touches = Array.from(e.touches).map(t => ({x: t.clientX, y: t.clientY}));
+        });
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+            touches = Array.from(e.touches).map(t => ({x: t.clientX, y: t.clientY}));
+        });
+        canvas.addEventListener('touchend', e => {
+            e.preventDefault();
+            touches = Array.from(e.touches).map(t => ({x: t.clientX, y: t.clientY}));
+        });
+        canvas.addEventListener('mousedown', e => {
+            touches = [{x: e.clientX, y: e.clientY}];
+        });
+        canvas.addEventListener('mousemove', e => {
+            if (e.buttons) touches = [{x: e.clientX, y: e.clientY}];
+        });
+        canvas.addEventListener('mouseup', () => {
+            touches = [];
+        });
+
+        // RAIN SIMULATION
+        class Raindrop {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = -20;
+                this.speed = 8 + Math.random() * 4;
+                this.length = 10 + Math.random() * 10;
+            }
+            update(wind, sizeMultiplier) {
+                this.y += this.speed * sizeMultiplier;
+                this.x += wind * 0.1;
+                if (this.y > height) {
+                    if (document.getElementById('rain-splash').checked) {
+                        rainSplashes.push(new Splash(this.x, height));
+                    }
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.strokeStyle = 'rgba(174, 194, 224, 0.5)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x, this.y + this.length);
+                ctx.stroke();
+            }
+        }
+
+        class Splash {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.particles = [];
+                for (let i = 0; i < 4; i++) {
+                    this.particles.push({
+                        x: 0,
+                        y: 0,
+                        vx: (Math.random() - 0.5) * 3,
+                        vy: -Math.random() * 3,
+                        life: 1
+                    });
+                }
+            }
+            update() {
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.2;
+                    p.life -= 0.05;
+                });
+            }
+            draw() {
+                this.particles.forEach(p => {
+                    ctx.fillStyle = `rgba(174, 194, 224, ${p.life * 0.6})`;
+                    ctx.fillRect(this.x + p.x, this.y + p.y, 2, 2);
+                });
+            }
+            isDead() {
+                return this.particles[0].life <= 0;
+            }
+        }
+
+        let raindrops = [];
+        let rainSplashes = [];
+        let windGust = 0;
+
+        function initRain() {
+            raindrops = [];
+            rainSplashes = [];
+            const intensity = document.getElementById('rain-intensity').value;
+            const counts = {light: 50, medium: 100, heavy: 200, storm: 400};
+            for (let i = 0; i < counts[intensity]; i++) {
+                raindrops.push(new Raindrop());
+            }
+        }
+
+        function updateRain() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, width, height);
+
+            const baseWind = parseFloat(document.getElementById('rain-wind').value);
+            const size = parseFloat(document.getElementById('rain-size').value);
+
+            if (touches.length > 0) {
+                windGust = (touches[0].x - width / 2) * 0.2;
+            } else {
+                windGust *= 0.95;
+            }
+
+            const totalWind = baseWind + windGust;
+
+            raindrops.forEach(drop => {
+                drop.update(totalWind, size);
+                drop.draw();
+            });
+
+            rainSplashes.forEach(splash => {
+                splash.update();
+                splash.draw();
+            });
+            rainSplashes = rainSplashes.filter(s => !s.isDead());
+
+            animationId = requestAnimationFrame(updateRain);
+        }
+
+        // FIRE SIMULATION
+        class FireParticle {
+            constructor(x, y, colorScheme) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = -Math.random() * 3 - 1;
+                this.life = 1;
+                this.size = Math.random() * 8 + 2;
+                this.colorScheme = colorScheme;
+                this.isSmoke = Math.random() < 0.15;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy -= 0.05;
+                this.vx *= 0.98;
+                this.life -= 0.01;
+                this.size *= 0.98;
+            }
+            draw() {
+                if (this.isSmoke) {
+                    ctx.fillStyle = `rgba(100, 100, 100, ${this.life * 0.3})`;
+                } else {
+                    const colors = {
+                        orange: [`rgba(255, 200, 0, ${this.life})`, `rgba(255, 100, 0, ${this.life * 0.8})`],
+                        blue: [`rgba(100, 200, 255, ${this.life})`, `rgba(50, 100, 255, ${this.life * 0.8})`],
+                        green: [`rgba(100, 255, 100, ${this.life})`, `rgba(0, 200, 100, ${this.life * 0.8})`],
+                        white: [`rgba(255, 255, 255, ${this.life})`, `rgba(200, 200, 255, ${this.life * 0.8})`]
+                    };
+                    const c = colors[this.colorScheme];
+                    ctx.fillStyle = this.life > 0.5 ? c[0] : c[1];
+                }
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            isDead() {
+                return this.life <= 0;
+            }
+        }
+
+        let fireParticles = [];
+        let fireX = 0, fireY = 0;
+
+        function initFire() {
+            fireParticles = [];
+            fireX = width / 2;
+            fireY = height - 50;
+        }
+
+        function updateFire() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+
+            if (touches.length > 0) {
+                fireX = touches[0].x;
+                fireY = touches[0].y;
+            }
+
+            const intensity = parseInt(document.getElementById('fire-intensity').value);
+            const emberCount = parseInt(document.getElementById('fire-embers').value);
+            const color = document.getElementById('fire-color').value;
+            const smoke = document.getElementById('fire-smoke').checked;
+
+            const spawnCount = Math.floor(emberCount / 20);
+            for (let i = 0; i < spawnCount; i++) {
+                const particle = new FireParticle(
+                    fireX + (Math.random() - 0.5) * intensity,
+                    fireY,
+                    color
+                );
+                if (!smoke && particle.isSmoke) continue;
+                fireParticles.push(particle);
+            }
+
+            fireParticles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            fireParticles = fireParticles.filter(p => !p.isDead());
+
+            animationId = requestAnimationFrame(updateFire);
+        }
+
+        // FLOCK SIMULATION
+        class Boid {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                this.trail = [];
+            }
+            update(boids, separation, speed, showTrails) {
+                let alignX = 0, alignY = 0;
+                let cohesionX = 0, cohesionY = 0;
+                let separationX = 0, separationY = 0;
+                let nearby = 0;
+
+                boids.forEach(other => {
+                    if (other === this) return;
+                    const dx = other.x - this.x;
+                    const dy = other.y - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 100) {
+                        alignX += other.vx;
+                        alignY += other.vy;
+                        cohesionX += other.x;
+                        cohesionY += other.y;
+                        nearby++;
+                    }
+
+                    if (dist < separation) {
+                        separationX -= dx;
+                        separationY -= dy;
+                    }
+                });
+
+                if (nearby > 0) {
+                    alignX /= nearby;
+                    alignY /= nearby;
+                    cohesionX /= nearby;
+                    cohesionY /= nearby;
+
+                    this.vx += (alignX - this.vx) * 0.05;
+                    this.vy += (alignY - this.vy) * 0.05;
+                    this.vx += (cohesionX - this.x) * 0.001;
+                    this.vy += (cohesionY - this.y) * 0.001;
+                }
+
+                this.vx += separationX * 0.05;
+                this.vy += separationY * 0.05;
+
+                // Avoid touch
+                touches.forEach(touch => {
+                    const dx = touch.x - this.x;
+                    const dy = touch.y - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        this.vx -= dx * 0.5;
+                        this.vy -= dy * 0.5;
+                    }
+                });
+
+                const velocityMag = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                const maxSpeed = speed * 2;
+                if (velocityMag > maxSpeed) {
+                    this.vx = (this.vx / velocityMag) * maxSpeed;
+                    this.vy = (this.vy / velocityMag) * maxSpeed;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+
+                if (showTrails) {
+                    this.trail.push({x: this.x, y: this.y});
+                    if (this.trail.length > 20) this.trail.shift();
+                }
+            }
+            draw(showTrails) {
+                if (showTrails) {
+                    ctx.strokeStyle = 'rgba(100, 150, 200, 0.3)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    this.trail.forEach((p, i) => {
+                        if (i === 0) ctx.moveTo(p.x, p.y);
+                        else ctx.lineTo(p.x, p.y);
+                    });
+                    ctx.stroke();
+                }
+
+                const angle = Math.atan2(this.vy, this.vx);
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(angle);
+                ctx.fillStyle = '#4a5568';
+                ctx.beginPath();
+                ctx.moveTo(8, 0);
+                ctx.lineTo(-4, 4);
+                ctx.lineTo(-4, -4);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        let boids = [];
+
+        function initFlock() {
+            const count = parseInt(document.getElementById('flock-count').value);
+            boids = [];
+            for (let i = 0; i < count; i++) {
+                boids.push(new Boid());
+            }
+        }
+
+        function updateFlock() {
+            const showTrails = document.getElementById('flock-trails').checked;
+
+            if (showTrails) {
+                ctx.fillStyle = 'rgba(230, 240, 250, 0.1)';
+            } else {
+                ctx.fillStyle = '#e6f0fa';
+            }
+            ctx.fillRect(0, 0, width, height);
+
+            const separation = parseInt(document.getElementById('flock-sep').value);
+            const speed = parseFloat(document.getElementById('flock-speed').value);
+
+            boids.forEach(boid => {
+                boid.update(boids, separation, speed, showTrails);
+                boid.draw(showTrails);
+            });
+
+            animationId = requestAnimationFrame(updateFlock);
+        }
+
+        // GALAXY SIMULATION
+        class Star {
+            constructor(arms, armIndex) {
+                const armAngle = (armIndex / arms) * Math.PI * 2;
+                const distance = Math.random() * 300 + 50;
+                const spread = (Math.random() - 0.5) * 0.8;
+
+                this.angle = armAngle + spread;
+                this.distance = distance;
+                this.speed = 0.3 / distance;
+                this.size = Math.random() * 2 + 0.5;
+                this.brightness = Math.random();
+                this.colorHue = Math.random() * 60 + 200;
+            }
+            update(rotationSpeed) {
+                this.angle += this.speed * rotationSpeed * 0.01;
+                this.brightness = 0.5 + Math.sin(Date.now() * 0.001 + this.angle) * 0.5;
+            }
+            draw(centerX, centerY, colorScheme) {
+                const x = centerX + Math.cos(this.angle) * this.distance;
+                const y = centerY + Math.sin(this.angle) * this.distance;
+
+                let color;
+                if (colorScheme === 'white') {
+                    color = `rgba(255, 255, 255, ${this.brightness})`;
+                } else if (colorScheme === 'blue') {
+                    color = `rgba(150, 200, 255, ${this.brightness})`;
+                } else {
+                    color = `hsla(${this.colorHue}, 80%, 70%, ${this.brightness})`;
+                }
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        let stars = [];
+
+        function initGalaxy() {
+            stars = [];
+            const count = parseInt(document.getElementById('galaxy-stars').value);
+            const arms = parseInt(document.getElementById('galaxy-arms').value);
+
+            for (let i = 0; i < count; i++) {
+                const armIndex = i % arms;
+                stars.push(new Star(arms, armIndex));
+            }
+        }
+
+        function updateGalaxy() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const rotationSpeed = parseFloat(document.getElementById('galaxy-speed').value);
+            const colorScheme = document.getElementById('galaxy-color').value;
+
+            stars.forEach(star => {
+                star.update(rotationSpeed);
+                star.draw(centerX, centerY, colorScheme);
+            });
+
+            // Center glow
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 100);
+            gradient.addColorStop(0, 'rgba(255, 255, 200, 0.3)');
+            gradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            animationId = requestAnimationFrame(updateGalaxy);
+        }
+
+        // AURORA SIMULATION
+        let auroraStars = [];
+        let auroraWaves = [];
+        let auroraTime = 0;
+
+        function initAurora() {
+            const starCount = parseInt(document.getElementById('aurora-stars').value);
+            auroraStars = [];
+            for (let i = 0; i < starCount; i++) {
+                auroraStars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height * 0.6,
+                    brightness: Math.random(),
+                    twinkleSpeed: Math.random() * 0.02 + 0.01
+                });
+            }
+
+            auroraWaves = [];
+            for (let i = 0; i < 5; i++) {
+                auroraWaves.push({
+                    offset: Math.random() * 100,
+                    yBase: height * 0.2 + i * 40,
+                    amplitude: 30 + Math.random() * 20,
+                    frequency: 0.003 + Math.random() * 0.002,
+                    speed: 0.5 + Math.random() * 0.5,
+                    alpha: 0.15 + Math.random() * 0.1
+                });
+            }
+        }
+
+        function updateAurora() {
+            ctx.fillStyle = '#000814';
+            ctx.fillRect(0, 0, width, height);
+
+            // Stars
+            auroraStars.forEach(star => {
+                star.brightness = 0.3 + Math.sin(Date.now() * star.twinkleSpeed) * 0.3;
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+                ctx.fillRect(star.x, star.y, 1, 1);
+            });
+
+            const intensity = parseInt(document.getElementById('aurora-intensity').value) / 100;
+            const colorScheme = document.getElementById('aurora-color').value;
+            const waveSpeed = parseFloat(document.getElementById('aurora-speed').value);
+
+            auroraTime += waveSpeed;
+
+            auroraWaves.forEach((wave, index) => {
+                const colors = {
+                    green: [`rgba(0, 255, 150, ${wave.alpha * intensity})`, `rgba(100, 255, 200, ${wave.alpha * 0.5 * intensity})`],
+                    purple: [`rgba(200, 100, 255, ${wave.alpha * intensity})`, `rgba(255, 150, 255, ${wave.alpha * 0.5 * intensity})`],
+                    multicolor: [
+                        `hsla(${index * 60}, 80%, 70%, ${wave.alpha * intensity})`,
+                        `hsla(${index * 60 + 30}, 80%, 70%, ${wave.alpha * 0.5 * intensity})`
+                    ]
+                };
+
+                const gradient = ctx.createLinearGradient(0, wave.yBase - 50, 0, wave.yBase + 100);
+                gradient.addColorStop(0, colors[colorScheme][0]);
+                gradient.addColorStop(1, colors[colorScheme][1]);
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.moveTo(0, height);
+
+                for (let x = 0; x <= width; x += 5) {
+                    const y = wave.yBase +
+                        Math.sin(x * wave.frequency + auroraTime * wave.speed + wave.offset) * wave.amplitude +
+                        Math.sin(x * wave.frequency * 2 + auroraTime * wave.speed * 1.5) * wave.amplitude * 0.5;
+                    ctx.lineTo(x, y);
+                }
+
+                ctx.lineTo(width, height);
+                ctx.closePath();
+                ctx.fill();
+            });
+
+            animationId = requestAnimationFrame(updateAurora);
+        }
+
+        // OCEAN WAVES SIMULATION
+        let oceanTime = 0;
+
+        function initOcean() {
+            oceanTime = 0;
+        }
+
+        function updateOcean() {
+            const colorScheme = document.getElementById('ocean-color').value;
+
+            const backgrounds = {
+                blue: ['#87CEEB', '#4A90E2'],
+                teal: ['#7FDBDA', '#3AA899'],
+                sunset: ['#FFB347', '#FF6B6B']
+            };
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, backgrounds[colorScheme][0]);
+            gradient.addColorStop(1, backgrounds[colorScheme][1]);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            const waveCount = parseInt(document.getElementById('ocean-count').value);
+            const speed = parseFloat(document.getElementById('ocean-speed').value);
+            const amplitude = parseInt(document.getElementById('ocean-amp').value);
+
+            oceanTime += speed * 0.02;
+
+            const waveColors = {
+                blue: ['rgba(30, 144, 255, 0.6)', 'rgba(65, 105, 225, 0.4)'],
+                teal: ['rgba(64, 224, 208, 0.6)', 'rgba(72, 209, 204, 0.4)'],
+                sunset: ['rgba(255, 140, 0, 0.6)', 'rgba(255, 99, 71, 0.4)']
+            };
+
+            for (let layer = 0; layer < waveCount; layer++) {
+                const yOffset = height * 0.4 + layer * (height * 0.6 / waveCount);
+                const layerAmplitude = amplitude * (1 - layer / waveCount * 0.3);
+                const frequency = 0.005 + layer * 0.001;
+                const phaseShift = layer * 0.5;
+
+                const colorIndex = layer % 2;
+                ctx.fillStyle = waveColors[colorScheme][colorIndex];
+
+                ctx.beginPath();
+                ctx.moveTo(0, height);
+
+                for (let x = 0; x <= width; x += 5) {
+                    const y = yOffset +
+                        Math.sin(x * frequency + oceanTime + phaseShift) * layerAmplitude +
+                        Math.sin(x * frequency * 2 + oceanTime * 1.3) * layerAmplitude * 0.5;
+                    ctx.lineTo(x, y);
+                }
+
+                ctx.lineTo(width, height);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            animationId = requestAnimationFrame(updateOcean);
+        }
+
+        // Control change handlers
+        document.getElementById('rain-intensity').addEventListener('change', initRain);
+        document.getElementById('flock-count').addEventListener('change', initFlock);
+        document.getElementById('galaxy-stars').addEventListener('change', initGalaxy);
+        document.getElementById('galaxy-arms').addEventListener('change', initGalaxy);
+        document.getElementById('aurora-stars').addEventListener('change', initAurora);
+
+        // Initialize
+        function initSimulation(sim) {
+            switch(sim) {
+                case 'rain': initRain(); updateRain(); break;
+                case 'fire': initFire(); updateFire(); break;
+                case 'flock': initFlock(); updateFlock(); break;
+                case 'galaxy': initGalaxy(); updateGalaxy(); break;
+                case 'aurora': initAurora(); updateAurora(); break;
+                case 'ocean': initOcean(); updateOcean(); break;
+            }
+        }
+
+        initSimulation('rain');
+    </script>
+</body>
+</html>

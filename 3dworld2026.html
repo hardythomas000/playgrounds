@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D World 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            overflow-x: hidden;
+            touch-action: pan-y;
+        }
+
+        .header {
+            background: #fff;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 4px;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: #f5f5f7;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #007aff;
+            color: #fff;
+        }
+
+        .content {
+            display: none;
+            flex-direction: column;
+            min-height: calc(100vh - 140px);
+        }
+
+        .content.active {
+            display: flex;
+        }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: #000;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 60vh;
+            touch-action: none;
+            display: block;
+        }
+
+        .controls {
+            background: #fff;
+            padding: 16px;
+            border-top: 1px solid #e5e5e7;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e5e5e7;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #007aff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #007aff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e5e5e7;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+            color: #1d1d1f;
+        }
+
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle input[type="checkbox"] {
+            width: 50px;
+            height: 28px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e5e5e7;
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        .toggle input[type="checkbox"]:checked {
+            background: #007aff;
+        }
+
+        .toggle input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+
+        .toggle input[type="checkbox"]:checked::before {
+            transform: translateX(22px);
+        }
+
+        .value-display {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>3D World 2026</h1>
+        <div class="tabs">
+            <button class="tab active" data-tab="cube">Rotating Cube</button>
+            <button class="tab" data-tab="starfield">Starfield</button>
+            <button class="tab" data-tab="terrain">Terrain</button>
+            <button class="tab" data-tab="metaballs">Metaballs</button>
+            <button class="tab" data-tab="tunnel">Tunnel</button>
+        </div>
+    </div>
+
+    <!-- ROTATING CUBE -->
+    <div class="content active" id="cube">
+        <div class="canvas-container">
+            <canvas id="cubeCanvas"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">
+                    Rotation Speed: <span class="value-display" id="cubeSpeedVal">1.0</span>
+                </label>
+                <input type="range" id="cubeSpeed" min="0" max="5" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Line Color</label>
+                <select id="cubeColor">
+                    <option value="#00ff00">Green</option>
+                    <option value="#00ffff">Cyan</option>
+                    <option value="#ff00ff">Magenta</option>
+                    <option value="#ffff00">Yellow</option>
+                    <option value="#ffffff" selected>White</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Perspective: <span class="value-display" id="cubePerspectiveVal">400</span>
+                </label>
+                <input type="range" id="cubePerspective" min="200" max="800" step="50" value="400">
+            </div>
+            <div class="control-group">
+                <label class="control-label toggle">
+                    Show Axes
+                    <input type="checkbox" id="cubeAxes" checked>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- STARFIELD -->
+    <div class="content" id="starfield">
+        <div class="canvas-container">
+            <canvas id="starfieldCanvas"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">
+                    Star Count: <span class="value-display" id="starCountVal">500</span>
+                </label>
+                <input type="range" id="starCount" min="100" max="1000" step="50" value="500">
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Speed: <span class="value-display" id="starSpeedVal">2.0</span>
+                </label>
+                <input type="range" id="starSpeed" min="0.5" max="10" step="0.5" value="2">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Star Color</label>
+                <select id="starColor">
+                    <option value="#ffffff" selected>White</option>
+                    <option value="#00ffff">Cyan</option>
+                    <option value="#ffff00">Yellow</option>
+                    <option value="#ff00ff">Magenta</option>
+                    <option value="rainbow">Rainbow</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Trail Length: <span class="value-display" id="starTrailVal">0.1</span>
+                </label>
+                <input type="range" id="starTrail" min="0" max="1" step="0.05" value="0.1">
+            </div>
+        </div>
+    </div>
+
+    <!-- TERRAIN -->
+    <div class="content" id="terrain">
+        <div class="canvas-container">
+            <canvas id="terrainCanvas"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">
+                    Roughness: <span class="value-display" id="terrainRoughnessVal">0.5</span>
+                </label>
+                <input type="range" id="terrainRoughness" min="0.1" max="1" step="0.1" value="0.5">
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Grid Size: <span class="value-display" id="terrainGridVal">30</span>
+                </label>
+                <input type="range" id="terrainGrid" min="15" max="50" step="5" value="30">
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Height Scale: <span class="value-display" id="terrainHeightVal">50</span>
+                </label>
+                <input type="range" id="terrainHeight" min="20" max="100" step="10" value="50">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Color Theme</label>
+                <select id="terrainColor">
+                    <option value="green" selected>Green</option>
+                    <option value="desert">Desert</option>
+                    <option value="ice">Ice</option>
+                    <option value="lava">Lava</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- METABALLS -->
+    <div class="content" id="metaballs">
+        <div class="canvas-container">
+            <canvas id="metaballsCanvas"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">
+                    Blob Count: <span class="value-display" id="metaBlobsVal">5</span>
+                </label>
+                <input type="range" id="metaBlobs" min="3" max="8" step="1" value="5">
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Threshold: <span class="value-display" id="metaThresholdVal">1.0</span>
+                </label>
+                <input type="range" id="metaThreshold" min="0.5" max="2" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Color Scheme</label>
+                <select id="metaColor">
+                    <option value="rainbow" selected>Rainbow</option>
+                    <option value="fire">Fire</option>
+                    <option value="ocean">Ocean</option>
+                    <option value="neon">Neon</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Speed: <span class="value-display" id="metaSpeedVal">1.0</span>
+                </label>
+                <input type="range" id="metaSpeed" min="0.2" max="3" step="0.2" value="1">
+            </div>
+        </div>
+    </div>
+
+    <!-- TUNNEL -->
+    <div class="content" id="tunnel">
+        <div class="canvas-container">
+            <canvas id="tunnelCanvas"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">
+                    Ring Count: <span class="value-display" id="tunnelRingsVal">20</span>
+                </label>
+                <input type="range" id="tunnelRings" min="10" max="40" step="5" value="20">
+            </div>
+            <div class="control-group">
+                <label class="control-label">
+                    Speed: <span class="value-display" id="tunnelSpeedVal">0.05</span>
+                </label>
+                <input type="range" id="tunnelSpeed" min="0.01" max="0.2" step="0.01" value="0.05">
+            </div>
+            <div class="control-group">
+                <label class="control-label toggle">
+                    Color Cycle
+                    <input type="checkbox" id="tunnelColorCycle" checked>
+                </label>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Ring Shape</label>
+                <select id="tunnelShape">
+                    <option value="circle" selected>Circle</option>
+                    <option value="square">Square</option>
+                    <option value="hexagon">Hexagon</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TAB SWITCHING
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(targetId).classList.add('active');
+
+                // Initialize animation for newly active tab
+                switch(targetId) {
+                    case 'cube': cubeInit(); break;
+                    case 'starfield': starfieldInit(); break;
+                    case 'terrain': terrainInit(); break;
+                    case 'metaballs': metaballsInit(); break;
+                    case 'tunnel': tunnelInit(); break;
+                }
+            });
+        });
+
+        // UTILITY: Canvas sizing
+        function resizeCanvas(canvas, bgColor = '#000') {
+            const container = canvas.parentElement;
+            const size = Math.min(container.clientWidth - 32, window.innerHeight * 0.6);
+            canvas.width = size;
+            canvas.height = size;
+        }
+
+        // ==================== ROTATING CUBE ====================
+        let cubeAnimationId = null;
+
+        function cubeInit() {
+            if (cubeAnimationId) return; // Already running
+
+            const canvas = document.getElementById('cubeCanvas');
+            const ctx = canvas.getContext('2d');
+            resizeCanvas(canvas);
+
+            let angleX = 0, angleY = 0, angleZ = 0;
+            let touchRotateX = 0, touchRotateY = 0;
+            let autoRotate = true;
+
+            // Controls
+            const speedSlider = document.getElementById('cubeSpeed');
+            const colorSelect = document.getElementById('cubeColor');
+            const perspectiveSlider = document.getElementById('cubePerspective');
+            const axesCheckbox = document.getElementById('cubeAxes');
+
+            speedSlider.oninput = e => document.getElementById('cubeSpeedVal').textContent = e.target.value;
+            perspectiveSlider.oninput = e => document.getElementById('cubePerspectiveVal').textContent = e.target.value;
+
+            // Touch controls
+            let lastTouchX = 0, lastTouchY = 0;
+            canvas.addEventListener('touchstart', e => {
+                autoRotate = false;
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            });
+
+            canvas.addEventListener('touchmove', e => {
+                e.preventDefault();
+                const dx = e.touches[0].clientX - lastTouchX;
+                const dy = e.touches[0].clientY - lastTouchY;
+                touchRotateY += dx * 0.01;
+                touchRotateX += dy * 0.01;
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            });
+
+            canvas.addEventListener('touchend', () => {
+                setTimeout(() => autoRotate = true, 1000);
+            });
+
+            // 3D projection
+            function project(x, y, z) {
+                const perspective = parseFloat(perspectiveSlider.value);
+                const scale = perspective / (perspective + z);
+                return {
+                    x: canvas.width / 2 + x * scale,
+                    y: canvas.height / 2 + y * scale
+                };
+            }
+
+            // Rotation matrices
+            function rotateX(point, angle) {
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+                return {
+                    x: point.x,
+                    y: point.y * cos - point.z * sin,
+                    z: point.y * sin + point.z * cos
+                };
+            }
+
+            function rotateY(point, angle) {
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+                return {
+                    x: point.x * cos + point.z * sin,
+                    y: point.y,
+                    z: -point.x * sin + point.z * cos
+                };
+            }
+
+            function rotateZ(point, angle) {
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+                return {
+                    x: point.x * cos - point.y * sin,
+                    y: point.x * sin + point.y * cos,
+                    z: point.z
+                };
+            }
+
+            // Cube vertices
+            const size = 80;
+            const vertices = [
+                {x: -size, y: -size, z: -size},
+                {x: size, y: -size, z: -size},
+                {x: size, y: size, z: -size},
+                {x: -size, y: size, z: -size},
+                {x: -size, y: -size, z: size},
+                {x: size, y: -size, z: size},
+                {x: size, y: size, z: size},
+                {x: -size, y: size, z: size}
+            ];
+
+            const edges = [
+                [0,1],[1,2],[2,3],[3,0], // back
+                [4,5],[5,6],[6,7],[7,4], // front
+                [0,4],[1,5],[2,6],[3,7]  // connecting
+            ];
+
+            function animate() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const speed = parseFloat(speedSlider.value);
+                if (autoRotate) {
+                    angleX += 0.01 * speed;
+                    angleY += 0.015 * speed;
+                    angleZ += 0.008 * speed;
+                } else {
+                    angleX = touchRotateX;
+                    angleY = touchRotateY;
+                }
+
+                // Transform vertices
+                const transformed = vertices.map(v => {
+                    let p = rotateX(v, angleX);
+                    p = rotateY(p, angleY);
+                    p = rotateZ(p, angleZ);
+                    return p;
+                });
+
+                // Draw edges
+                ctx.strokeStyle = colorSelect.value;
+                ctx.lineWidth = 2;
+                edges.forEach(([i, j]) => {
+                    const p1 = project(transformed[i].x, transformed[i].y, transformed[i].z);
+                    const p2 = project(transformed[j].x, transformed[j].y, transformed[j].z);
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                });
+
+                // Draw axes
+                if (axesCheckbox.checked) {
+                    const axisLen = 120;
+                    const axes = [
+                        {p: {x: axisLen, y: 0, z: 0}, color: '#ff0000'}, // X
+                        {p: {x: 0, y: axisLen, z: 0}, color: '#00ff00'}, // Y
+                        {p: {x: 0, y: 0, z: axisLen}, color: '#0000ff'}  // Z
+                    ];
+
+                    axes.forEach(axis => {
+                        let p = rotateX(axis.p, angleX);
+                        p = rotateY(p, angleY);
+                        p = rotateZ(p, angleZ);
+                        const proj = project(p.x, p.y, p.z);
+                        const origin = project(0, 0, 0);
+
+                        ctx.strokeStyle = axis.color;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(origin.x, origin.y);
+                        ctx.lineTo(proj.x, proj.y);
+                        ctx.stroke();
+                    });
+                }
+
+                cubeAnimationId = requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // ==================== STARFIELD ====================
+        let starfieldAnimationId = null;
+
+        function starfieldInit() {
+            if (starfieldAnimationId) cancelAnimationFrame(starfieldAnimationId);
+
+            const canvas = document.getElementById('starfieldCanvas');
+            const ctx = canvas.getContext('2d');
+            resizeCanvas(canvas);
+
+            let stars = [];
+            let dirX = 0, dirY = 0;
+
+            const countSlider = document.getElementById('starCount');
+            const speedSlider = document.getElementById('starSpeed');
+            const colorSelect = document.getElementById('starColor');
+            const trailSlider = document.getElementById('starTrail');
+
+            countSlider.oninput = e => {
+                document.getElementById('starCountVal').textContent = e.target.value;
+                initStars();
+            };
+            speedSlider.oninput = e => document.getElementById('starSpeedVal').textContent = e.target.value;
+            trailSlider.oninput = e => document.getElementById('starTrailVal').textContent = e.target.value;
+
+            function initStars() {
+                const count = parseInt(countSlider.value);
+                stars = [];
+                for (let i = 0; i < count; i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width - canvas.width / 2,
+                        y: Math.random() * canvas.height - canvas.height / 2,
+                        z: Math.random() * 1000
+                    });
+                }
+            }
+
+            canvas.addEventListener('touchstart', e => {
+                const rect = canvas.getBoundingClientRect();
+                dirX = (e.touches[0].clientX - rect.left - canvas.width / 2) / canvas.width;
+                dirY = (e.touches[0].clientY - rect.top - canvas.height / 2) / canvas.height;
+            });
+
+            canvas.addEventListener('touchend', () => {
+                dirX = 0;
+                dirY = 0;
+            });
+
+            initStars();
+
+            function animate() {
+                const trail = parseFloat(trailSlider.value);
+                ctx.fillStyle = `rgba(0,0,0,${trail})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const speed = parseFloat(speedSlider.value);
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+
+                stars.forEach((star, i) => {
+                    star.z -= speed;
+
+                    if (star.z <= 0) {
+                        star.x = Math.random() * canvas.width - centerX;
+                        star.y = Math.random() * canvas.height - centerY;
+                        star.z = 1000;
+                    }
+
+                    const k = 128 / star.z;
+                    const px = star.x * k + centerX + dirX * 100;
+                    const py = star.y * k + centerY + dirY * 100;
+
+                    if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
+                        const size = (1 - star.z / 1000) * 3;
+
+                        let color = colorSelect.value;
+                        if (color === 'rainbow') {
+                            const hue = (i * 137.5) % 360;
+                            color = `hsl(${hue}, 100%, 50%)`;
+                        }
+
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(px, py, size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+
+                starfieldAnimationId = requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // ==================== TERRAIN ====================
+        let terrainAnimationId = null;
+
+        function terrainInit() {
+            if (terrainAnimationId) cancelAnimationFrame(terrainAnimationId);
+
+            const canvas = document.getElementById('terrainCanvas');
+            const ctx = canvas.getContext('2d');
+            resizeCanvas(canvas);
+
+            let angleY = 0;
+            let heightMap = [];
+
+            const roughnessSlider = document.getElementById('terrainRoughness');
+            const gridSlider = document.getElementById('terrainGrid');
+            const heightSlider = document.getElementById('terrainHeight');
+            const colorSelect = document.getElementById('terrainColor');
+
+            roughnessSlider.oninput = e => {
+                document.getElementById('terrainRoughnessVal').textContent = e.target.value;
+                generateTerrain();
+            };
+            gridSlider.oninput = e => {
+                document.getElementById('terrainGridVal').textContent = e.target.value;
+                generateTerrain();
+            };
+            heightSlider.oninput = e => document.getElementById('terrainHeightVal').textContent = e.target.value;
+
+            function generateTerrain() {
+                const gridSize = parseInt(gridSlider.value);
+                const roughness = parseFloat(roughnessSlider.value);
+                heightMap = [];
+
+                for (let i = 0; i < gridSize; i++) {
+                    heightMap[i] = [];
+                    for (let j = 0; j < gridSize; j++) {
+                        const noise = Math.sin(i * 0.2) * Math.cos(j * 0.2) * 0.5 +
+                                     Math.sin(i * 0.5 + 10) * Math.cos(j * 0.5 + 10) * 0.3 +
+                                     (Math.random() - 0.5) * roughness;
+                        heightMap[i][j] = noise;
+                    }
+                }
+            }
+
+            function project3D(x, y, z) {
+                const perspective = 400;
+                const scale = perspective / (perspective + z);
+                return {
+                    x: canvas.width / 2 + x * scale,
+                    y: canvas.height / 2 + y * scale
+                };
+            }
+
+            function rotateY(x, z, angle) {
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+                return {
+                    x: x * cos + z * sin,
+                    z: -x * sin + z * cos
+                };
+            }
+
+            generateTerrain();
+
+            function animate() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                angleY += 0.005;
+
+                const gridSize = parseInt(gridSlider.value);
+                const heightScale = parseFloat(heightSlider.value);
+                const spacing = 15;
+                const offsetX = -gridSize * spacing / 2;
+                const offsetZ = -gridSize * spacing / 2;
+
+                const colorTheme = colorSelect.value;
+                const colors = {
+                    green: ['#00ff00', '#00aa00', '#006600'],
+                    desert: ['#ffff00', '#ffaa00', '#aa6600'],
+                    ice: ['#00ffff', '#0088ff', '#0044aa'],
+                    lava: ['#ff0000', '#ff6600', '#aa0000']
+                };
+
+                // Draw grid lines
+                for (let i = 0; i < gridSize - 1; i++) {
+                    for (let j = 0; j < gridSize - 1; j++) {
+                        const points = [];
+
+                        for (let di = 0; di <= 1; di++) {
+                            for (let dj = 0; dj <= 1; dj++) {
+                                const x = (i + di) * spacing + offsetX;
+                                const y = -heightMap[i + di][j + dj] * heightScale;
+                                const z = (j + dj) * spacing + offsetZ;
+
+                                const rotated = rotateY(x, z, angleY);
+                                const projected = project3D(rotated.x, y, rotated.z);
+                                points.push(projected);
+                            }
+                        }
+
+                        const avgHeight = (heightMap[i][j] + heightMap[i+1][j] +
+                                         heightMap[i][j+1] + heightMap[i+1][j+1]) / 4;
+                        const colorIdx = Math.floor((avgHeight + 1) * colors[colorTheme].length / 2);
+                        const color = colors[colorTheme][Math.max(0, Math.min(colorIdx, colors[colorTheme].length - 1))];
+
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = 1;
+
+                        // Draw quad as lines
+                        ctx.beginPath();
+                        ctx.moveTo(points[0].x, points[0].y);
+                        ctx.lineTo(points[1].x, points[1].y);
+                        ctx.lineTo(points[3].x, points[3].y);
+                        ctx.lineTo(points[2].x, points[2].y);
+                        ctx.closePath();
+                        ctx.stroke();
+                    }
+                }
+
+                terrainAnimationId = requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // ==================== METABALLS ====================
+        let metaballsAnimationId = null;
+
+        function metaballsInit() {
+            if (metaballsAnimationId) cancelAnimationFrame(metaballsAnimationId);
+
+            const canvas = document.getElementById('metaballsCanvas');
+            const ctx = canvas.getContext('2d');
+            resizeCanvas(canvas);
+
+            let blobs = [];
+            let touchX = null, touchY = null;
+
+            const blobsSlider = document.getElementById('metaBlobs');
+            const thresholdSlider = document.getElementById('metaThreshold');
+            const colorSelect = document.getElementById('metaColor');
+            const speedSlider = document.getElementById('metaSpeed');
+
+            blobsSlider.oninput = e => {
+                document.getElementById('metaBlobsVal').textContent = e.target.value;
+                initBlobs();
+            };
+            thresholdSlider.oninput = e => document.getElementById('metaThresholdVal').textContent = e.target.value;
+            speedSlider.oninput = e => document.getElementById('metaSpeedVal').textContent = e.target.value;
+
+            function initBlobs() {
+                const count = parseInt(blobsSlider.value);
+                blobs = [];
+                for (let i = 0; i < count; i++) {
+                    blobs.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        r: 30 + Math.random() * 40
+                    });
+                }
+            }
+
+            canvas.addEventListener('touchstart', e => {
+                const rect = canvas.getBoundingClientRect();
+                touchX = e.touches[0].clientX - rect.left;
+                touchY = e.touches[0].clientY - rect.top;
+            });
+
+            canvas.addEventListener('touchmove', e => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                touchX = e.touches[0].clientX - rect.left;
+                touchY = e.touches[0].clientY - rect.top;
+            });
+
+            canvas.addEventListener('touchend', () => {
+                touchX = null;
+                touchY = null;
+            });
+
+            initBlobs();
+
+            function animate() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const speed = parseFloat(speedSlider.value);
+                const threshold = parseFloat(thresholdSlider.value);
+
+                // Update blob positions
+                blobs.forEach(blob => {
+                    if (touchX !== null) {
+                        const dx = touchX - blob.x;
+                        const dy = touchY - blob.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist > 0) {
+                            blob.vx += (dx / dist) * 0.5;
+                            blob.vy += (dy / dist) * 0.5;
+                        }
+                    }
+
+                    blob.x += blob.vx * speed;
+                    blob.y += blob.vy * speed;
+
+                    // Bounce off walls
+                    if (blob.x < 0 || blob.x > canvas.width) blob.vx *= -0.9;
+                    if (blob.y < 0 || blob.y > canvas.height) blob.vy *= -0.9;
+
+                    blob.x = Math.max(0, Math.min(canvas.width, blob.x));
+                    blob.y = Math.max(0, Math.min(canvas.height, blob.y));
+
+                    // Damping
+                    blob.vx *= 0.99;
+                    blob.vy *= 0.99;
+                });
+
+                // Render metaballs
+                const imageData = ctx.createImageData(canvas.width, canvas.height);
+                const data = imageData.data;
+
+                const colorScheme = colorSelect.value;
+                const step = 4; // Performance optimization
+
+                for (let y = 0; y < canvas.height; y += step) {
+                    for (let x = 0; x < canvas.width; x += step) {
+                        let sum = 0;
+
+                        blobs.forEach(blob => {
+                            const dx = x - blob.x;
+                            const dy = y - blob.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist > 0) {
+                                sum += (blob.r * blob.r) / (dist * dist);
+                            }
+                        });
+
+                        if (sum > threshold) {
+                            let r, g, b;
+
+                            switch(colorScheme) {
+                                case 'fire':
+                                    r = Math.min(255, sum * 100);
+                                    g = Math.min(255, sum * 50);
+                                    b = 0;
+                                    break;
+                                case 'ocean':
+                                    r = 0;
+                                    g = Math.min(255, sum * 50);
+                                    b = Math.min(255, sum * 100);
+                                    break;
+                                case 'neon':
+                                    r = Math.min(255, sum * 80);
+                                    g = Math.min(255, sum * 100);
+                                    b = Math.min(255, sum * 80);
+                                    break;
+                                default: // rainbow
+                                    const hue = (sum * 100) % 360;
+                                    const rgb = hslToRgb(hue / 360, 1, 0.5);
+                                    r = rgb[0];
+                                    g = rgb[1];
+                                    b = rgb[2];
+                            }
+
+                            // Fill block
+                            for (let dy = 0; dy < step; dy++) {
+                                for (let dx = 0; dx < step; dx++) {
+                                    const px = x + dx;
+                                    const py = y + dy;
+                                    if (px < canvas.width && py < canvas.height) {
+                                        const idx = (py * canvas.width + px) * 4;
+                                        data[idx] = r;
+                                        data[idx + 1] = g;
+                                        data[idx + 2] = b;
+                                        data[idx + 3] = 255;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+
+                metaballsAnimationId = requestAnimationFrame(animate);
+            }
+
+            function hslToRgb(h, s, l) {
+                let r, g, b;
+                if (s === 0) {
+                    r = g = b = l;
+                } else {
+                    const hue2rgb = (p, q, t) => {
+                        if (t < 0) t += 1;
+                        if (t > 1) t -= 1;
+                        if (t < 1/6) return p + (q - p) * 6 * t;
+                        if (t < 1/2) return q;
+                        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                        return p;
+                    };
+                    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                    const p = 2 * l - q;
+                    r = hue2rgb(p, q, h + 1/3);
+                    g = hue2rgb(p, q, h);
+                    b = hue2rgb(p, q, h - 1/3);
+                }
+                return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+            }
+
+            animate();
+        }
+
+        // ==================== TUNNEL ====================
+        let tunnelAnimationId = null;
+
+        function tunnelInit() {
+            if (tunnelAnimationId) cancelAnimationFrame(tunnelAnimationId);
+
+            const canvas = document.getElementById('tunnelCanvas');
+            const ctx = canvas.getContext('2d');
+            resizeCanvas(canvas);
+
+            let offset = 0;
+
+            const ringsSlider = document.getElementById('tunnelRings');
+            const speedSlider = document.getElementById('tunnelSpeed');
+            const colorCycleCheckbox = document.getElementById('tunnelColorCycle');
+            const shapeSelect = document.getElementById('tunnelShape');
+
+            ringsSlider.oninput = e => document.getElementById('tunnelRingsVal').textContent = e.target.value;
+            speedSlider.oninput = e => document.getElementById('tunnelSpeedVal').textContent = e.target.value;
+
+            function drawShape(x, y, radius, shape, rotation = 0) {
+                ctx.beginPath();
+
+                switch(shape) {
+                    case 'circle':
+                        ctx.arc(x, y, radius, 0, Math.PI * 2);
+                        break;
+                    case 'square':
+                        const s = radius * 0.7;
+                        ctx.save();
+                        ctx.translate(x, y);
+                        ctx.rotate(rotation);
+                        ctx.rect(-s, -s, s * 2, s * 2);
+                        ctx.restore();
+                        break;
+                    case 'hexagon':
+                        ctx.save();
+                        ctx.translate(x, y);
+                        ctx.rotate(rotation);
+                        for (let i = 0; i < 6; i++) {
+                            const angle = (Math.PI / 3) * i;
+                            const px = radius * Math.cos(angle);
+                            const py = radius * Math.sin(angle);
+                            if (i === 0) ctx.moveTo(px, py);
+                            else ctx.lineTo(px, py);
+                        }
+                        ctx.closePath();
+                        ctx.restore();
+                        break;
+                }
+            }
+
+            function animate() {
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const speed = parseFloat(speedSlider.value);
+                const ringCount = parseInt(ringsSlider.value);
+                const colorCycle = colorCycleCheckbox.checked;
+                const shape = shapeSelect.value;
+
+                offset += speed;
+                if (offset >= 1) offset = 0;
+
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const maxRadius = Math.min(canvas.width, canvas.height) / 2;
+
+                for (let i = 0; i < ringCount; i++) {
+                    const z = (i + offset) / ringCount;
+                    const radius = maxRadius * z;
+
+                    if (radius > 0) {
+                        if (colorCycle) {
+                            const hue = ((i * 30 + offset * 360) % 360);
+                            ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+                        } else {
+                            ctx.strokeStyle = '#00ffff';
+                        }
+
+                        const brightness = z;
+                        ctx.lineWidth = 2 * brightness + 1;
+
+                        const rotation = offset * Math.PI * 2;
+                        drawShape(centerX, centerY, radius, shape, rotation);
+                        ctx.stroke();
+                    }
+                }
+
+                tunnelAnimationId = requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // Initialize first tab
+        cubeInit();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const activeTab = document.querySelector('.tab.active').dataset.tab;
+            switch(activeTab) {
+                case 'cube': cubeInit(); break;
+                case 'starfield': starfieldInit(); break;
+                case 'terrain': terrainInit(); break;
+                case 'metaballs': metaballsInit(); break;
+                case 'tunnel': tunnelInit(); break;
+            }
+        });
+    </script>
+</body>
+</html>

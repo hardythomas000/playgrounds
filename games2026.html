@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mini Games 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+            padding-bottom: 20px;
+        }
+
+        header {
+            background: #fff;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        nav {
+            background: #fff;
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-btn {
+            display: inline-block;
+            padding: 14px 20px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6e6e73;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-btn.active {
+            color: #0071e3;
+            border-bottom-color: #0071e3;
+        }
+
+        .game-container {
+            display: none;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .game-container.active {
+            display: block;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            touch-action: none;
+        }
+
+        .controls {
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #6e6e73;
+        }
+
+        select, button, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        button {
+            background: #0071e3;
+            color: #fff;
+            border: none;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        button:active {
+            background: #0056b3;
+        }
+
+        button.secondary {
+            background: #f5f5f7;
+            color: #1d1d1f;
+            border: 1px solid #d2d2d7;
+        }
+
+        button.secondary:active {
+            background: #e8e8ed;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 16px 0;
+            padding: 12px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            min-width: 280px;
+        }
+
+        .game-over.show {
+            display: block;
+        }
+
+        .game-over h2 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .game-over p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #6e6e73;
+        }
+
+        .memory-grid {
+            display: grid;
+            gap: 8px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: #fff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            user-select: none;
+        }
+
+        .memory-card.flipped {
+            background: #0071e3;
+            color: #fff;
+        }
+
+        .memory-card.matched {
+            background: #34c759;
+            color: #fff;
+            cursor: default;
+        }
+
+        .memory-card:not(.matched):active {
+            transform: scale(0.95);
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat {
+            flex: 1;
+            background: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6e6e73;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .reaction-screen {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s;
+        }
+
+        .reaction-screen h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .reaction-screen p {
+            font-size: 15px;
+            color: #6e6e73;
+            line-height: 1.5;
+        }
+
+        .reaction-screen.waiting {
+            background: #ff3b30;
+            color: #fff;
+        }
+
+        .reaction-screen.ready {
+            background: #34c759;
+            color: #fff;
+        }
+
+        .reaction-results {
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .reaction-results h4 {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .reaction-time {
+            font-size: 48px;
+            font-weight: 700;
+            color: #0071e3;
+            margin: 16px 0;
+        }
+
+        .result-list {
+            list-style: none;
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .result-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .result-list li:last-child {
+            border-bottom: none;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mini Games 2026</h1>
+    </header>
+
+    <nav>
+        <button class="nav-btn active" data-game="snake">Snake</button>
+        <button class="nav-btn" data-game="breakout">Breakout</button>
+        <button class="nav-btn" data-game="flappy">Flappy Tap</button>
+        <button class="nav-btn" data-game="memory">Memory Match</button>
+        <button class="nav-btn" data-game="reaction">Reaction Timer</button>
+    </nav>
+
+    <!-- Snake Game -->
+    <div class="game-container active" id="snake">
+        <div class="controls">
+            <div class="control-group">
+                <label>Speed</label>
+                <select id="snake-speed">
+                    <option value="150">Easy</option>
+                    <option value="100" selected>Medium</option>
+                    <option value="60">Hard</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Grid Size</label>
+                <select id="snake-grid">
+                    <option value="15">Small (15x15)</option>
+                    <option value="20" selected>Medium (20x20)</option>
+                    <option value="25">Large (25x25)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Wall Wrap</label>
+                <select id="snake-wrap">
+                    <option value="true" selected>On</option>
+                    <option value="false">Off</option>
+                </select>
+            </div>
+            <button id="snake-start">Start Game</button>
+        </div>
+        <div class="score">Score: <span id="snake-score">0</span></div>
+        <canvas id="snake-canvas" width="400" height="400"></canvas>
+    </div>
+
+    <!-- Breakout Game -->
+    <div class="game-container" id="breakout">
+        <div class="controls">
+            <div class="control-group">
+                <label>Ball Speed</label>
+                <select id="breakout-speed">
+                    <option value="3">Slow</option>
+                    <option value="5" selected>Medium</option>
+                    <option value="7">Fast</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Paddle Size</label>
+                <select id="breakout-paddle">
+                    <option value="80">Large</option>
+                    <option value="60" selected>Medium</option>
+                    <option value="40">Small</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Brick Rows</label>
+                <select id="breakout-rows">
+                    <option value="3">3 Rows</option>
+                    <option value="4">4 Rows</option>
+                    <option value="5" selected>5 Rows</option>
+                    <option value="6">6 Rows</option>
+                    <option value="7">7 Rows</option>
+                    <option value="8">8 Rows</option>
+                </select>
+            </div>
+            <button id="breakout-start">Start Game</button>
+        </div>
+        <div class="score">Score: <span id="breakout-score">0</span> | Lives: <span id="breakout-lives">3</span></div>
+        <canvas id="breakout-canvas" width="400" height="500"></canvas>
+    </div>
+
+    <!-- Flappy Tap Game -->
+    <div class="game-container" id="flappy">
+        <div class="controls">
+            <div class="control-group">
+                <label>Gravity</label>
+                <select id="flappy-gravity">
+                    <option value="0.3">Easy</option>
+                    <option value="0.5" selected>Medium</option>
+                    <option value="0.7">Hard</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Gap Size</label>
+                <select id="flappy-gap">
+                    <option value="160">Large</option>
+                    <option value="120" selected>Medium</option>
+                    <option value="90">Small</option>
+                </select>
+            </div>
+            <button id="flappy-start">Start Game</button>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="flappy-score">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Best</div>
+                <div class="stat-value" id="flappy-best">0</div>
+            </div>
+        </div>
+        <canvas id="flappy-canvas" width="400" height="500"></canvas>
+    </div>
+
+    <!-- Memory Match Game -->
+    <div class="game-container" id="memory">
+        <div class="controls">
+            <div class="control-group">
+                <label>Grid Size</label>
+                <select id="memory-size">
+                    <option value="3x4">3x4 (12 cards)</option>
+                    <option value="4x4" selected>4x4 (16 cards)</option>
+                    <option value="4x5">4x5 (20 cards)</option>
+                    <option value="5x6">5x6 (30 cards)</option>
+                </select>
+            </div>
+            <button id="memory-start">Start Game</button>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Time</div>
+                <div class="stat-value" id="memory-time">0s</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Moves</div>
+                <div class="stat-value" id="memory-moves">0</div>
+            </div>
+        </div>
+        <div class="memory-grid" id="memory-grid"></div>
+    </div>
+
+    <!-- Reaction Timer Game -->
+    <div class="game-container" id="reaction">
+        <div class="controls">
+            <button id="reaction-start">Start Test</button>
+        </div>
+        <div class="reaction-screen" id="reaction-screen">
+            <h3>Ready to test your reaction time?</h3>
+            <p>Tap "Start Test" to begin. The screen will turn red, then green at a random time. Tap as soon as it turns green!</p>
+        </div>
+        <div class="reaction-results" id="reaction-results" style="display: none;">
+            <h4>Results</h4>
+            <div class="reaction-time" id="reaction-time">0 ms</div>
+            <ul class="result-list" id="reaction-list"></ul>
+        </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div class="overlay" id="overlay"></div>
+    <div class="game-over" id="game-over">
+        <h2 id="game-over-title">Game Over</h2>
+        <p id="game-over-message">Your score: 0</p>
+        <button id="game-over-restart">Play Again</button>
+    </div>
+
+    <script>
+        // Navigation
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const gameContainers = document.querySelectorAll('.game-container');
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const gameId = btn.dataset.game;
+                navBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                gameContainers.forEach(c => c.classList.remove('active'));
+                document.getElementById(gameId).classList.add('active');
+            });
+        });
+
+        // Game Over Modal
+        const overlay = document.getElementById('overlay');
+        const gameOverModal = document.getElementById('game-over');
+        const gameOverTitle = document.getElementById('game-over-title');
+        const gameOverMessage = document.getElementById('game-over-message');
+        const gameOverRestart = document.getElementById('game-over-restart');
+        let currentRestartCallback = null;
+
+        function showGameOver(title, message, restartCallback) {
+            gameOverTitle.textContent = title;
+            gameOverMessage.textContent = message;
+            currentRestartCallback = restartCallback;
+            overlay.classList.add('show');
+            gameOverModal.classList.add('show');
+        }
+
+        function hideGameOver() {
+            overlay.classList.remove('show');
+            gameOverModal.classList.remove('show');
+        }
+
+        gameOverRestart.addEventListener('click', () => {
+            hideGameOver();
+            if (currentRestartCallback) currentRestartCallback();
+        });
+
+        overlay.addEventListener('click', hideGameOver);
+
+        // ===== SNAKE GAME =====
+        const snakeCanvas = document.getElementById('snake-canvas');
+        const snakeCtx = snakeCanvas.getContext('2d');
+        const snakeScoreEl = document.getElementById('snake-score');
+        const snakeStartBtn = document.getElementById('snake-start');
+        const snakeSpeedSelect = document.getElementById('snake-speed');
+        const snakeGridSelect = document.getElementById('snake-grid');
+        const snakeWrapSelect = document.getElementById('snake-wrap');
+
+        let snake = {
+            running: false,
+            snake: [{x: 10, y: 10}],
+            direction: {x: 1, y: 0},
+            nextDirection: {x: 1, y: 0},
+            food: {x: 15, y: 15},
+            score: 0,
+            gridSize: 20,
+            cellSize: 0,
+            speed: 100,
+            wrap: true,
+            lastTime: 0,
+            touchStartX: 0,
+            touchStartY: 0
+        };
+
+        function initSnake() {
+            snake.gridSize = parseInt(snakeGridSelect.value);
+            snake.cellSize = snakeCanvas.width / snake.gridSize;
+            snake.speed = parseInt(snakeSpeedSelect.value);
+            snake.wrap = snakeWrapSelect.value === 'true';
+            snake.snake = [{x: Math.floor(snake.gridSize / 2), y: Math.floor(snake.gridSize / 2)}];
+            snake.direction = {x: 1, y: 0};
+            snake.nextDirection = {x: 1, y: 0};
+            snake.score = 0;
+            snakeScoreEl.textContent = '0';
+            placeSnakeFood();
+        }
+
+        function placeSnakeFood() {
+            do {
+                snake.food = {
+                    x: Math.floor(Math.random() * snake.gridSize),
+                    y: Math.floor(Math.random() * snake.gridSize)
+                };
+            } while (snake.snake.some(seg => seg.x === snake.food.x && seg.y === snake.food.y));
+        }
+
+        function updateSnake() {
+            snake.direction = {...snake.nextDirection};
+
+            let newHead = {
+                x: snake.snake[0].x + snake.direction.x,
+                y: snake.snake[0].y + snake.direction.y
+            };
+
+            if (snake.wrap) {
+                if (newHead.x < 0) newHead.x = snake.gridSize - 1;
+                if (newHead.x >= snake.gridSize) newHead.x = 0;
+                if (newHead.y < 0) newHead.y = snake.gridSize - 1;
+                if (newHead.y >= snake.gridSize) newHead.y = 0;
+            } else {
+                if (newHead.x < 0 || newHead.x >= snake.gridSize ||
+                    newHead.y < 0 || newHead.y >= snake.gridSize) {
+                    endSnakeGame();
+                    return;
+                }
+            }
+
+            if (snake.snake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
+                endSnakeGame();
+                return;
+            }
+
+            snake.snake.unshift(newHead);
+
+            if (newHead.x === snake.food.x && newHead.y === snake.food.y) {
+                snake.score++;
+                snakeScoreEl.textContent = snake.score;
+                placeSnakeFood();
+            } else {
+                snake.snake.pop();
+            }
+        }
+
+        function drawSnake() {
+            snakeCtx.fillStyle = '#f5f5f7';
+            snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+            snakeCtx.fillStyle = '#34c759';
+            snake.snake.forEach((seg, i) => {
+                if (i === 0) snakeCtx.fillStyle = '#30a845';
+                else snakeCtx.fillStyle = '#34c759';
+                snakeCtx.fillRect(
+                    seg.x * snake.cellSize + 1,
+                    seg.y * snake.cellSize + 1,
+                    snake.cellSize - 2,
+                    snake.cellSize - 2
+                );
+            });
+
+            snakeCtx.fillStyle = '#ff3b30';
+            snakeCtx.beginPath();
+            snakeCtx.arc(
+                snake.food.x * snake.cellSize + snake.cellSize / 2,
+                snake.food.y * snake.cellSize + snake.cellSize / 2,
+                snake.cellSize / 2 - 2,
+                0,
+                Math.PI * 2
+            );
+            snakeCtx.fill();
+        }
+
+        function snakeGameLoop(timestamp) {
+            if (!snake.running) return;
+
+            if (timestamp - snake.lastTime > snake.speed) {
+                updateSnake();
+                drawSnake();
+                snake.lastTime = timestamp;
+            }
+
+            requestAnimationFrame(snakeGameLoop);
+        }
+
+        function startSnake() {
+            if (snake.running) return;
+            initSnake();
+            snake.running = true;
+            snake.lastTime = 0;
+            drawSnake();
+            requestAnimationFrame(snakeGameLoop);
+        }
+
+        function endSnakeGame() {
+            snake.running = false;
+            showGameOver('Game Over!', `Your score: ${snake.score}`, startSnake);
+        }
+
+        snakeStartBtn.addEventListener('click', startSnake);
+
+        snakeCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            snake.touchStartX = touch.clientX;
+            snake.touchStartY = touch.clientY;
+        });
+
+        snakeCanvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            const touch = e.changedTouches[0];
+            const deltaX = touch.clientX - snake.touchStartX;
+            const deltaY = touch.clientY - snake.touchStartY;
+
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 30 && snake.direction.x === 0) {
+                    snake.nextDirection = {x: 1, y: 0};
+                } else if (deltaX < -30 && snake.direction.x === 0) {
+                    snake.nextDirection = {x: -1, y: 0};
+                }
+            } else {
+                if (deltaY > 30 && snake.direction.y === 0) {
+                    snake.nextDirection = {x: 0, y: 1};
+                } else if (deltaY < -30 && snake.direction.y === 0) {
+                    snake.nextDirection = {x: 0, y: -1};
+                }
+            }
+        });
+
+        // ===== BREAKOUT GAME =====
+        const breakoutCanvas = document.getElementById('breakout-canvas');
+        const breakoutCtx = breakoutCanvas.getContext('2d');
+        const breakoutScoreEl = document.getElementById('breakout-score');
+        const breakoutLivesEl = document.getElementById('breakout-lives');
+        const breakoutStartBtn = document.getElementById('breakout-start');
+        const breakoutSpeedSelect = document.getElementById('breakout-speed');
+        const breakoutPaddleSelect = document.getElementById('breakout-paddle');
+        const breakoutRowsSelect = document.getElementById('breakout-rows');
+
+        let breakout = {
+            running: false,
+            paddle: {x: 170, y: 470, width: 60, height: 10},
+            ball: {x: 200, y: 300, dx: 4, dy: -4, radius: 6},
+            bricks: [],
+            score: 0,
+            lives: 3,
+            touchX: null
+        };
+
+        const brickColors = ['#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#0071e3', '#5856d6', '#af52de'];
+
+        function initBreakout() {
+            breakout.paddle.width = parseInt(breakoutPaddleSelect.value);
+            breakout.paddle.x = (breakoutCanvas.width - breakout.paddle.width) / 2;
+            breakout.ball.x = breakoutCanvas.width / 2;
+            breakout.ball.y = 300;
+            const speed = parseInt(breakoutSpeedSelect.value);
+            breakout.ball.dx = speed * (Math.random() > 0.5 ? 1 : -1);
+            breakout.ball.dy = -speed;
+            breakout.score = 0;
+            breakout.lives = 3;
+            breakoutScoreEl.textContent = '0';
+            breakoutLivesEl.textContent = '3';
+
+            const rows = parseInt(breakoutRowsSelect.value);
+            const cols = 8;
+            const brickWidth = 45;
+            const brickHeight = 20;
+            const padding = 5;
+            const offsetX = 10;
+            const offsetY = 40;
+
+            breakout.bricks = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    breakout.bricks.push({
+                        x: offsetX + c * (brickWidth + padding),
+                        y: offsetY + r * (brickHeight + padding),
+                        width: brickWidth,
+                        height: brickHeight,
+                        visible: true,
+                        color: brickColors[r % brickColors.length]
+                    });
+                }
+            }
+        }
+
+        function updateBreakout() {
+            breakout.ball.x += breakout.ball.dx;
+            breakout.ball.y += breakout.ball.dy;
+
+            if (breakout.ball.x - breakout.ball.radius < 0 ||
+                breakout.ball.x + breakout.ball.radius > breakoutCanvas.width) {
+                breakout.ball.dx = -breakout.ball.dx;
+            }
+
+            if (breakout.ball.y - breakout.ball.radius < 0) {
+                breakout.ball.dy = -breakout.ball.dy;
+            }
+
+            if (breakout.ball.y + breakout.ball.radius > breakoutCanvas.height) {
+                breakout.lives--;
+                breakoutLivesEl.textContent = breakout.lives;
+                if (breakout.lives === 0) {
+                    endBreakoutGame(false);
+                    return;
+                }
+                breakout.ball.x = breakoutCanvas.width / 2;
+                breakout.ball.y = 300;
+                breakout.ball.dy = -Math.abs(breakout.ball.dy);
+            }
+
+            if (breakout.ball.y + breakout.ball.radius > breakout.paddle.y &&
+                breakout.ball.y - breakout.ball.radius < breakout.paddle.y + breakout.paddle.height &&
+                breakout.ball.x > breakout.paddle.x &&
+                breakout.ball.x < breakout.paddle.x + breakout.paddle.width) {
+                const hitPos = (breakout.ball.x - breakout.paddle.x) / breakout.paddle.width;
+                const angle = (hitPos - 0.5) * Math.PI * 0.6;
+                const speed = Math.sqrt(breakout.ball.dx ** 2 + breakout.ball.dy ** 2);
+                breakout.ball.dx = speed * Math.sin(angle);
+                breakout.ball.dy = -speed * Math.cos(angle);
+            }
+
+            let allBroken = true;
+            breakout.bricks.forEach(brick => {
+                if (!brick.visible) return;
+                allBroken = false;
+
+                if (breakout.ball.x + breakout.ball.radius > brick.x &&
+                    breakout.ball.x - breakout.ball.radius < brick.x + brick.width &&
+                    breakout.ball.y + breakout.ball.radius > brick.y &&
+                    breakout.ball.y - breakout.ball.radius < brick.y + brick.height) {
+                    brick.visible = false;
+                    breakout.ball.dy = -breakout.ball.dy;
+                    breakout.score += 10;
+                    breakoutScoreEl.textContent = breakout.score;
+                }
+            });
+
+            if (allBroken) {
+                endBreakoutGame(true);
+            }
+        }
+
+        function drawBreakout() {
+            breakoutCtx.fillStyle = '#f5f5f7';
+            breakoutCtx.fillRect(0, 0, breakoutCanvas.width, breakoutCanvas.height);
+
+            breakoutCtx.fillStyle = '#0071e3';
+            breakoutCtx.fillRect(breakout.paddle.x, breakout.paddle.y,
+                breakout.paddle.width, breakout.paddle.height);
+
+            breakoutCtx.fillStyle = '#1d1d1f';
+            breakoutCtx.beginPath();
+            breakoutCtx.arc(breakout.ball.x, breakout.ball.y, breakout.ball.radius, 0, Math.PI * 2);
+            breakoutCtx.fill();
+
+            breakout.bricks.forEach(brick => {
+                if (!brick.visible) return;
+                breakoutCtx.fillStyle = brick.color;
+                breakoutCtx.fillRect(brick.x, brick.y, brick.width, brick.height);
+            });
+        }
+
+        function breakoutGameLoop() {
+            if (!breakout.running) return;
+            updateBreakout();
+            drawBreakout();
+            requestAnimationFrame(breakoutGameLoop);
+        }
+
+        function startBreakout() {
+            if (breakout.running) return;
+            initBreakout();
+            breakout.running = true;
+            drawBreakout();
+            requestAnimationFrame(breakoutGameLoop);
+        }
+
+        function endBreakoutGame(won) {
+            breakout.running = false;
+            const title = won ? 'You Win!' : 'Game Over!';
+            showGameOver(title, `Your score: ${breakout.score}`, startBreakout);
+        }
+
+        breakoutStartBtn.addEventListener('click', startBreakout);
+
+        breakoutCanvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const rect = breakoutCanvas.getBoundingClientRect();
+            const scaleX = breakoutCanvas.width / rect.width;
+            const touch = e.touches[0];
+            breakout.paddle.x = (touch.clientX - rect.left) * scaleX - breakout.paddle.width / 2;
+            breakout.paddle.x = Math.max(0, Math.min(breakout.paddle.x,
+                breakoutCanvas.width - breakout.paddle.width));
+        });
+
+        // ===== FLAPPY TAP GAME =====
+        const flappyCanvas = document.getElementById('flappy-canvas');
+        const flappyCtx = flappyCanvas.getContext('2d');
+        const flappyScoreEl = document.getElementById('flappy-score');
+        const flappyBestEl = document.getElementById('flappy-best');
+        const flappyStartBtn = document.getElementById('flappy-start');
+        const flappyGravitySelect = document.getElementById('flappy-gravity');
+        const flappyGapSelect = document.getElementById('flappy-gap');
+
+        let flappy = {
+            running: false,
+            bird: {y: 250, velocity: 0, radius: 15},
+            pipes: [],
+            score: 0,
+            best: parseInt(localStorage.getItem('flappyBest') || '0'),
+            gravity: 0.5,
+            gap: 120,
+            pipeSpeed: 2,
+            frameCount: 0
+        };
+
+        flappyBestEl.textContent = flappy.best;
+
+        function initFlappy() {
+            flappy.bird.y = 250;
+            flappy.bird.velocity = 0;
+            flappy.pipes = [];
+            flappy.score = 0;
+            flappy.frameCount = 0;
+            flappy.gravity = parseFloat(flappyGravitySelect.value);
+            flappy.gap = parseInt(flappyGapSelect.value);
+            flappyScoreEl.textContent = '0';
+        }
+
+        function updateFlappy() {
+            flappy.bird.velocity += flappy.gravity;
+            flappy.bird.y += flappy.bird.velocity;
+
+            if (flappy.bird.y - flappy.bird.radius < 0 ||
+                flappy.bird.y + flappy.bird.radius > flappyCanvas.height) {
+                endFlappyGame();
+                return;
+            }
+
+            if (flappy.frameCount % 90 === 0) {
+                const minHeight = 60;
+                const maxHeight = flappyCanvas.height - flappy.gap - 60;
+                const height = Math.random() * (maxHeight - minHeight) + minHeight;
+                flappy.pipes.push({
+                    x: flappyCanvas.width,
+                    topHeight: height,
+                    scored: false
+                });
+            }
+
+            flappy.pipes = flappy.pipes.filter(pipe => pipe.x + 60 > 0);
+
+            flappy.pipes.forEach(pipe => {
+                pipe.x -= flappy.pipeSpeed;
+
+                if (!pipe.scored && pipe.x + 60 < flappyCanvas.width / 2) {
+                    pipe.scored = true;
+                    flappy.score++;
+                    flappyScoreEl.textContent = flappy.score;
+                }
+
+                const birdX = flappyCanvas.width / 2;
+                if (flappy.bird.y - flappy.bird.radius < pipe.topHeight ||
+                    flappy.bird.y + flappy.bird.radius > pipe.topHeight + flappy.gap) {
+                    if (birdX + flappy.bird.radius > pipe.x &&
+                        birdX - flappy.bird.radius < pipe.x + 60) {
+                        endFlappyGame();
+                    }
+                }
+            });
+
+            flappy.frameCount++;
+        }
+
+        function drawFlappy() {
+            flappyCtx.fillStyle = '#87ceeb';
+            flappyCtx.fillRect(0, 0, flappyCanvas.width, flappyCanvas.height);
+
+            flappyCtx.fillStyle = '#34c759';
+            flappy.pipes.forEach(pipe => {
+                flappyCtx.fillRect(pipe.x, 0, 60, pipe.topHeight);
+                flappyCtx.fillRect(pipe.x, pipe.topHeight + flappy.gap, 60,
+                    flappyCanvas.height - pipe.topHeight - flappy.gap);
+            });
+
+            flappyCtx.fillStyle = '#ffcc00';
+            flappyCtx.beginPath();
+            flappyCtx.arc(flappyCanvas.width / 2, flappy.bird.y, flappy.bird.radius, 0, Math.PI * 2);
+            flappyCtx.fill();
+        }
+
+        function flappyGameLoop() {
+            if (!flappy.running) return;
+            updateFlappy();
+            drawFlappy();
+            requestAnimationFrame(flappyGameLoop);
+        }
+
+        function startFlappy() {
+            if (flappy.running) return;
+            initFlappy();
+            flappy.running = true;
+            requestAnimationFrame(flappyGameLoop);
+        }
+
+        function endFlappyGame() {
+            flappy.running = false;
+            if (flappy.score > flappy.best) {
+                flappy.best = flappy.score;
+                localStorage.setItem('flappyBest', flappy.best);
+                flappyBestEl.textContent = flappy.best;
+            }
+            showGameOver('Game Over!', `Your score: ${flappy.score}`, startFlappy);
+        }
+
+        flappyStartBtn.addEventListener('click', startFlappy);
+
+        flappyCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (flappy.running) {
+                flappy.bird.velocity = -8;
+            }
+        });
+
+        // ===== MEMORY MATCH GAME =====
+        const memoryGrid = document.getElementById('memory-grid');
+        const memoryStartBtn = document.getElementById('memory-start');
+        const memorySizeSelect = document.getElementById('memory-size');
+        const memoryTimeEl = document.getElementById('memory-time');
+        const memoryMovesEl = document.getElementById('memory-moves');
+
+        const emojis = ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑', '🥝',
+                       '🥑', '🍆', '🥕', '🌽', '🥦', '🥒', '🍄', '🥜', '🌰', '🍞',
+                       '🥐', '🥖', '🥨', '🧀', '🥚', '🍳', '🥓', '🥞', '🍗', '🍖'];
+
+        let memory = {
+            running: false,
+            cards: [],
+            flipped: [],
+            matched: [],
+            moves: 0,
+            startTime: null,
+            timerInterval: null
+        };
+
+        function initMemory() {
+            const size = memorySizeSelect.value;
+            const [cols, rows] = size.split('x').map(Number);
+            const totalCards = cols * rows;
+            const pairs = totalCards / 2;
+
+            const selectedEmojis = emojis.slice(0, pairs);
+            const cardEmojis = [...selectedEmojis, ...selectedEmojis];
+            cardEmojis.sort(() => Math.random() - 0.5);
+
+            memory.cards = cardEmojis;
+            memory.flipped = [];
+            memory.matched = [];
+            memory.moves = 0;
+            memory.startTime = Date.now();
+            memoryMovesEl.textContent = '0';
+            memoryTimeEl.textContent = '0s';
+
+            memoryGrid.innerHTML = '';
+            memoryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            cardEmojis.forEach((emoji, i) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.index = i;
+                card.textContent = '?';
+                card.addEventListener('click', () => flipCard(i));
+                memoryGrid.appendChild(card);
+            });
+
+            if (memory.timerInterval) clearInterval(memory.timerInterval);
+            memory.timerInterval = setInterval(updateMemoryTimer, 1000);
+            memory.running = true;
+        }
+
+        function updateMemoryTimer() {
+            if (!memory.running) return;
+            const elapsed = Math.floor((Date.now() - memory.startTime) / 1000);
+            memoryTimeEl.textContent = `${elapsed}s`;
+        }
+
+        function flipCard(index) {
+            if (!memory.running) return;
+            if (memory.flipped.length >= 2) return;
+            if (memory.flipped.includes(index)) return;
+            if (memory.matched.includes(index)) return;
+
+            const card = memoryGrid.children[index];
+            card.classList.add('flipped');
+            card.textContent = memory.cards[index];
+            memory.flipped.push(index);
+
+            if (memory.flipped.length === 2) {
+                memory.moves++;
+                memoryMovesEl.textContent = memory.moves;
+
+                const [first, second] = memory.flipped;
+                if (memory.cards[first] === memory.cards[second]) {
+                    memory.matched.push(first, second);
+                    memoryGrid.children[first].classList.add('matched');
+                    memoryGrid.children[second].classList.add('matched');
+                    memory.flipped = [];
+
+                    if (memory.matched.length === memory.cards.length) {
+                        endMemoryGame();
+                    }
+                } else {
+                    setTimeout(() => {
+                        memoryGrid.children[first].classList.remove('flipped');
+                        memoryGrid.children[second].classList.remove('flipped');
+                        memoryGrid.children[first].textContent = '?';
+                        memoryGrid.children[second].textContent = '?';
+                        memory.flipped = [];
+                    }, 800);
+                }
+            }
+        }
+
+        function endMemoryGame() {
+            memory.running = false;
+            clearInterval(memory.timerInterval);
+            const elapsed = Math.floor((Date.now() - memory.startTime) / 1000);
+            showGameOver('You Win!', `Time: ${elapsed}s | Moves: ${memory.moves}`, initMemory);
+        }
+
+        memoryStartBtn.addEventListener('click', initMemory);
+
+        // ===== REACTION TIMER GAME =====
+        const reactionScreen = document.getElementById('reaction-screen');
+        const reactionStartBtn = document.getElementById('reaction-start');
+        const reactionResults = document.getElementById('reaction-results');
+        const reactionTimeEl = document.getElementById('reaction-time');
+        const reactionList = document.getElementById('reaction-list');
+
+        let reaction = {
+            running: false,
+            waiting: false,
+            startTime: null,
+            results: [],
+            timeout: null
+        };
+
+        function startReaction() {
+            if (reaction.running) return;
+            reaction.running = true;
+            reaction.results = [];
+            reactionResults.style.display = 'none';
+            reactionList.innerHTML = '';
+            runReactionRound();
+        }
+
+        function runReactionRound() {
+            if (reaction.results.length >= 5) {
+                finishReaction();
+                return;
+            }
+
+            reactionScreen.className = 'reaction-screen waiting';
+            reactionScreen.innerHTML = '<h3>Wait for green...</h3>';
+            reaction.waiting = true;
+
+            const delay = 1500 + Math.random() * 3000;
+            reaction.timeout = setTimeout(() => {
+                reactionScreen.className = 'reaction-screen ready';
+                reactionScreen.innerHTML = '<h3>TAP NOW!</h3>';
+                reaction.waiting = false;
+                reaction.startTime = Date.now();
+            }, delay);
+        }
+
+        function finishReaction() {
+            reaction.running = false;
+            const avg = Math.round(reaction.results.reduce((a, b) => a + b, 0) / reaction.results.length);
+            const best = Math.min(...reaction.results);
+
+            reactionTimeEl.textContent = `${avg} ms`;
+            reactionList.innerHTML = `
+                <li>Average: ${avg} ms</li>
+                <li>Best: ${best} ms</li>
+                <li>Worst: ${Math.max(...reaction.results)} ms</li>
+            `;
+
+            reaction.results.forEach((time, i) => {
+                const li = document.createElement('li');
+                li.textContent = `Round ${i + 1}: ${time} ms`;
+                reactionList.appendChild(li);
+            });
+
+            reactionResults.style.display = 'block';
+            reactionScreen.className = 'reaction-screen';
+            reactionScreen.innerHTML = '<h3>Test Complete!</h3><p>Tap "Start Test" to try again</p>';
+        }
+
+        reactionStartBtn.addEventListener('click', startReaction);
+
+        reactionScreen.addEventListener('click', () => {
+            if (!reaction.running) return;
+
+            if (reaction.waiting) {
+                clearTimeout(reaction.timeout);
+                reaction.running = false;
+                reaction.waiting = false;
+                reactionScreen.className = 'reaction-screen';
+                reactionScreen.innerHTML = '<h3>Too early!</h3><p>Wait for the green screen. Tap "Start Test" to try again.</p>';
+            } else if (reaction.startTime) {
+                const reactionTime = Date.now() - reaction.startTime;
+                reaction.results.push(reactionTime);
+                reaction.startTime = null;
+
+                reactionScreen.className = 'reaction-screen';
+                reactionScreen.innerHTML = `<h3>${reactionTime} ms</h3><p>Round ${reaction.results.length} of 5</p>`;
+
+                setTimeout(runReactionRound, 1000);
+            }
+        });
+
+        // Initialize first game
+        initSnake();
+        drawSnake();
+    </script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cool Web Effects 2026</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f7;color:#1a1a2e;min-height:100vh}
+nav{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid #e0e0e0;position:sticky;top:0;z-index:100;-webkit-overflow-scrolling:touch}
+nav button{flex:none;padding:12px 14px;background:none;border:none;color:#666;font-size:12px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav button.active{color:#e84393;border-bottom-color:#e84393}
+.panel{display:none;flex-direction:column;min-height:calc(100vh - 49px)}
+.panel.active{display:flex}
+.controls{display:flex;flex-wrap:wrap;gap:10px;padding:12px;background:#fff;border-bottom:1px solid #e0e0e0;align-items:center}
+.controls label{font-size:12px;color:#555;display:flex;align-items:center;gap:4px;font-weight:500}
+.controls select,.controls input[type=range]{background:#f0f0f5;border:1px solid #ccc;color:#333;border-radius:6px;padding:4px 8px;font-size:12px}
+.controls input[type=range]{width:80px;accent-color:#e84393}
+.val{font-size:11px;color:#e84393;font-weight:700;min-width:24px}
+.preview{flex:1;padding:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+
+/* === PARTICLES === */
+.particle-canvas{width:100%;height:360px;border-radius:14px;overflow:hidden;position:relative;background:#1a1a2e;touch-action:none}
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:float linear infinite}
+@keyframes float{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-360px) scale(0);opacity:0}}
+
+/* === MORPHING === */
+.morph-area{display:flex;flex-direction:column;align-items:center;gap:20px}
+.morph-shape{width:200px;height:200px;transition:all 1s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;font-size:48px;cursor:pointer}
+.morph-label{font-size:13px;color:#888;font-weight:500}
+
+/* === GRADIENT MESH === */
+.gradient-box{width:100%;max-width:400px;height:320px;border-radius:16px;transition:all .5s;position:relative;overflow:hidden}
+.gradient-box::after{content:'Tap & drag';position:absolute;bottom:16px;right:16px;font-size:11px;color:rgba(255,255,255,.6);font-weight:500}
+
+/* === PARALLAX CARDS === */
+.parallax-stack{position:relative;width:280px;height:360px;perspective:800px}
+.pcard{position:absolute;width:260px;border-radius:16px;padding:24px;transition:all .5s cubic-bezier(.4,0,.2,1);cursor:pointer;border:1px solid rgba(0,0,0,.08);box-shadow:0 4px 20px rgba(0,0,0,.1)}
+.pcard h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.pcard p{font-size:12px;line-height:1.5;opacity:.8}
+.pcard.expanded{z-index:10!important;transform:translateY(0) scale(1.05)!important;box-shadow:0 20px 60px rgba(0,0,0,.2)!important}
+
+/* === LIQUID BTN === */
+.btn-area{display:flex;flex-direction:column;gap:24px;align-items:center;width:100%;max-width:400px}
+.liquid-btn{position:relative;padding:16px 40px;border:none;border-radius:50px;font-size:15px;font-weight:700;cursor:pointer;overflow:hidden;transition:all .4s;color:#fff;letter-spacing:.5px}
+.liquid-btn::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;transition:all .6s;transform:translate(-50%,-50%)}
+.liquid-btn:active::before{width:400px;height:400px}
+.btn-label{font-size:11px;color:#999;text-align:center}
+
+/* === TYPEWRITER === */
+.type-area{width:100%;max-width:440px;text-align:center}
+.type-text{font-size:28px;font-weight:800;min-height:80px;display:flex;align-items:center;justify-content:center}
+.type-cursor{display:inline-block;width:3px;height:32px;background:#e84393;margin-left:4px;animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.type-sub{font-size:13px;color:#888;margin-top:12px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="active" onclick="show(0)">Particles</button>
+  <button onclick="show(1)">Morph</button>
+  <button onclick="show(2)">Gradients</button>
+  <button onclick="show(3)">Card Stack</button>
+  <button onclick="show(4)">Buttons</button>
+  <button onclick="show(5)">Typewriter</button>
+</nav>
+
+<!-- 0: PARTICLES -->
+<div class="panel active" id="p0">
+  <div class="controls">
+    <label>Count <input type="range" id="partCount" min="10" max="80" value="30" oninput="restartParticles()"><span class="val" id="partCountV">30</span></label>
+    <label>Size <input type="range" id="partSize" min="2" max="16" value="6" oninput="restartParticles()"><span class="val" id="partSizeV">6</span></label>
+    <label>Color <select id="partColor" onchange="restartParticles()"><option value="mixed">Mixed</option><option value="fire">Fire</option><option value="ice">Ice</option><option value="matrix">Matrix</option></select></label>
+  </div>
+  <div class="preview"><div class="particle-canvas" id="partCanvas" ontouchmove="spawnAtTouch(event)" onmousemove="spawnAtMouse(event)"></div></div>
+</div>
+
+<!-- 1: MORPH -->
+<div class="panel" id="p1">
+  <div class="controls">
+    <label>Tap the shape to morph it</label>
+  </div>
+  <div class="preview">
+    <div class="morph-area">
+      <div class="morph-shape" id="morphShape" onclick="nextMorph()"></div>
+      <div class="morph-label" id="morphLabel"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2: GRADIENTS -->
+<div class="panel" id="p2">
+  <div class="controls">
+    <label>Style <select id="gradStyle" onchange="updateGrad()"><option value="mesh">Mesh</option><option value="aurora">Aurora</option><option value="sunset">Sunset</option><option value="candy">Candy</option></select></label>
+    <label>Animate <select id="gradAnim" onchange="updateGrad()"><option value="yes">Yes</option><option value="no">No</option></select></label>
+  </div>
+  <div class="preview"><div class="gradient-box" id="gradBox"></div></div>
+</div>
+
+<!-- 3: CARD STACK -->
+<div class="panel" id="p3">
+  <div class="controls">
+    <label>Tap cards to expand / collapse</label>
+  </div>
+  <div class="preview"><div class="parallax-stack" id="cardStack"></div></div>
+</div>
+
+<!-- 4: BUTTONS -->
+<div class="panel" id="p4">
+  <div class="controls">
+    <label>Tap each button to see the effect</label>
+  </div>
+  <div class="preview"><div class="btn-area" id="btnArea"></div></div>
+</div>
+
+<!-- 5: TYPEWRITER -->
+<div class="panel" id="p5">
+  <div class="controls">
+    <label>Speed <input type="range" id="typeSpeed" min="30" max="150" value="70" oninput="restartType()"><span class="val" id="typeSpeedV">70ms</span></label>
+    <label>Style <select id="typeStyle" onchange="restartType()"><option value="words">Word by word</option><option value="chars">Character</option><option value="glitch">Glitch</option></select></label>
+  </div>
+  <div class="preview">
+    <div class="type-area">
+      <div class="type-text" id="typeText"><span class="type-cursor"></span></div>
+      <div class="type-sub">Used in hero sections, landing pages, and onboarding flows</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var panels=document.querySelectorAll('.panel'),navBtns=document.querySelectorAll('nav button');
+function show(i){
+  panels.forEach(function(p,j){p.classList.toggle('active',j===i);navBtns[j].classList.toggle('active',j===i)});
+  if(i===0)restartParticles();
+  if(i===1)initMorph();
+  if(i===2)updateGrad();
+  if(i===3)initStack();
+  if(i===4)initButtons();
+  if(i===5)restartType();
+}
+
+// === PARTICLES ===
+var partColors={mixed:['#e84393','#6c5ce7','#00cec9','#fdcb6e','#ff6b6b'],fire:['#ff4500','#ff6b35','#ffa500','#ffcc02','#ff1744'],ice:['#74b9ff','#a29bfe','#dfe6e9','#81ecec','#0984e3'],matrix:['#00ff41','#39ff14','#00e676','#69f0ae','#b9f6ca']};
+var partInterval;
+function restartParticles(){
+  clearInterval(partInterval);
+  var canvas=document.getElementById('partCanvas');
+  canvas.innerHTML='';
+  var count=+document.getElementById('partCount').value;
+  var size=+document.getElementById('partSize').value;
+  var scheme=document.getElementById('partColor').value;
+  document.getElementById('partCountV').textContent=count;
+  document.getElementById('partSizeV').textContent=size;
+  var colors=partColors[scheme];
+  partInterval=setInterval(function(){
+    if(canvas.children.length>count*2){var old=canvas.firstElementChild;if(old)old.remove()}
+    spawnParticle(canvas,Math.random()*canvas.offsetWidth,canvas.offsetHeight,size,colors);
+  },100);
+}
+function spawnParticle(canvas,x,y,size,colors){
+  var p=document.createElement('div');
+  p.className='particle';
+  var s=size*(0.5+Math.random());
+  var c=colors[Math.floor(Math.random()*colors.length)];
+  var dur=2+Math.random()*3;
+  p.style.cssText='left:'+x+'px;top:'+y+'px;width:'+s+'px;height:'+s+'px;background:'+c+';box-shadow:0 0 '+(s*2)+'px '+c+';animation-duration:'+dur+'s';
+  canvas.appendChild(p);
+  setTimeout(function(){p.remove()},dur*1000);
+}
+function spawnAtTouch(e){
+  e.preventDefault();
+  var canvas=document.getElementById('partCanvas');
+  var rect=canvas.getBoundingClientRect();
+  var size=+document.getElementById('partSize').value;
+  var colors=partColors[document.getElementById('partColor').value];
+  for(var t=0;t<e.touches.length;t++){
+    spawnParticle(canvas,e.touches[t].clientX-rect.left,e.touches[t].clientY-rect.top,size,colors);
+  }
+}
+function spawnAtMouse(e){
+  var canvas=document.getElementById('partCanvas');
+  var rect=canvas.getBoundingClientRect();
+  var size=+document.getElementById('partSize').value;
+  var colors=partColors[document.getElementById('partColor').value];
+  spawnParticle(canvas,e.clientX-rect.left,e.clientY-rect.top,size,colors);
+}
+restartParticles();
+
+// === MORPH ===
+var morphStates=[
+  {radius:'0%',bg:'linear-gradient(135deg,#6c5ce7,#a29bfe)',icon:'◆',label:'Diamond',rot:'rotate(45deg)',w:160,h:160},
+  {radius:'50%',bg:'linear-gradient(135deg,#e84393,#fd79a8)',icon:'●',label:'Circle',rot:'rotate(0deg)',w:200,h:200},
+  {radius:'30%',bg:'linear-gradient(135deg,#00cec9,#81ecec)',icon:'⬟',label:'Squircle',rot:'rotate(0deg)',w:180,h:180},
+  {radius:'50% 0 50% 0',bg:'linear-gradient(135deg,#fdcb6e,#e17055)',icon:'◇',label:'Leaf',rot:'rotate(0deg)',w:180,h:180},
+  {radius:'20% 60% 20% 60%',bg:'linear-gradient(135deg,#ff6b6b,#ee5a24)',icon:'★',label:'Blob',rot:'rotate(15deg)',w:190,h:170},
+  {radius:'0',bg:'linear-gradient(135deg,#0984e3,#74b9ff)',icon:'▲',label:'Square',rot:'rotate(0deg)',w:160,h:160}
+];
+var morphIdx=0;
+function initMorph(){morphIdx=0;applyMorph()}
+function nextMorph(){morphIdx=(morphIdx+1)%morphStates.length;applyMorph()}
+function applyMorph(){
+  var s=morphStates[morphIdx],el=document.getElementById('morphShape');
+  el.style.borderRadius=s.radius;
+  el.style.background=s.bg;
+  el.style.transform=s.rot;
+  el.style.width=s.w+'px';
+  el.style.height=s.h+'px';
+  el.textContent=s.icon;
+  document.getElementById('morphLabel').textContent=s.label+' — tap to morph';
+}
+initMorph();
+
+// === GRADIENTS ===
+var gradStyles={
+  mesh:'background:conic-gradient(from 45deg at 30% 40%,#e84393,#6c5ce7,#00cec9,#fdcb6e,#e84393)',
+  aurora:'background:linear-gradient(135deg,#0c0c1d 0%,#1a0533 25%,#0d4f3c 50%,#1a6b4f 75%,#0c0c1d 100%)',
+  sunset:'background:linear-gradient(to bottom,#ff6b35 0%,#e84393 40%,#6c5ce7 70%,#1a1a2e 100%)',
+  candy:'background:linear-gradient(135deg,#ff9a9e,#fecfef,#fdfcfb,#a18cd1,#fbc2eb)'
+};
+var gradAngle=0,gradAnimId;
+function updateGrad(){
+  cancelAnimationFrame(gradAnimId);
+  var style=document.getElementById('gradStyle').value;
+  var anim=document.getElementById('gradAnim').value;
+  var box=document.getElementById('gradBox');
+  if(anim==='yes'){
+    var base=gradStyles[style];
+    function tick(){
+      gradAngle=(gradAngle+0.5)%360;
+      var s=base.replace(/from \d+deg/,'from '+gradAngle+'deg').replace(/135deg/,gradAngle+'deg').replace(/to bottom/,gradAngle+'deg');
+      box.style.cssText=s+';border-radius:16px;width:100%;max-width:400px;height:320px;transition:none';
+      gradAnimId=requestAnimationFrame(tick);
+    }
+    tick();
+  }else{
+    box.style.cssText=gradStyles[style]+';border-radius:16px;width:100%;max-width:400px;height:320px';
+  }
+}
+updateGrad();
+
+// === CARD STACK ===
+var stackData=[
+  {title:'Notifications',text:'3 new messages from your team waiting for review.',bg:'linear-gradient(135deg,#6c5ce7,#a29bfe)',color:'#fff'},
+  {title:'Weekly Report',text:'Revenue up 12%. Engagement increased across all channels.',bg:'#fff',color:'#1a1a2e'},
+  {title:'New Feature',text:'Dark mode is now available. Toggle in settings.',bg:'linear-gradient(135deg,#00cec9,#81ecec)',color:'#1a1a2e'},
+  {title:'Milestone',text:'Congratulations! 10,000 active users reached today.',bg:'linear-gradient(135deg,#fdcb6e,#e17055)',color:'#fff'}
+];
+function initStack(){
+  var stack=document.getElementById('cardStack');
+  stack.innerHTML=stackData.map(function(c,i){
+    var top=i*70;
+    var scale=1-i*0.03;
+    return '<div class="pcard" style="top:'+top+'px;left:'+(i*5)+'px;transform:scale('+scale+');z-index:'+(10-i)+';background:'+c.bg+';color:'+c.color+'" onclick="toggleCard(this,'+i+')"><h3>'+c.title+'</h3><p>'+c.text+'</p></div>';
+  }).join('');
+}
+function toggleCard(el,i){
+  el.classList.toggle('expanded');
+  if(el.classList.contains('expanded')){
+    el.style.top='0px';
+  }else{
+    el.style.top=(i*70)+'px';
+  }
+}
+initStack();
+
+// === BUTTONS ===
+var btnData=[
+  {text:'Neon Pulse',bg:'linear-gradient(135deg,#e84393,#fd79a8)',ripple:'rgba(255,255,255,.3)',shadow:'0 4px 20px rgba(232,67,147,.4)'},
+  {text:'Electric Blue',bg:'linear-gradient(135deg,#0984e3,#74b9ff)',ripple:'rgba(255,255,255,.3)',shadow:'0 4px 20px rgba(9,132,227,.4)'},
+  {text:'Sunset Glow',bg:'linear-gradient(135deg,#e17055,#fdcb6e)',ripple:'rgba(255,255,255,.4)',shadow:'0 4px 20px rgba(225,112,85,.4)'},
+  {text:'Emerald Wave',bg:'linear-gradient(135deg,#00b894,#55efc4)',ripple:'rgba(255,255,255,.3)',shadow:'0 4px 20px rgba(0,184,148,.4)'},
+  {text:'Ghost',bg:'transparent',ripple:'rgba(108,92,231,.15)',shadow:'none',border:'2px solid #6c5ce7',textColor:'#6c5ce7'}
+];
+function initButtons(){
+  var area=document.getElementById('btnArea');
+  area.innerHTML=btnData.map(function(b,i){
+    var extra=b.border?'border:'+b.border+';':'';
+    var tc=b.textColor||'#fff';
+    return '<div><button class="liquid-btn" style="background:'+b.bg+';box-shadow:'+b.shadow+';'+extra+'color:'+tc+'" ontouchstart="rippleBtn(this,event,\''+b.ripple+'\')" onclick="rippleBtn(this,event,\''+b.ripple+'\')">'+b.text+'</button><div class="btn-label">'+['Gradient + ripple','Depth shadow','Warm tones','Nature palette','Ghost outline'][i]+'</div></div>';
+  }).join('');
+}
+function rippleBtn(btn,e,color){
+  var ripple=document.createElement('span');
+  var rect=btn.getBoundingClientRect();
+  var x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  var y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  ripple.style.cssText='position:absolute;border-radius:50%;background:'+color+';width:0;height:0;left:'+x+'px;top:'+y+'px;transform:translate(-50%,-50%);transition:all .6s;pointer-events:none';
+  btn.appendChild(ripple);
+  requestAnimationFrame(function(){ripple.style.width='300px';ripple.style.height='300px';ripple.style.opacity='0'});
+  setTimeout(function(){ripple.remove()},700);
+}
+initButtons();
+
+// === TYPEWRITER ===
+var typeTexts=['Build beautiful things.','Design with intention.','Ship with confidence.','Create the future.','Less is more.'];
+var typeIdx=0,typeTimer,charIdx=0,isDeleting=false;
+function restartType(){
+  clearTimeout(typeTimer);
+  document.getElementById('typeSpeedV').textContent=document.getElementById('typeSpeed').value+'ms';
+  typeIdx=0;charIdx=0;isDeleting=false;
+  typeStep();
+}
+function typeStep(){
+  var speed=+document.getElementById('typeSpeed').value;
+  var style=document.getElementById('typeStyle').value;
+  var el=document.getElementById('typeText');
+  var text=typeTexts[typeIdx];
+
+  if(style==='glitch'){
+    var glitchChars='!@#$%^&*';
+    if(!isDeleting){
+      var display=text.substring(0,charIdx);
+      if(charIdx<text.length){display+=glitchChars[Math.floor(Math.random()*glitchChars.length)]}
+      el.innerHTML=display+'<span class="type-cursor"></span>';
+      charIdx++;
+      if(charIdx>text.length){setTimeout(function(){isDeleting=true;typeStep()},2000);return}
+    }else{
+      charIdx--;
+      el.innerHTML=text.substring(0,charIdx)+'<span class="type-cursor"></span>';
+      if(charIdx===0){isDeleting=false;typeIdx=(typeIdx+1)%typeTexts.length;setTimeout(typeStep,500);return}
+    }
+    typeTimer=setTimeout(typeStep,isDeleting?speed/2:speed);
+  }else if(style==='words'){
+    var words=text.split(' ');
+    if(!isDeleting){
+      el.innerHTML=words.slice(0,charIdx+1).join(' ')+'<span class="type-cursor"></span>';
+      charIdx++;
+      if(charIdx>=words.length){setTimeout(function(){isDeleting=true;typeStep()},2000);return}
+    }else{
+      charIdx--;
+      el.innerHTML=(charIdx>0?words.slice(0,charIdx).join(' '):'')+'<span class="type-cursor"></span>';
+      if(charIdx===0){isDeleting=false;typeIdx=(typeIdx+1)%typeTexts.length;setTimeout(typeStep,500);return}
+    }
+    typeTimer=setTimeout(typeStep,isDeleting?speed*1.5:speed*3);
+  }else{
+    if(!isDeleting){
+      el.innerHTML=text.substring(0,charIdx)+'<span class="type-cursor"></span>';
+      charIdx++;
+      if(charIdx>text.length){setTimeout(function(){isDeleting=true;typeStep()},2000);return}
+    }else{
+      charIdx--;
+      el.innerHTML=text.substring(0,charIdx)+'<span class="type-cursor"></span>';
+      if(charIdx===0){isDeleting=false;typeIdx=(typeIdx+1)%typeTexts.length;setTimeout(typeStep,500);return}
+    }
+    typeTimer=setTimeout(typeStep,isDeleting?speed/2:speed);
+  }
+}
+restartType();
+</script>
+</body>
+</html>

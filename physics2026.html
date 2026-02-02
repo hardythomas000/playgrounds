@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Playground 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+            padding-bottom: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #e84393;
+        }
+
+        .nav-container {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav {
+            display: flex;
+            padding: 0;
+            min-width: max-content;
+        }
+
+        .nav button {
+            flex: 1;
+            min-width: 140px;
+            padding: 16px 20px;
+            background: white;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6e6e73;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav button.active {
+            color: #e84393;
+            border-bottom-color: #e84393;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .canvas-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 400px;
+            border-radius: 8px;
+            background: #fafafa;
+            display: block;
+            touch-action: none;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+
+        .control-value {
+            color: #e84393;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e5e7;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e84393;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(232,67,147,0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e84393;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(232,67,147,0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: #e84393;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+            background: #d63384;
+        }
+
+        .btn-secondary {
+            background: #f0f0f2;
+            color: #1d1d1f;
+        }
+
+        .btn-secondary:active {
+            background: #e0e0e2;
+        }
+
+        .info {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f9f9fb;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #6e6e73;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Physics Playground 2026</h1>
+    </div>
+
+    <div class="nav-container">
+        <div class="nav">
+            <button class="nav-btn active" data-tab="gravity">Gravity Balls</button>
+            <button class="nav-btn" data-tab="pendulum">Pendulum Wave</button>
+            <button class="nav-btn" data-tab="spring">Spring Physics</button>
+            <button class="nav-btn" data-tab="cloth">Cloth Sim</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Gravity Balls Tab -->
+        <div id="gravity" class="tab-content active">
+            <div class="canvas-container">
+                <canvas id="gravityCanvas"></canvas>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Gravity</span>
+                        <span class="control-value" id="gravityValue">0.5</span>
+                    </div>
+                    <input type="range" id="gravitySlider" min="0.1" max="1.5" step="0.1" value="0.5">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Bounciness</span>
+                        <span class="control-value" id="bouncinessValue">0.7</span>
+                    </div>
+                    <input type="range" id="bouncinessSlider" min="0.1" max="0.95" step="0.05" value="0.7">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Ball Size</span>
+                        <span class="control-value" id="sizeValue">15</span>
+                    </div>
+                    <input type="range" id="sizeSlider" min="8" max="30" step="2" value="15">
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="clearBalls">Clear All</button>
+                </div>
+                <div class="info">
+                    Tap anywhere on the canvas to drop balls. Watch them bounce with realistic physics!
+                </div>
+            </div>
+        </div>
+
+        <!-- Pendulum Wave Tab -->
+        <div id="pendulum" class="tab-content">
+            <div class="canvas-container">
+                <canvas id="pendulumCanvas"></canvas>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Pendulums</span>
+                        <span class="control-value" id="pendulumCountValue">15</span>
+                    </div>
+                    <input type="range" id="pendulumCountSlider" min="5" max="20" step="1" value="15">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Speed</span>
+                        <span class="control-value" id="speedValue">1.0</span>
+                    </div>
+                    <input type="range" id="speedSlider" min="0.2" max="2.0" step="0.1" value="1.0">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Damping</span>
+                        <span class="control-value" id="dampingValue">0.00</span>
+                    </div>
+                    <input type="range" id="dampingSlider" min="0" max="0.02" step="0.001" value="0">
+                </div>
+                <div class="button-group">
+                    <button class="btn" id="resetPendulum">Reset Wave</button>
+                </div>
+                <div class="info">
+                    Watch the mesmerizing wave patterns as pendulums of different lengths oscillate in harmony.
+                </div>
+            </div>
+        </div>
+
+        <!-- Spring Physics Tab -->
+        <div id="spring" class="tab-content">
+            <div class="canvas-container">
+                <canvas id="springCanvas"></canvas>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Spring Stiffness</span>
+                        <span class="control-value" id="stiffnessValue">0.05</span>
+                    </div>
+                    <input type="range" id="stiffnessSlider" min="0.01" max="0.15" step="0.01" value="0.05">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Mass Weight</span>
+                        <span class="control-value" id="massValue">1.0</span>
+                    </div>
+                    <input type="range" id="massSlider" min="0.3" max="2.0" step="0.1" value="1.0">
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="resetSpring">Reset Position</button>
+                </div>
+                <div class="info">
+                    Drag the mass and release it to watch it oscillate on the spring. Try different settings!
+                </div>
+            </div>
+        </div>
+
+        <!-- Cloth Sim Tab -->
+        <div id="cloth" class="tab-content">
+            <div class="canvas-container">
+                <canvas id="clothCanvas"></canvas>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Grid Size</span>
+                        <span class="control-value" id="gridSizeValue">20</span>
+                    </div>
+                    <input type="range" id="gridSizeSlider" min="10" max="30" step="2" value="20">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Gravity</span>
+                        <span class="control-value" id="clothGravityValue">0.5</span>
+                    </div>
+                    <input type="range" id="clothGravitySlider" min="0.1" max="1.0" step="0.1" value="0.5">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Tear Threshold</span>
+                        <span class="control-value" id="tearValue">50</span>
+                    </div>
+                    <input type="range" id="tearSlider" min="30" max="100" step="5" value="50">
+                </div>
+                <div class="button-group">
+                    <button class="btn" id="resetCloth">Reset Cloth</button>
+                </div>
+                <div class="info">
+                    Touch and drag the cloth to interact with it. Pull hard enough and it will tear!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        let activeTab = 'gravity';
+
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                if (tab === activeTab) return;
+
+                navButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                tabContents.forEach(t => t.classList.remove('active'));
+                document.getElementById(tab).classList.add('active');
+
+                activeTab = tab;
+                initActiveTab(tab);
+            });
+        });
+
+        function initActiveTab(tab) {
+            if (tab === 'gravity' && !gravityInitialized) initGravity();
+            if (tab === 'pendulum' && !pendulumInitialized) initPendulum();
+            if (tab === 'spring' && !springInitialized) initSpring();
+            if (tab === 'cloth' && !clothInitialized) initCloth();
+        }
+
+        // === GRAVITY BALLS ===
+        let gravityInitialized = false;
+        let gravityCanvas, gravityCtx;
+        let balls = [];
+        let gravityStrength = 0.5;
+        let bounciness = 0.7;
+        let ballSize = 15;
+
+        function initGravity() {
+            gravityInitialized = true;
+            gravityCanvas = document.getElementById('gravityCanvas');
+            gravityCtx = gravityCanvas.getContext('2d');
+            resizeCanvas(gravityCanvas);
+
+            // Controls
+            const gravitySlider = document.getElementById('gravitySlider');
+            const bouncinessSlider = document.getElementById('bouncinessSlider');
+            const sizeSlider = document.getElementById('sizeSlider');
+            const clearBtn = document.getElementById('clearBalls');
+
+            gravitySlider.addEventListener('input', (e) => {
+                gravityStrength = parseFloat(e.target.value);
+                document.getElementById('gravityValue').textContent = gravityStrength.toFixed(1);
+            });
+
+            bouncinessSlider.addEventListener('input', (e) => {
+                bounciness = parseFloat(e.target.value);
+                document.getElementById('bouncinessValue').textContent = bounciness.toFixed(2);
+            });
+
+            sizeSlider.addEventListener('input', (e) => {
+                ballSize = parseInt(e.target.value);
+                document.getElementById('sizeValue').textContent = ballSize;
+            });
+
+            clearBtn.addEventListener('click', () => {
+                balls = [];
+            });
+
+            // Touch/click events
+            gravityCanvas.addEventListener('touchstart', handleGravityTouch);
+            gravityCanvas.addEventListener('click', handleGravityClick);
+
+            animateGravity();
+        }
+
+        function handleGravityTouch(e) {
+            e.preventDefault();
+            const rect = gravityCanvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = (touch.clientX - rect.left) * (gravityCanvas.width / rect.width);
+            const y = (touch.clientY - rect.top) * (gravityCanvas.height / rect.height);
+            addBall(x, y);
+        }
+
+        function handleGravityClick(e) {
+            const rect = gravityCanvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (gravityCanvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (gravityCanvas.height / rect.height);
+            addBall(x, y);
+        }
+
+        function addBall(x, y) {
+            const colors = ['#e84393', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd'];
+            balls.push({
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * 4,
+                vy: 0,
+                radius: ballSize,
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+        }
+
+        function animateGravity() {
+            if (activeTab !== 'gravity') {
+                requestAnimationFrame(animateGravity);
+                return;
+            }
+
+            gravityCtx.clearRect(0, 0, gravityCanvas.width, gravityCanvas.height);
+
+            balls.forEach((ball, index) => {
+                // Physics
+                ball.vy += gravityStrength;
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+
+                // Floor collision
+                if (ball.y + ball.radius > gravityCanvas.height) {
+                    ball.y = gravityCanvas.height - ball.radius;
+                    ball.vy *= -bounciness;
+                    ball.vx *= 0.98;
+                }
+
+                // Ceiling collision
+                if (ball.y - ball.radius < 0) {
+                    ball.y = ball.radius;
+                    ball.vy *= -bounciness;
+                }
+
+                // Wall collisions
+                if (ball.x + ball.radius > gravityCanvas.width) {
+                    ball.x = gravityCanvas.width - ball.radius;
+                    ball.vx *= -bounciness;
+                }
+
+                if (ball.x - ball.radius < 0) {
+                    ball.x = ball.radius;
+                    ball.vx *= -bounciness;
+                }
+
+                // Remove stationary balls at bottom (cleanup)
+                if (Math.abs(ball.vy) < 0.5 && ball.y > gravityCanvas.height - ball.radius - 2) {
+                    if (Math.abs(ball.vx) < 0.2) {
+                        ball.vx = 0;
+                        ball.vy = 0;
+                    }
+                }
+
+                // Draw
+                gravityCtx.beginPath();
+                gravityCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                gravityCtx.fillStyle = ball.color;
+                gravityCtx.fill();
+            });
+
+            requestAnimationFrame(animateGravity);
+        }
+
+        // === PENDULUM WAVE ===
+        let pendulumInitialized = false;
+        let pendulumCanvas, pendulumCtx;
+        let pendulums = [];
+        let pendulumCount = 15;
+        let pendulumSpeed = 1.0;
+        let damping = 0.0;
+        let time = 0;
+
+        function initPendulum() {
+            pendulumInitialized = true;
+            pendulumCanvas = document.getElementById('pendulumCanvas');
+            pendulumCtx = pendulumCanvas.getContext('2d');
+            resizeCanvas(pendulumCanvas);
+
+            // Controls
+            const countSlider = document.getElementById('pendulumCountSlider');
+            const speedSlider = document.getElementById('speedSlider');
+            const dampingSlider = document.getElementById('dampingSlider');
+            const resetBtn = document.getElementById('resetPendulum');
+
+            countSlider.addEventListener('input', (e) => {
+                pendulumCount = parseInt(e.target.value);
+                document.getElementById('pendulumCountValue').textContent = pendulumCount;
+                createPendulums();
+            });
+
+            speedSlider.addEventListener('input', (e) => {
+                pendulumSpeed = parseFloat(e.target.value);
+                document.getElementById('speedValue').textContent = pendulumSpeed.toFixed(1);
+            });
+
+            dampingSlider.addEventListener('input', (e) => {
+                damping = parseFloat(e.target.value);
+                document.getElementById('dampingValue').textContent = damping.toFixed(3);
+            });
+
+            resetBtn.addEventListener('click', () => {
+                time = 0;
+                createPendulums();
+            });
+
+            createPendulums();
+            animatePendulum();
+        }
+
+        function createPendulums() {
+            pendulums = [];
+            const baseLength = pendulumCanvas.height * 0.6;
+
+            for (let i = 0; i < pendulumCount; i++) {
+                // Each pendulum has slightly different length for wave effect
+                const lengthMultiplier = 1 - (i / pendulumCount) * 0.3;
+                pendulums.push({
+                    length: baseLength * lengthMultiplier,
+                    angle: Math.PI / 2,
+                    angleVel: 0,
+                    x: (i + 1) * (pendulumCanvas.width / (pendulumCount + 1))
+                });
+            }
+        }
+
+        function animatePendulum() {
+            if (activeTab !== 'pendulum') {
+                requestAnimationFrame(animatePendulum);
+                return;
+            }
+
+            pendulumCtx.clearRect(0, 0, pendulumCanvas.width, pendulumCanvas.height);
+
+            const originY = 50;
+            time += 0.02 * pendulumSpeed;
+
+            pendulums.forEach((p, i) => {
+                // Pendulum physics with wave pattern
+                const frequency = Math.sqrt(9.81 / p.length);
+                const amplitude = Math.PI / 3;
+                p.angle = amplitude * Math.sin(frequency * time) * Math.exp(-damping * time);
+
+                const endX = p.x + p.length * Math.sin(p.angle);
+                const endY = originY + p.length * Math.cos(p.angle);
+
+                // Draw rod
+                pendulumCtx.beginPath();
+                pendulumCtx.moveTo(p.x, originY);
+                pendulumCtx.lineTo(endX, endY);
+                pendulumCtx.strokeStyle = '#d0d0d0';
+                pendulumCtx.lineWidth = 2;
+                pendulumCtx.stroke();
+
+                // Draw bob
+                const hue = (i / pendulumCount) * 60 + 300;
+                pendulumCtx.beginPath();
+                pendulumCtx.arc(endX, endY, 8, 0, Math.PI * 2);
+                pendulumCtx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+                pendulumCtx.fill();
+
+                // Draw pivot
+                pendulumCtx.beginPath();
+                pendulumCtx.arc(p.x, originY, 4, 0, Math.PI * 2);
+                pendulumCtx.fillStyle = '#6e6e73';
+                pendulumCtx.fill();
+            });
+
+            requestAnimationFrame(animatePendulum);
+        }
+
+        // === SPRING PHYSICS ===
+        let springInitialized = false;
+        let springCanvas, springCtx;
+        let spring = {
+            anchorX: 0,
+            anchorY: 100,
+            massX: 0,
+            massY: 300,
+            vx: 0,
+            vy: 0,
+            radius: 20,
+            isDragging: false
+        };
+        let springStiffness = 0.05;
+        let mass = 1.0;
+
+        function initSpring() {
+            springInitialized = true;
+            springCanvas = document.getElementById('springCanvas');
+            springCtx = springCanvas.getContext('2d');
+            resizeCanvas(springCanvas);
+
+            spring.anchorX = springCanvas.width / 2;
+            spring.massX = spring.anchorX;
+
+            // Controls
+            const stiffnessSlider = document.getElementById('stiffnessSlider');
+            const massSlider = document.getElementById('massSlider');
+            const resetBtn = document.getElementById('resetSpring');
+
+            stiffnessSlider.addEventListener('input', (e) => {
+                springStiffness = parseFloat(e.target.value);
+                document.getElementById('stiffnessValue').textContent = springStiffness.toFixed(2);
+            });
+
+            massSlider.addEventListener('input', (e) => {
+                mass = parseFloat(e.target.value);
+                document.getElementById('massValue').textContent = mass.toFixed(1);
+            });
+
+            resetBtn.addEventListener('click', () => {
+                spring.massX = spring.anchorX;
+                spring.massY = 300;
+                spring.vx = 0;
+                spring.vy = 0;
+            });
+
+            // Touch/mouse events
+            springCanvas.addEventListener('touchstart', handleSpringTouchStart);
+            springCanvas.addEventListener('touchmove', handleSpringTouchMove);
+            springCanvas.addEventListener('touchend', handleSpringTouchEnd);
+            springCanvas.addEventListener('mousedown', handleSpringMouseDown);
+            springCanvas.addEventListener('mousemove', handleSpringMouseMove);
+            springCanvas.addEventListener('mouseup', handleSpringMouseUp);
+
+            animateSpring();
+        }
+
+        function handleSpringTouchStart(e) {
+            e.preventDefault();
+            const rect = springCanvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = (touch.clientX - rect.left) * (springCanvas.width / rect.width);
+            const y = (touch.clientY - rect.top) * (springCanvas.height / rect.height);
+            checkSpringGrab(x, y);
+        }
+
+        function handleSpringTouchMove(e) {
+            if (!spring.isDragging) return;
+            e.preventDefault();
+            const rect = springCanvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            spring.massX = (touch.clientX - rect.left) * (springCanvas.width / rect.width);
+            spring.massY = (touch.clientY - rect.top) * (springCanvas.height / rect.height);
+        }
+
+        function handleSpringTouchEnd(e) {
+            spring.isDragging = false;
+        }
+
+        function handleSpringMouseDown(e) {
+            const rect = springCanvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (springCanvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (springCanvas.height / rect.height);
+            checkSpringGrab(x, y);
+        }
+
+        function handleSpringMouseMove(e) {
+            if (!spring.isDragging) return;
+            const rect = springCanvas.getBoundingClientRect();
+            spring.massX = (e.clientX - rect.left) * (springCanvas.width / rect.width);
+            spring.massY = (e.clientY - rect.top) * (springCanvas.height / rect.height);
+        }
+
+        function handleSpringMouseUp(e) {
+            spring.isDragging = false;
+        }
+
+        function checkSpringGrab(x, y) {
+            const dx = x - spring.massX;
+            const dy = y - spring.massY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < spring.radius + 10) {
+                spring.isDragging = true;
+                spring.vx = 0;
+                spring.vy = 0;
+            }
+        }
+
+        function animateSpring() {
+            if (activeTab !== 'spring') {
+                requestAnimationFrame(animateSpring);
+                return;
+            }
+
+            springCtx.clearRect(0, 0, springCanvas.width, springCanvas.height);
+
+            if (!spring.isDragging) {
+                // Spring force
+                const dx = spring.massX - spring.anchorX;
+                const dy = spring.massY - spring.anchorY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                const forceMag = -springStiffness * dist;
+                const fx = (dx / dist) * forceMag;
+                const fy = (dy / dist) * forceMag;
+
+                // Apply force (F = ma, a = F/m)
+                spring.vx += fx / mass;
+                spring.vy += fy / mass;
+
+                // Gravity
+                spring.vy += 0.3;
+
+                // Damping
+                spring.vx *= 0.99;
+                spring.vy *= 0.99;
+
+                // Update position
+                spring.massX += spring.vx;
+                spring.massY += spring.vy;
+
+                // Keep in bounds
+                if (spring.massX < spring.radius) spring.massX = spring.radius;
+                if (spring.massX > springCanvas.width - spring.radius) spring.massX = springCanvas.width - spring.radius;
+                if (spring.massY < spring.radius) spring.massY = spring.radius;
+                if (spring.massY > springCanvas.height - spring.radius) spring.massY = springCanvas.height - spring.radius;
+            }
+
+            // Draw anchor
+            springCtx.beginPath();
+            springCtx.arc(spring.anchorX, spring.anchorY, 8, 0, Math.PI * 2);
+            springCtx.fillStyle = '#6e6e73';
+            springCtx.fill();
+
+            // Draw spring (zigzag)
+            drawSpringLine(spring.anchorX, spring.anchorY, spring.massX, spring.massY);
+
+            // Draw mass
+            springCtx.beginPath();
+            springCtx.arc(spring.massX, spring.massY, spring.radius, 0, Math.PI * 2);
+            springCtx.fillStyle = spring.isDragging ? '#ff6b6b' : '#e84393';
+            springCtx.fill();
+            springCtx.strokeStyle = '#fff';
+            springCtx.lineWidth = 3;
+            springCtx.stroke();
+
+            requestAnimationFrame(animateSpring);
+        }
+
+        function drawSpringLine(x1, y1, x2, y2) {
+            const coils = 12;
+            const width = 20;
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
+
+            springCtx.beginPath();
+            springCtx.moveTo(x1, y1);
+
+            for (let i = 0; i <= coils; i++) {
+                const t = i / coils;
+                const x = x1 + dx * t;
+                const y = y1 + dy * t;
+                const offset = Math.sin(i * Math.PI) * width;
+                const perpX = -Math.sin(angle) * offset;
+                const perpY = Math.cos(angle) * offset;
+                springCtx.lineTo(x + perpX, y + perpY);
+            }
+
+            springCtx.strokeStyle = '#b0b0b0';
+            springCtx.lineWidth = 3;
+            springCtx.stroke();
+        }
+
+        // === CLOTH SIMULATION ===
+        let clothInitialized = false;
+        let clothCanvas, clothCtx;
+        let clothPoints = [];
+        let clothConstraints = [];
+        let gridSize = 20;
+        let clothGravity = 0.5;
+        let tearThreshold = 50;
+        let dragPoint = null;
+
+        function initCloth() {
+            clothInitialized = true;
+            clothCanvas = document.getElementById('clothCanvas');
+            clothCtx = clothCanvas.getContext('2d');
+            resizeCanvas(clothCanvas);
+
+            // Controls
+            const gridSizeSlider = document.getElementById('gridSizeSlider');
+            const gravitySlider = document.getElementById('clothGravitySlider');
+            const tearSlider = document.getElementById('tearSlider');
+            const resetBtn = document.getElementById('resetCloth');
+
+            gridSizeSlider.addEventListener('input', (e) => {
+                gridSize = parseInt(e.target.value);
+                document.getElementById('gridSizeValue').textContent = gridSize;
+                createCloth();
+            });
+
+            gravitySlider.addEventListener('input', (e) => {
+                clothGravity = parseFloat(e.target.value);
+                document.getElementById('clothGravityValue').textContent = clothGravity.toFixed(1);
+            });
+
+            tearSlider.addEventListener('input', (e) => {
+                tearThreshold = parseInt(e.target.value);
+                document.getElementById('tearValue').textContent = tearThreshold;
+            });
+
+            resetBtn.addEventListener('click', () => {
+                createCloth();
+            });
+
+            // Touch/mouse events
+            clothCanvas.addEventListener('touchstart', handleClothTouchStart);
+            clothCanvas.addEventListener('touchmove', handleClothTouchMove);
+            clothCanvas.addEventListener('touchend', handleClothTouchEnd);
+            clothCanvas.addEventListener('mousedown', handleClothMouseDown);
+            clothCanvas.addEventListener('mousemove', handleClothMouseMove);
+            clothCanvas.addEventListener('mouseup', handleClothMouseUp);
+
+            createCloth();
+            animateCloth();
+        }
+
+        function createCloth() {
+            clothPoints = [];
+            clothConstraints = [];
+
+            const spacing = Math.min(clothCanvas.width / (gridSize + 1), 20);
+            const startX = (clothCanvas.width - spacing * (gridSize - 1)) / 2;
+            const startY = 50;
+
+            // Create points
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    clothPoints.push({
+                        x: startX + x * spacing,
+                        y: startY + y * spacing,
+                        px: startX + x * spacing,
+                        py: startY + y * spacing,
+                        pinned: y === 0 && (x % 3 === 0),
+                        index: y * gridSize + x
+                    });
+                }
+            }
+
+            // Create constraints (structural)
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    const i = y * gridSize + x;
+
+                    // Horizontal
+                    if (x < gridSize - 1) {
+                        clothConstraints.push({
+                            p1: i,
+                            p2: i + 1,
+                            length: spacing,
+                            active: true
+                        });
+                    }
+
+                    // Vertical
+                    if (y < gridSize - 1) {
+                        clothConstraints.push({
+                            p1: i,
+                            p2: i + gridSize,
+                            length: spacing,
+                            active: true
+                        });
+                    }
+                }
+            }
+        }
+
+        function handleClothTouchStart(e) {
+            e.preventDefault();
+            const rect = clothCanvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = (touch.clientX - rect.left) * (clothCanvas.width / rect.width);
+            const y = (touch.clientY - rect.top) * (clothCanvas.height / rect.height);
+            checkClothGrab(x, y);
+        }
+
+        function handleClothTouchMove(e) {
+            if (!dragPoint) return;
+            e.preventDefault();
+            const rect = clothCanvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = (touch.clientX - rect.left) * (clothCanvas.width / rect.width);
+            const y = (touch.clientY - rect.top) * (clothCanvas.height / rect.height);
+            dragPoint.x = x;
+            dragPoint.y = y;
+        }
+
+        function handleClothTouchEnd(e) {
+            dragPoint = null;
+        }
+
+        function handleClothMouseDown(e) {
+            const rect = clothCanvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (clothCanvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (clothCanvas.height / rect.height);
+            checkClothGrab(x, y);
+        }
+
+        function handleClothMouseMove(e) {
+            if (!dragPoint) return;
+            const rect = clothCanvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (clothCanvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (clothCanvas.height / rect.height);
+            dragPoint.x = x;
+            dragPoint.y = y;
+        }
+
+        function handleClothMouseUp(e) {
+            dragPoint = null;
+        }
+
+        function checkClothGrab(x, y) {
+            for (let point of clothPoints) {
+                const dx = x - point.x;
+                const dy = y - point.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 20) {
+                    dragPoint = point;
+                    break;
+                }
+            }
+        }
+
+        function animateCloth() {
+            if (activeTab !== 'cloth') {
+                requestAnimationFrame(animateCloth);
+                return;
+            }
+
+            clothCtx.clearRect(0, 0, clothCanvas.width, clothCanvas.height);
+
+            // Update points (Verlet integration)
+            clothPoints.forEach(point => {
+                if (point.pinned || point === dragPoint) return;
+
+                const vx = point.x - point.px;
+                const vy = point.y - point.py;
+
+                point.px = point.x;
+                point.py = point.y;
+
+                point.x += vx * 0.99;
+                point.y += vy * 0.99;
+                point.y += clothGravity;
+
+                // Bounds
+                if (point.y > clothCanvas.height - 5) {
+                    point.y = clothCanvas.height - 5;
+                    point.py = point.y;
+                }
+            });
+
+            // Satisfy constraints
+            for (let iter = 0; iter < 3; iter++) {
+                clothConstraints.forEach(constraint => {
+                    if (!constraint.active) return;
+
+                    const p1 = clothPoints[constraint.p1];
+                    const p2 = clothPoints[constraint.p2];
+
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    // Tear if stretched too much
+                    if (dist > constraint.length * (tearThreshold / 30)) {
+                        constraint.active = false;
+                        return;
+                    }
+
+                    const diff = (constraint.length - dist) / dist;
+                    const offsetX = dx * diff * 0.5;
+                    const offsetY = dy * diff * 0.5;
+
+                    if (!p1.pinned && p1 !== dragPoint) {
+                        p1.x -= offsetX;
+                        p1.y -= offsetY;
+                    }
+
+                    if (!p2.pinned && p2 !== dragPoint) {
+                        p2.x += offsetX;
+                        p2.y += offsetY;
+                    }
+                });
+            }
+
+            // Draw constraints
+            clothCtx.strokeStyle = '#e84393';
+            clothCtx.lineWidth = 2;
+            clothConstraints.forEach(constraint => {
+                if (!constraint.active) return;
+                const p1 = clothPoints[constraint.p1];
+                const p2 = clothPoints[constraint.p2];
+                clothCtx.beginPath();
+                clothCtx.moveTo(p1.x, p1.y);
+                clothCtx.lineTo(p2.x, p2.y);
+                clothCtx.stroke();
+            });
+
+            // Draw points
+            clothPoints.forEach(point => {
+                clothCtx.beginPath();
+                clothCtx.arc(point.x, point.y, point.pinned ? 5 : 3, 0, Math.PI * 2);
+                clothCtx.fillStyle = point.pinned ? '#6e6e73' : (point === dragPoint ? '#ff6b6b' : '#1d1d1f');
+                clothCtx.fill();
+            });
+
+            requestAnimationFrame(animateCloth);
+        }
+
+        // === UTILITIES ===
+        function resizeCanvas(canvas) {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+
+        // Initialize first tab
+        window.addEventListener('load', () => {
+            initGravity();
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (gravityCanvas) resizeCanvas(gravityCanvas);
+            if (pendulumCanvas) {
+                resizeCanvas(pendulumCanvas);
+                if (pendulumInitialized) createPendulums();
+            }
+            if (springCanvas) {
+                resizeCanvas(springCanvas);
+                if (springInitialized) {
+                    spring.anchorX = springCanvas.width / 2;
+                    spring.massX = spring.anchorX;
+                }
+            }
+            if (clothCanvas) {
+                resizeCanvas(clothCanvas);
+                if (clothInitialized) createCloth();
+            }
+        });
+    </script>
+</body>
+</html>
