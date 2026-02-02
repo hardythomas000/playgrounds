@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Clocks 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+            padding-bottom: 40px;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 15px;
+        }
+
+        nav {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 5px;
+        }
+
+        nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #f5f5f7;
+            border: none;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #1d1d1f;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .tab-btn.active {
+            background: #007aff;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #86868b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-group select,
+        .control-group input[type="number"],
+        .control-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e5e5e7;
+            border-radius: 10px;
+            font-size: 16px;
+            background: #f5f5f7;
+        }
+
+        .control-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-wrapper span {
+            font-size: 15px;
+            color: #1d1d1f;
+        }
+
+        .clock-display {
+            background: white;
+            padding: 40px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+
+        .analog-clock {
+            width: 280px;
+            height: 280px;
+        }
+
+        .binary-clock {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .binary-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .binary-label {
+            width: 60px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #86868b;
+        }
+
+        .binary-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .binary-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e5e5e7;
+            transition: all 0.3s;
+        }
+
+        .binary-dot.on {
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .word-clock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+            gap: 4px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .word-letter {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: #d1d1d6;
+            transition: all 0.3s;
+        }
+
+        .word-letter.active {
+            color: var(--highlight-color, #007aff);
+        }
+
+        .countdown-display {
+            font-size: 72px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .countdown-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn.secondary {
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .btn.danger {
+            background: #ff3b30;
+        }
+
+        .world-clocks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .world-clock-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .world-clock-item svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+
+        .world-clock-city {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .world-clock-time {
+            font-size: 18px;
+            font-weight: 500;
+            color: #007aff;
+        }
+
+        .stopwatch-display {
+            font-size: 64px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 30px;
+        }
+
+        .lap-times {
+            max-width: 400px;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .lap-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f5f5f7;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .flip-digit {
+            display: inline-block;
+            position: relative;
+            width: 60px;
+            height: 80px;
+            perspective: 1000px;
+            margin: 0 2px;
+        }
+
+        .flip-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #1d1d1f;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 48px;
+            font-weight: 700;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 480px) {
+            .flip-digit {
+                width: 45px;
+                height: 60px;
+            }
+            .flip-card {
+                font-size: 36px;
+            }
+            .countdown-display {
+                font-size: 56px;
+            }
+            .stopwatch-display {
+                font-size: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Clocks 2026</h1>
+        <nav id="tabNav">
+            <button class="tab-btn active" data-tab="analog">Analog Clock</button>
+            <button class="tab-btn" data-tab="binary">Binary Clock</button>
+            <button class="tab-btn" data-tab="word">Word Clock</button>
+            <button class="tab-btn" data-tab="countdown">Countdown</button>
+            <button class="tab-btn" data-tab="world">World Time</button>
+            <button class="tab-btn" data-tab="stopwatch">Stopwatch</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Analog Clock Tab -->
+        <section class="tab-content active" id="analog">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Clock Style</label>
+                    <select id="analogStyle">
+                        <option value="minimal">Minimal</option>
+                        <option value="classic">Classic</option>
+                        <option value="modern">Modern</option>
+                        <option value="neon">Neon</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Accent Color</label>
+                    <select id="analogColor">
+                        <option value="#007aff">Blue</option>
+                        <option value="#ff3b30">Red</option>
+                        <option value="#34c759">Green</option>
+                        <option value="#ff9500">Orange</option>
+                        <option value="#af52de">Purple</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="showSeconds" checked>
+                        <span>Show seconds hand</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="showNumbers" checked>
+                        <span>Show numbers</span>
+                    </div>
+                </div>
+            </div>
+            <div class="clock-display">
+                <svg class="analog-clock" id="analogClock" viewBox="0 0 200 200"></svg>
+            </div>
+        </section>
+
+        <!-- Binary Clock Tab -->
+        <section class="tab-content" id="binary">
+            <div class="controls">
+                <div class="control-group">
+                    <label>LED Color</label>
+                    <select id="binaryColor">
+                        <option value="#34c759">Green</option>
+                        <option value="#007aff">Blue</option>
+                        <option value="#ff3b30">Red</option>
+                        <option value="#ff9500">Amber</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="showDecimal" checked>
+                        <span>Show decimal labels</span>
+                    </div>
+                </div>
+            </div>
+            <div class="clock-display">
+                <div class="binary-clock" id="binaryClock"></div>
+            </div>
+        </section>
+
+        <!-- Word Clock Tab -->
+        <section class="tab-content" id="word">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Time Format</label>
+                    <select id="wordFormat">
+                        <option value="12h">12-hour</option>
+                        <option value="24h">24-hour</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Highlight Color</label>
+                    <select id="wordColor">
+                        <option value="#007aff">Blue</option>
+                        <option value="#ff3b30">Red</option>
+                        <option value="#34c759">Green</option>
+                        <option value="#ff9500">Orange</option>
+                        <option value="#af52de">Purple</option>
+                    </select>
+                </div>
+            </div>
+            <div class="clock-display">
+                <div class="word-clock-grid" id="wordClock"></div>
+            </div>
+        </section>
+
+        <!-- Countdown Tab -->
+        <section class="tab-content" id="countdown">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Duration Preset</label>
+                    <select id="countdownPreset">
+                        <option value="60">1 minute</option>
+                        <option value="300">5 minutes</option>
+                        <option value="900">15 minutes</option>
+                        <option value="1800">30 minutes</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                <div class="control-group" id="customTimeGroup" style="display: none;">
+                    <label>Custom Time (seconds)</label>
+                    <input type="number" id="customTime" value="60" min="1">
+                </div>
+                <div class="control-group">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="alarmSound" checked>
+                        <span>Alarm sound</span>
+                    </div>
+                </div>
+            </div>
+            <div class="clock-display">
+                <div id="countdownDisplay" class="countdown-display">00:00</div>
+                <div class="countdown-controls">
+                    <button class="btn" id="countdownStart">Start</button>
+                    <button class="btn secondary" id="countdownReset">Reset</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- World Time Tab -->
+        <section class="tab-content" id="world">
+            <div class="clock-display">
+                <div class="world-clocks" id="worldClocks"></div>
+            </div>
+        </section>
+
+        <!-- Stopwatch Tab -->
+        <section class="tab-content" id="stopwatch">
+            <div class="clock-display">
+                <div class="stopwatch-display" id="stopwatchDisplay">00:00.00</div>
+                <div class="countdown-controls">
+                    <button class="btn" id="stopwatchStart">Start</button>
+                    <button class="btn secondary" id="stopwatchLap">Lap</button>
+                    <button class="btn danger" id="stopwatchReset">Reset</button>
+                </div>
+                <div class="lap-times" id="lapTimes"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Tab Navigation
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // Analog Clock
+        let analogStyle = 'minimal';
+        let analogColor = '#007aff';
+        let showSeconds = true;
+        let showNumbers = true;
+
+        function drawAnalogClock() {
+            const svg = document.getElementById('analogClock');
+            const now = new Date();
+            const hours = now.getHours() % 12;
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            const milliseconds = now.getMilliseconds();
+
+            const hourAngle = (hours * 30) + (minutes * 0.5) - 90;
+            const minuteAngle = (minutes * 6) + (seconds * 0.1) - 90;
+            const secondAngle = (seconds * 6) + (milliseconds * 0.006) - 90;
+
+            let svgContent = '';
+
+            // Clock face
+            if (analogStyle === 'neon') {
+                svgContent += `<circle cx="100" cy="100" r="95" fill="none" stroke="${analogColor}" stroke-width="2" opacity="0.3"/>`;
+                svgContent += `<circle cx="100" cy="100" r="85" fill="none" stroke="${analogColor}" stroke-width="1" opacity="0.2"/>`;
+            } else {
+                svgContent += `<circle cx="100" cy="100" r="95" fill="white" stroke="#e5e5e7" stroke-width="2"/>`;
+            }
+
+            // Numbers
+            if (showNumbers) {
+                for (let i = 1; i <= 12; i++) {
+                    const angle = (i * 30 - 90) * Math.PI / 180;
+                    const x = 100 + 70 * Math.cos(angle);
+                    const y = 100 + 70 * Math.sin(angle);
+                    const color = analogStyle === 'neon' ? analogColor : '#1d1d1f';
+                    svgContent += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="18" font-weight="500" fill="${color}">${i}</text>`;
+                }
+            } else if (analogStyle === 'classic') {
+                // Hour markers
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i * 30 - 90) * Math.PI / 180;
+                    const x1 = 100 + 85 * Math.cos(angle);
+                    const y1 = 100 + 85 * Math.sin(angle);
+                    const x2 = 100 + 75 * Math.cos(angle);
+                    const y2 = 100 + 75 * Math.sin(angle);
+                    svgContent += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#1d1d1f" stroke-width="2"/>`;
+                }
+            }
+
+            // Center dot
+            const centerColor = analogStyle === 'neon' ? analogColor : '#1d1d1f';
+            svgContent += `<circle cx="100" cy="100" r="4" fill="${centerColor}"/>`;
+
+            // Hour hand
+            const hourX = 100 + 40 * Math.cos(hourAngle * Math.PI / 180);
+            const hourY = 100 + 40 * Math.sin(hourAngle * Math.PI / 180);
+            const hourWidth = analogStyle === 'minimal' ? 3 : 4;
+            const hourColor = analogStyle === 'modern' ? analogColor : centerColor;
+            svgContent += `<line x1="100" y1="100" x2="${hourX}" y2="${hourY}" stroke="${hourColor}" stroke-width="${hourWidth}" stroke-linecap="round"/>`;
+
+            // Minute hand
+            const minuteX = 100 + 60 * Math.cos(minuteAngle * Math.PI / 180);
+            const minuteY = 100 + 60 * Math.sin(minuteAngle * Math.PI / 180);
+            const minuteWidth = analogStyle === 'minimal' ? 2 : 3;
+            const minuteColor = analogStyle === 'modern' ? analogColor : centerColor;
+            svgContent += `<line x1="100" y1="100" x2="${minuteX}" y2="${minuteY}" stroke="${minuteColor}" stroke-width="${minuteWidth}" stroke-linecap="round"/>`;
+
+            // Second hand
+            if (showSeconds) {
+                const secondX = 100 + 70 * Math.cos(secondAngle * Math.PI / 180);
+                const secondY = 100 + 70 * Math.sin(secondAngle * Math.PI / 180);
+                const secondWidth = 1;
+                svgContent += `<line x1="100" y1="100" x2="${secondX}" y2="${secondY}" stroke="${analogColor}" stroke-width="${secondWidth}" stroke-linecap="round"/>`;
+                if (analogStyle === 'neon') {
+                    svgContent += `<line x1="100" y1="100" x2="${secondX}" y2="${secondY}" stroke="${analogColor}" stroke-width="3" stroke-linecap="round" opacity="0.3" filter="blur(2px)"/>`;
+                }
+            }
+
+            svg.innerHTML = svgContent;
+        }
+
+        document.getElementById('analogStyle').addEventListener('change', (e) => {
+            analogStyle = e.target.value;
+        });
+
+        document.getElementById('analogColor').addEventListener('change', (e) => {
+            analogColor = e.target.value;
+        });
+
+        document.getElementById('showSeconds').addEventListener('change', (e) => {
+            showSeconds = e.target.checked;
+        });
+
+        document.getElementById('showNumbers').addEventListener('change', (e) => {
+            showNumbers = e.target.checked;
+        });
+
+        // Binary Clock
+        let binaryColor = '#34c759';
+        let showDecimal = true;
+
+        function toBinary(num, bits) {
+            return num.toString(2).padStart(bits, '0').split('').map(b => b === '1');
+        }
+
+        function updateBinaryClock() {
+            const container = document.getElementById('binaryClock');
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+
+            const times = [
+                { label: 'Hours', value: hours, bits: 6 },
+                { label: 'Minutes', value: minutes, bits: 6 },
+                { label: 'Seconds', value: seconds, bits: 6 }
+            ];
+
+            let html = '';
+            times.forEach(time => {
+                const binary = toBinary(time.value, time.bits);
+                html += `<div class="binary-row">
+                    <div class="binary-label">${time.label}${showDecimal ? ': ' + time.value : ''}</div>
+                    <div class="binary-dots">`;
+                binary.forEach((on, i) => {
+                    const value = Math.pow(2, time.bits - 1 - i);
+                    html += `<div class="binary-dot ${on ? 'on' : ''}" style="${on ? 'background: ' + binaryColor : ''}" title="${value}"></div>`;
+                });
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        document.getElementById('binaryColor').addEventListener('change', (e) => {
+            binaryColor = e.target.value;
+        });
+
+        document.getElementById('showDecimal').addEventListener('change', (e) => {
+            showDecimal = e.target.checked;
+        });
+
+        // Word Clock
+        const WORD_GRID = [
+            'ITLISASAMPM',
+            'ACQUARTERDC',
+            'TWENTYFIVEX',
+            'HALFBTENFTO',
+            'PASTERUNINE',
+            'ONESIXTHREE',
+            'FOURFIVETWO',
+            'EIGHTELEVEN',
+            'SEVENTWELVE',
+            'TENOCLOCK'
+        ];
+
+        let wordFormat = '12h';
+        let wordColor = '#007aff';
+
+        function getActiveWords(hours, minutes) {
+            const words = [];
+            words.push([0, 0, 2]); // IT
+            words.push([0, 3, 5]); // IS
+
+            // Round to nearest 5 minutes
+            const roundedMin = Math.round(minutes / 5) * 5;
+
+            if (roundedMin === 0) {
+                words.push([9, 5, 10]); // OCLOCK
+            } else if (roundedMin === 5) {
+                words.push([2, 6, 10]); // FIVE
+                words.push([4, 0, 4]); // PAST
+            } else if (roundedMin === 10) {
+                words.push([3, 5, 8]); // TEN
+                words.push([4, 0, 4]); // PAST
+            } else if (roundedMin === 15) {
+                words.push([1, 2, 9]); // QUARTER
+                words.push([4, 0, 4]); // PAST
+            } else if (roundedMin === 20) {
+                words.push([2, 0, 6]); // TWENTY
+                words.push([4, 0, 4]); // PAST
+            } else if (roundedMin === 25) {
+                words.push([2, 0, 6]); // TWENTY
+                words.push([2, 6, 10]); // FIVE
+                words.push([4, 0, 4]); // PAST
+            } else if (roundedMin === 30) {
+                words.push([3, 0, 4]); // HALF
+                words.push([4, 0, 4]); // PAST
+            } else if (roundedMin === 35) {
+                words.push([2, 0, 6]); // TWENTY
+                words.push([2, 6, 10]); // FIVE
+                words.push([3, 9, 11]); // TO
+                hours = (hours + 1) % 24;
+            } else if (roundedMin === 40) {
+                words.push([2, 0, 6]); // TWENTY
+                words.push([3, 9, 11]); // TO
+                hours = (hours + 1) % 24;
+            } else if (roundedMin === 45) {
+                words.push([1, 2, 9]); // QUARTER
+                words.push([3, 9, 11]); // TO
+                hours = (hours + 1) % 24;
+            } else if (roundedMin === 50) {
+                words.push([3, 5, 8]); // TEN
+                words.push([3, 9, 11]); // TO
+                hours = (hours + 1) % 24;
+            } else if (roundedMin === 55) {
+                words.push([2, 6, 10]); // FIVE
+                words.push([3, 9, 11]); // TO
+                hours = (hours + 1) % 24;
+            }
+
+            // Hour words
+            const hour12 = hours % 12 || 12;
+            const hourWords = {
+                1: [5, 0, 3],    // ONE
+                2: [6, 8, 11],   // TWO
+                3: [5, 6, 11],   // THREE
+                4: [6, 0, 4],    // FOUR
+                5: [6, 4, 8],    // FIVE
+                6: [5, 3, 6],    // SIX
+                7: [8, 0, 5],    // SEVEN
+                8: [7, 0, 5],    // EIGHT
+                9: [4, 7, 11],   // NINE
+                10: [9, 0, 3],   // TEN
+                11: [7, 5, 11],  // ELEVEN
+                12: [8, 5, 11]   // TWELVE
+            };
+            if (hourWords[hour12]) {
+                words.push(hourWords[hour12]);
+            }
+
+            // AM/PM for 12h format
+            if (wordFormat === '12h') {
+                if (hours < 12) {
+                    words.push([0, 6, 8]); // AM
+                } else {
+                    words.push([0, 8, 10]); // PM
+                }
+            }
+
+            return words;
+        }
+
+        function updateWordClock() {
+            const container = document.getElementById('wordClock');
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+
+            const activeWords = getActiveWords(hours, minutes);
+            const activePositions = new Set();
+
+            activeWords.forEach(([row, start, end]) => {
+                for (let i = start; i < end; i++) {
+                    activePositions.add(`${row}-${i}`);
+                }
+            });
+
+            let html = '';
+            WORD_GRID.forEach((row, r) => {
+                row.split('').forEach((letter, c) => {
+                    const isActive = activePositions.has(`${r}-${c}`);
+                    html += `<div class="word-letter ${isActive ? 'active' : ''}" style="${isActive ? '--highlight-color: ' + wordColor : ''}">${letter}</div>`;
+                });
+            });
+
+            container.innerHTML = html;
+        }
+
+        document.getElementById('wordFormat').addEventListener('change', (e) => {
+            wordFormat = e.target.value;
+        });
+
+        document.getElementById('wordColor').addEventListener('change', (e) => {
+            wordColor = e.target.value;
+        });
+
+        // Countdown
+        let countdownTime = 60;
+        let countdownRemaining = 60;
+        let countdownInterval = null;
+        let countdownRunning = false;
+
+        document.getElementById('countdownPreset').addEventListener('change', (e) => {
+            const preset = e.target.value;
+            if (preset === 'custom') {
+                document.getElementById('customTimeGroup').style.display = 'block';
+                countdownTime = parseInt(document.getElementById('customTime').value);
+            } else {
+                document.getElementById('customTimeGroup').style.display = 'none';
+                countdownTime = parseInt(preset);
+            }
+            countdownRemaining = countdownTime;
+            updateCountdownDisplay();
+        });
+
+        document.getElementById('customTime').addEventListener('input', (e) => {
+            countdownTime = parseInt(e.target.value) || 60;
+            countdownRemaining = countdownTime;
+            updateCountdownDisplay();
+        });
+
+        function updateCountdownDisplay() {
+            const minutes = Math.floor(countdownRemaining / 60);
+            const seconds = countdownRemaining % 60;
+            document.getElementById('countdownDisplay').textContent =
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function playBeep() {
+            if (!document.getElementById('alarmSound').checked) return;
+
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 880;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        document.getElementById('countdownStart').addEventListener('click', () => {
+            if (countdownRunning) {
+                clearInterval(countdownInterval);
+                countdownRunning = false;
+                document.getElementById('countdownStart').textContent = 'Start';
+            } else {
+                countdownRunning = true;
+                document.getElementById('countdownStart').textContent = 'Pause';
+                countdownInterval = setInterval(() => {
+                    countdownRemaining--;
+                    updateCountdownDisplay();
+
+                    if (countdownRemaining <= 0) {
+                        clearInterval(countdownInterval);
+                        countdownRunning = false;
+                        document.getElementById('countdownStart').textContent = 'Start';
+                        playBeep();
+                        setTimeout(() => playBeep(), 500);
+                        setTimeout(() => playBeep(), 1000);
+                    }
+                }, 1000);
+            }
+        });
+
+        document.getElementById('countdownReset').addEventListener('click', () => {
+            clearInterval(countdownInterval);
+            countdownRunning = false;
+            countdownRemaining = countdownTime;
+            document.getElementById('countdownStart').textContent = 'Start';
+            updateCountdownDisplay();
+        });
+
+        // World Time
+        const worldCities = [
+            { name: 'New York', timezone: 'America/New_York' },
+            { name: 'London', timezone: 'Europe/London' },
+            { name: 'Tokyo', timezone: 'Asia/Tokyo' },
+            { name: 'Sydney', timezone: 'Australia/Sydney' },
+            { name: 'Dubai', timezone: 'Asia/Dubai' },
+            { name: 'São Paulo', timezone: 'America/Sao_Paulo' }
+        ];
+
+        function drawMiniClock(hours, minutes, seconds) {
+            const hourAngle = (hours % 12 * 30) + (minutes * 0.5) - 90;
+            const minuteAngle = (minutes * 6) - 90;
+            const secondAngle = (seconds * 6) - 90;
+
+            let svg = `<svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="48" fill="white" stroke="#e5e5e7" stroke-width="1"/>
+                <circle cx="50" cy="50" r="2" fill="#1d1d1f"/>`;
+
+            // Hour hand
+            const hourX = 50 + 25 * Math.cos(hourAngle * Math.PI / 180);
+            const hourY = 50 + 25 * Math.sin(hourAngle * Math.PI / 180);
+            svg += `<line x1="50" y1="50" x2="${hourX}" y2="${hourY}" stroke="#1d1d1f" stroke-width="2" stroke-linecap="round"/>`;
+
+            // Minute hand
+            const minuteX = 50 + 35 * Math.cos(minuteAngle * Math.PI / 180);
+            const minuteY = 50 + 35 * Math.sin(minuteAngle * Math.PI / 180);
+            svg += `<line x1="50" y1="50" x2="${minuteX}" y2="${minuteY}" stroke="#1d1d1f" stroke-width="1.5" stroke-linecap="round"/>`;
+
+            // Second hand
+            const secondX = 50 + 40 * Math.cos(secondAngle * Math.PI / 180);
+            const secondY = 50 + 40 * Math.sin(secondAngle * Math.PI / 180);
+            svg += `<line x1="50" y1="50" x2="${secondX}" y2="${secondY}" stroke="#007aff" stroke-width="0.5" stroke-linecap="round"/>`;
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        function updateWorldClocks() {
+            const container = document.getElementById('worldClocks');
+            let html = '';
+
+            worldCities.forEach(city => {
+                const date = new Date(new Date().toLocaleString('en-US', { timeZone: city.timezone }));
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                const seconds = date.getSeconds();
+                const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+
+                html += `
+                    <div class="world-clock-item">
+                        ${drawMiniClock(hours, minutes, seconds)}
+                        <div class="world-clock-city">${city.name}</div>
+                        <div class="world-clock-time">${timeStr}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Stopwatch
+        let stopwatchRunning = false;
+        let stopwatchStartTime = 0;
+        let stopwatchElapsed = 0;
+        let stopwatchInterval = null;
+        let lapCounter = 1;
+
+        function formatStopwatchTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const centiseconds = Math.floor((ms % 1000) / 10);
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
+        }
+
+        function updateStopwatch() {
+            const now = Date.now();
+            const elapsed = stopwatchElapsed + (now - stopwatchStartTime);
+            document.getElementById('stopwatchDisplay').textContent = formatStopwatchTime(elapsed);
+        }
+
+        document.getElementById('stopwatchStart').addEventListener('click', () => {
+            if (stopwatchRunning) {
+                stopwatchElapsed += Date.now() - stopwatchStartTime;
+                clearInterval(stopwatchInterval);
+                stopwatchRunning = false;
+                document.getElementById('stopwatchStart').textContent = 'Start';
+            } else {
+                stopwatchStartTime = Date.now();
+                stopwatchRunning = true;
+                document.getElementById('stopwatchStart').textContent = 'Stop';
+                stopwatchInterval = setInterval(updateStopwatch, 10);
+            }
+        });
+
+        document.getElementById('stopwatchLap').addEventListener('click', () => {
+            if (!stopwatchRunning) return;
+
+            const now = Date.now();
+            const elapsed = stopwatchElapsed + (now - stopwatchStartTime);
+            const lapTime = formatStopwatchTime(elapsed);
+
+            const lapItem = document.createElement('div');
+            lapItem.className = 'lap-item';
+            lapItem.innerHTML = `<span>Lap ${lapCounter}</span><span>${lapTime}</span>`;
+            document.getElementById('lapTimes').insertBefore(lapItem, document.getElementById('lapTimes').firstChild);
+
+            lapCounter++;
+        });
+
+        document.getElementById('stopwatchReset').addEventListener('click', () => {
+            clearInterval(stopwatchInterval);
+            stopwatchRunning = false;
+            stopwatchElapsed = 0;
+            stopwatchStartTime = 0;
+            lapCounter = 1;
+            document.getElementById('stopwatchStart').textContent = 'Start';
+            document.getElementById('stopwatchDisplay').textContent = '00:00.00';
+            document.getElementById('lapTimes').innerHTML = '';
+        });
+
+        // Main update loop
+        function mainLoop() {
+            const activeTab = document.querySelector('.tab-content.active');
+
+            if (activeTab.id === 'analog') {
+                drawAnalogClock();
+            } else if (activeTab.id === 'binary') {
+                updateBinaryClock();
+            } else if (activeTab.id === 'word') {
+                updateWordClock();
+            } else if (activeTab.id === 'world') {
+                updateWorldClocks();
+            }
+
+            requestAnimationFrame(mainLoop);
+        }
+
+        // Initialize
+        drawAnalogClock();
+        updateCountdownDisplay();
+        mainLoop();
+    </script>
+</body>
+</html>

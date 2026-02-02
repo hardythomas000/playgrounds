@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Creative Playground 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f7;
+            overflow-x: hidden;
+            touch-action: none;
+        }
+
+        .header {
+            background: #fff;
+            padding: 12px 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 4px;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: #f5f5f7;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1d1d1f;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #007aff;
+            color: #fff;
+        }
+
+        .container {
+            display: none;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+        }
+
+        .container.active {
+            display: flex;
+        }
+
+        .canvas-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        .etch-sketch canvas {
+            border: 12px solid #c41e3a;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .controls {
+            background: #fff;
+            padding: 16px;
+            border-top: 1px solid #e5e5e7;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 120px;
+        }
+
+        .control-group label {
+            font-size: 12px;
+            color: #6e6e73;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #e5e5e7;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+            border: none;
+        }
+
+        input[type="color"] {
+            width: 60px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        select, button {
+            padding: 8px 16px;
+            border: 1px solid #e5e5e7;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #1d1d1f;
+        }
+
+        button {
+            background: #007aff;
+            color: #fff;
+            border: none;
+            transition: opacity 0.2s;
+        }
+
+        button:active {
+            opacity: 0.7;
+        }
+
+        .info {
+            font-size: 12px;
+            color: #6e6e73;
+            padding: 4px 0;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .color-swatch.active {
+            border-color: #007aff;
+        }
+
+        .demo-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 10;
+            animation: fadeOut 3s forwards;
+        }
+
+        @keyframes fadeOut {
+            0%, 70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Creative Playground 2026</h1>
+        <div class="tabs">
+            <button class="tab active" data-tab="kaleidoscope">Kaleidoscope</button>
+            <button class="tab" data-tab="etch">Etch-a-Sketch</button>
+            <button class="tab" data-tab="splatter">Paint Splatter</button>
+            <button class="tab" data-tab="zen">Zen Garden</button>
+            <button class="tab" data-tab="tesselation">Tesselation</button>
+            <button class="tab" data-tab="string">String Art</button>
+        </div>
+    </div>
+
+    <!-- Kaleidoscope -->
+    <div class="container active" id="kaleidoscope">
+        <div class="canvas-wrapper">
+            <canvas id="kaleidoscope-canvas"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Segments: <span id="kalei-segments-val">8</span></label>
+                <input type="range" id="kalei-segments" min="4" max="12" step="2" value="8">
+            </div>
+            <div class="control-group">
+                <label>Line Width: <span id="kalei-width-val">3</span></label>
+                <input type="range" id="kalei-width" min="1" max="20" value="3">
+            </div>
+            <div class="control-group">
+                <label>Color Mode</label>
+                <select id="kalei-color-mode">
+                    <option value="rainbow">Rainbow</option>
+                    <option value="single">Single</option>
+                    <option value="random">Random</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Color</label>
+                <input type="color" id="kalei-color" value="#007aff">
+            </div>
+            <div class="control-group">
+                <label>Background</label>
+                <select id="kalei-bg">
+                    <option value="black">Black</option>
+                    <option value="white">White</option>
+                </select>
+            </div>
+            <button id="kalei-clear">Clear</button>
+        </div>
+    </div>
+
+    <!-- Etch-a-Sketch -->
+    <div class="container" id="etch">
+        <div class="canvas-wrapper etch-sketch">
+            <canvas id="etch-canvas"></canvas>
+            <div class="demo-overlay">Tilt your phone or drag to draw</div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Line Color</label>
+                <input type="color" id="etch-color" value="#2c2c2c">
+            </div>
+            <div class="control-group">
+                <label>Line Width: <span id="etch-width-val">2</span></label>
+                <input type="range" id="etch-width" min="1" max="10" value="2">
+            </div>
+            <button id="etch-clear">Shake to Clear</button>
+            <div class="info" id="etch-tilt">Tilt: 0°, 0°</div>
+        </div>
+    </div>
+
+    <!-- Paint Splatter -->
+    <div class="container" id="splatter">
+        <div class="canvas-wrapper">
+            <canvas id="splatter-canvas"></canvas>
+            <div class="demo-overlay">Tap anywhere to splatter</div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Color Mode</label>
+                <select id="splatter-mode">
+                    <option value="random">Random</option>
+                    <option value="palette">Palette</option>
+                    <option value="mono">Mono</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Color</label>
+                <input type="color" id="splatter-color" value="#007aff">
+            </div>
+            <div class="control-group">
+                <label>Size: <span id="splatter-size-val">50</span></label>
+                <input type="range" id="splatter-size" min="20" max="150" value="50">
+            </div>
+            <div class="control-group">
+                <label>Drips</label>
+                <select id="splatter-drips">
+                    <option value="on">On</option>
+                    <option value="off">Off</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Gravity</label>
+                <select id="splatter-gravity">
+                    <option value="down">Down</option>
+                    <option value="up">Up</option>
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                </select>
+            </div>
+            <button id="splatter-clear">Clear</button>
+        </div>
+    </div>
+
+    <!-- Zen Garden -->
+    <div class="container" id="zen">
+        <div class="canvas-wrapper">
+            <canvas id="zen-canvas"></canvas>
+            <div class="demo-overlay">Draw in the sand, tap to place rocks</div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Rake Width: <span id="zen-rake-val">3</span></label>
+                <input type="range" id="zen-rake" min="1" max="5" value="3">
+            </div>
+            <div class="control-group">
+                <label>Sand Color</label>
+                <input type="color" id="zen-sand" value="#e8dcc8">
+            </div>
+            <div class="control-group">
+                <label>Pattern</label>
+                <select id="zen-pattern">
+                    <option value="straight">Straight</option>
+                    <option value="circles">Circles</option>
+                    <option value="waves">Waves</option>
+                </select>
+            </div>
+            <button id="zen-clear">Clear</button>
+        </div>
+    </div>
+
+    <!-- Tesselation -->
+    <div class="container" id="tesselation">
+        <div class="canvas-wrapper">
+            <canvas id="tess-canvas"></canvas>
+            <div class="demo-overlay">Tap tiles to change colors</div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Shape</label>
+                <select id="tess-shape">
+                    <option value="triangle">Triangle</option>
+                    <option value="square">Square</option>
+                    <option value="hexagon">Hexagon</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Tile Size: <span id="tess-size-val">40</span></label>
+                <input type="range" id="tess-size" min="20" max="100" value="40">
+            </div>
+            <div class="control-group">
+                <label>Rotation: <span id="tess-rotation-val">0</span>°</label>
+                <input type="range" id="tess-rotation" min="0" max="360" value="0">
+            </div>
+            <div class="control-group">
+                <label>Gap: <span id="tess-gap-val">2</span></label>
+                <input type="range" id="tess-gap" min="0" max="10" value="2">
+            </div>
+            <div class="control-group">
+                <label>Palette</label>
+                <select id="tess-palette">
+                    <option value="pastel">Pastel</option>
+                    <option value="vibrant">Vibrant</option>
+                    <option value="earth">Earth</option>
+                    <option value="ocean">Ocean</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- String Art -->
+    <div class="container" id="string">
+        <div class="canvas-wrapper">
+            <canvas id="string-canvas"></canvas>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Points: <span id="string-points-val">36</span></label>
+                <input type="range" id="string-points" min="10" max="60" value="36">
+            </div>
+            <div class="control-group">
+                <label>Connect Every: <span id="string-step-val">12</span></label>
+                <input type="range" id="string-step" min="2" max="30" value="12">
+            </div>
+            <div class="control-group">
+                <label>Line Color</label>
+                <input type="color" id="string-color" value="#007aff">
+            </div>
+            <div class="control-group">
+                <label>Shape</label>
+                <select id="string-shape">
+                    <option value="circle">Circle</option>
+                    <option value="square">Square</option>
+                    <option value="triangle">Triangle</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Animate</label>
+                <select id="string-animate">
+                    <option value="off">Off</option>
+                    <option value="on">On</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+
+                // Initialize canvas when switched
+                const tabName = tab.dataset.tab;
+                if (tabName === 'kaleidoscope') initKaleidoscope();
+                else if (tabName === 'etch') initEtch();
+                else if (tabName === 'splatter') initSplatter();
+                else if (tabName === 'zen') initZen();
+                else if (tabName === 'tesselation') initTesselation();
+                else if (tabName === 'string') initString();
+            });
+        });
+
+        // Utility: Get canvas coordinates
+        function getCoords(canvas, e) {
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches ? e.touches[0] : e;
+            return {
+                x: (touch.clientX - rect.left) * (canvas.width / rect.width),
+                y: (touch.clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        // ===== KALEIDOSCOPE =====
+        let kaleiCanvas, kaleiCtx, kaleiDrawing = false, kaleiHue = 0;
+
+        function initKaleidoscope() {
+            kaleiCanvas = document.getElementById('kaleidoscope-canvas');
+            kaleiCtx = kaleiCanvas.getContext('2d');
+            kaleiCanvas.width = window.innerWidth;
+            kaleiCanvas.height = window.innerHeight - 200;
+
+            const bg = document.getElementById('kalei-bg').value;
+            kaleiCtx.fillStyle = bg === 'black' ? '#000' : '#fff';
+            kaleiCtx.fillRect(0, 0, kaleiCanvas.width, kaleiCanvas.height);
+
+            // Demo pattern
+            drawKaleiDemo();
+
+            kaleiCanvas.addEventListener('touchstart', kaleiStart);
+            kaleiCanvas.addEventListener('touchmove', kaleiMove);
+            kaleiCanvas.addEventListener('touchend', kaleiEnd);
+            kaleiCanvas.addEventListener('mousedown', kaleiStart);
+            kaleiCanvas.addEventListener('mousemove', kaleiMove);
+            kaleiCanvas.addEventListener('mouseup', kaleiEnd);
+
+            document.getElementById('kalei-segments').addEventListener('input', e => {
+                document.getElementById('kalei-segments-val').textContent = e.target.value;
+            });
+
+            document.getElementById('kalei-width').addEventListener('input', e => {
+                document.getElementById('kalei-width-val').textContent = e.target.value;
+            });
+
+            document.getElementById('kalei-clear').addEventListener('click', () => {
+                const bg = document.getElementById('kalei-bg').value;
+                kaleiCtx.fillStyle = bg === 'black' ? '#000' : '#fff';
+                kaleiCtx.fillRect(0, 0, kaleiCanvas.width, kaleiCanvas.height);
+            });
+
+            document.getElementById('kalei-bg').addEventListener('change', () => {
+                const bg = document.getElementById('kalei-bg').value;
+                kaleiCtx.fillStyle = bg === 'black' ? '#000' : '#fff';
+                kaleiCtx.fillRect(0, 0, kaleiCanvas.width, kaleiCanvas.height);
+            });
+        }
+
+        function drawKaleiDemo() {
+            const centerX = kaleiCanvas.width / 2;
+            const centerY = kaleiCanvas.height / 2;
+            const segments = 8;
+            const angleStep = (Math.PI * 2) / segments;
+
+            for (let i = 0; i < 50; i++) {
+                const angle = (i / 50) * Math.PI * 2;
+                const radius = 50 + i * 2;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+
+                if (i > 0) {
+                    const prevAngle = ((i - 1) / 50) * Math.PI * 2;
+                    const prevRadius = 50 + (i - 1) * 2;
+                    const prevX = centerX + Math.cos(prevAngle) * prevRadius;
+                    const prevY = centerY + Math.sin(prevAngle) * prevRadius;
+
+                    for (let s = 0; s < segments; s++) {
+                        kaleiCtx.save();
+                        kaleiCtx.translate(centerX, centerY);
+                        kaleiCtx.rotate(s * angleStep);
+                        kaleiCtx.translate(-centerX, -centerY);
+
+                        kaleiCtx.strokeStyle = `hsl(${i * 7}, 70%, 60%)`;
+                        kaleiCtx.lineWidth = 2;
+                        kaleiCtx.beginPath();
+                        kaleiCtx.moveTo(prevX, prevY);
+                        kaleiCtx.lineTo(x, y);
+                        kaleiCtx.stroke();
+
+                        kaleiCtx.restore();
+                    }
+                }
+            }
+        }
+
+        function kaleiStart(e) {
+            e.preventDefault();
+            kaleiDrawing = true;
+        }
+
+        function kaleiMove(e) {
+            if (!kaleiDrawing) return;
+            e.preventDefault();
+
+            const pos = getCoords(kaleiCanvas, e);
+            const centerX = kaleiCanvas.width / 2;
+            const centerY = kaleiCanvas.height / 2;
+            const segments = parseInt(document.getElementById('kalei-segments').value);
+            const width = parseInt(document.getElementById('kalei-width').value);
+            const colorMode = document.getElementById('kalei-color-mode').value;
+            const color = document.getElementById('kalei-color').value;
+            const angleStep = (Math.PI * 2) / segments;
+
+            let strokeColor;
+            if (colorMode === 'rainbow') {
+                strokeColor = `hsl(${kaleiHue}, 70%, 60%)`;
+                kaleiHue = (kaleiHue + 2) % 360;
+            } else if (colorMode === 'random') {
+                strokeColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+            } else {
+                strokeColor = color;
+            }
+
+            for (let i = 0; i < segments; i++) {
+                kaleiCtx.save();
+                kaleiCtx.translate(centerX, centerY);
+                kaleiCtx.rotate(i * angleStep);
+                kaleiCtx.translate(-centerX, -centerY);
+
+                kaleiCtx.strokeStyle = strokeColor;
+                kaleiCtx.lineWidth = width;
+                kaleiCtx.lineCap = 'round';
+                kaleiCtx.lineJoin = 'round';
+
+                kaleiCtx.beginPath();
+                kaleiCtx.arc(pos.x, pos.y, width / 2, 0, Math.PI * 2);
+                kaleiCtx.fill();
+                kaleiCtx.fillStyle = strokeColor;
+
+                kaleiCtx.restore();
+
+                // Mirror
+                kaleiCtx.save();
+                kaleiCtx.translate(centerX, centerY);
+                kaleiCtx.rotate(i * angleStep);
+                kaleiCtx.scale(-1, 1);
+                kaleiCtx.translate(-centerX, -centerY);
+
+                kaleiCtx.fillStyle = strokeColor;
+                kaleiCtx.beginPath();
+                kaleiCtx.arc(pos.x, pos.y, width / 2, 0, Math.PI * 2);
+                kaleiCtx.fill();
+
+                kaleiCtx.restore();
+            }
+        }
+
+        function kaleiEnd() {
+            kaleiDrawing = false;
+        }
+
+        // ===== ETCH-A-SKETCH =====
+        let etchCanvas, etchCtx, etchX, etchY, etchDrawing = false;
+        let etchTiltX = 0, etchTiltY = 0;
+
+        function initEtch() {
+            etchCanvas = document.getElementById('etch-canvas');
+            etchCtx = etchCanvas.getContext('2d');
+            etchCanvas.width = window.innerWidth - 48;
+            etchCanvas.height = window.innerHeight - 240;
+
+            etchCtx.fillStyle = '#c8c8c8';
+            etchCtx.fillRect(0, 0, etchCanvas.width, etchCanvas.height);
+
+            etchX = etchCanvas.width / 2;
+            etchY = etchCanvas.height / 2;
+
+            etchCanvas.addEventListener('touchstart', etchTouchStart);
+            etchCanvas.addEventListener('touchmove', etchTouchMove);
+            etchCanvas.addEventListener('touchend', etchTouchEnd);
+            etchCanvas.addEventListener('mousedown', etchTouchStart);
+            etchCanvas.addEventListener('mousemove', etchTouchMove);
+            etchCanvas.addEventListener('mouseup', etchTouchEnd);
+
+            document.getElementById('etch-width').addEventListener('input', e => {
+                document.getElementById('etch-width-val').textContent = e.target.value;
+            });
+
+            document.getElementById('etch-clear').addEventListener('click', () => {
+                etchCtx.fillStyle = '#c8c8c8';
+                etchCtx.fillRect(0, 0, etchCanvas.width, etchCanvas.height);
+                etchX = etchCanvas.width / 2;
+                etchY = etchCanvas.height / 2;
+            });
+
+            // Orientation
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+
+            requestAnimationFrame(etchLoop);
+        }
+
+        function handleOrientation(e) {
+            etchTiltX = e.gamma || 0; // -90 to 90
+            etchTiltY = e.beta || 0;  // -180 to 180
+            document.getElementById('etch-tilt').textContent =
+                `Tilt: ${Math.round(etchTiltX)}°, ${Math.round(etchTiltY)}°`;
+        }
+
+        function etchLoop() {
+            if (Math.abs(etchTiltX) > 5 || Math.abs(etchTiltY) > 5) {
+                const speed = 2;
+                const prevX = etchX;
+                const prevY = etchY;
+
+                etchX += (etchTiltX / 10) * speed;
+                etchY += (etchTiltY / 10) * speed;
+
+                etchX = Math.max(0, Math.min(etchCanvas.width, etchX));
+                etchY = Math.max(0, Math.min(etchCanvas.height, etchY));
+
+                const color = document.getElementById('etch-color').value;
+                const width = parseInt(document.getElementById('etch-width').value);
+
+                etchCtx.strokeStyle = color;
+                etchCtx.lineWidth = width;
+                etchCtx.lineCap = 'round';
+                etchCtx.beginPath();
+                etchCtx.moveTo(prevX, prevY);
+                etchCtx.lineTo(etchX, etchY);
+                etchCtx.stroke();
+            }
+
+            requestAnimationFrame(etchLoop);
+        }
+
+        function etchTouchStart(e) {
+            e.preventDefault();
+            etchDrawing = true;
+            const pos = getCoords(etchCanvas, e);
+            etchX = pos.x;
+            etchY = pos.y;
+        }
+
+        function etchTouchMove(e) {
+            if (!etchDrawing) return;
+            e.preventDefault();
+
+            const pos = getCoords(etchCanvas, e);
+            const color = document.getElementById('etch-color').value;
+            const width = parseInt(document.getElementById('etch-width').value);
+
+            etchCtx.strokeStyle = color;
+            etchCtx.lineWidth = width;
+            etchCtx.lineCap = 'round';
+            etchCtx.beginPath();
+            etchCtx.moveTo(etchX, etchY);
+            etchCtx.lineTo(pos.x, pos.y);
+            etchCtx.stroke();
+
+            etchX = pos.x;
+            etchY = pos.y;
+        }
+
+        function etchTouchEnd() {
+            etchDrawing = false;
+        }
+
+        // ===== PAINT SPLATTER =====
+        let splatterCanvas, splatterCtx;
+        const palettes = {
+            vibrant: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'],
+            pastel: ['#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#E0BBE4']
+        };
+
+        function initSplatter() {
+            splatterCanvas = document.getElementById('splatter-canvas');
+            splatterCtx = splatterCanvas.getContext('2d');
+            splatterCanvas.width = window.innerWidth;
+            splatterCanvas.height = window.innerHeight - 200;
+
+            splatterCtx.fillStyle = '#fff';
+            splatterCtx.fillRect(0, 0, splatterCanvas.width, splatterCanvas.height);
+
+            // Demo splatters
+            for (let i = 0; i < 5; i++) {
+                const x = Math.random() * splatterCanvas.width;
+                const y = Math.random() * splatterCanvas.height;
+                drawSplatter(x, y, 60, palettes.vibrant[i]);
+            }
+
+            splatterCanvas.addEventListener('touchstart', handleSplatter);
+            splatterCanvas.addEventListener('click', handleSplatter);
+
+            document.getElementById('splatter-size').addEventListener('input', e => {
+                document.getElementById('splatter-size-val').textContent = e.target.value;
+            });
+
+            document.getElementById('splatter-clear').addEventListener('click', () => {
+                splatterCtx.fillStyle = '#fff';
+                splatterCtx.fillRect(0, 0, splatterCanvas.width, splatterCanvas.height);
+            });
+        }
+
+        function handleSplatter(e) {
+            e.preventDefault();
+            const pos = getCoords(splatterCanvas, e);
+            const size = parseInt(document.getElementById('splatter-size').value);
+            const mode = document.getElementById('splatter-mode').value;
+
+            let color;
+            if (mode === 'random') {
+                color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+            } else if (mode === 'palette') {
+                const palette = palettes.vibrant;
+                color = palette[Math.floor(Math.random() * palette.length)];
+            } else {
+                color = document.getElementById('splatter-color').value;
+            }
+
+            drawSplatter(pos.x, pos.y, size, color);
+        }
+
+        function drawSplatter(x, y, size, color) {
+            const drips = document.getElementById('splatter-drips').value === 'on';
+            const gravity = document.getElementById('splatter-gravity').value;
+
+            // Main blob
+            splatterCtx.fillStyle = color;
+            splatterCtx.globalAlpha = 0.7;
+
+            for (let i = 0; i < 20; i++) {
+                const angle = (i / 20) * Math.PI * 2;
+                const radius = size * (0.5 + Math.random() * 0.5);
+                const bx = x + Math.cos(angle) * radius;
+                const by = y + Math.sin(angle) * radius;
+                const br = size * 0.3 * Math.random();
+
+                splatterCtx.beginPath();
+                splatterCtx.arc(bx, by, br, 0, Math.PI * 2);
+                splatterCtx.fill();
+            }
+
+            // Center
+            splatterCtx.globalAlpha = 0.9;
+            splatterCtx.beginPath();
+            splatterCtx.arc(x, y, size * 0.6, 0, Math.PI * 2);
+            splatterCtx.fill();
+
+            // Drips
+            if (drips) {
+                for (let i = 0; i < 5; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = size * (0.7 + Math.random() * 0.3);
+                    let dx = x + Math.cos(angle) * dist;
+                    let dy = y + Math.sin(angle) * dist;
+                    const dripLength = 20 + Math.random() * 40;
+
+                    if (gravity === 'down') dy += dripLength;
+                    else if (gravity === 'up') dy -= dripLength;
+                    else if (gravity === 'left') dx -= dripLength;
+                    else if (gravity === 'right') dx += dripLength;
+
+                    splatterCtx.globalAlpha = 0.6;
+                    splatterCtx.beginPath();
+                    splatterCtx.moveTo(x + Math.cos(angle) * dist, y + Math.sin(angle) * dist);
+                    splatterCtx.lineTo(dx, dy);
+                    splatterCtx.lineWidth = 2 + Math.random() * 3;
+                    splatterCtx.strokeStyle = color;
+                    splatterCtx.stroke();
+
+                    splatterCtx.beginPath();
+                    splatterCtx.arc(dx, dy, 3, 0, Math.PI * 2);
+                    splatterCtx.fill();
+                }
+            }
+
+            splatterCtx.globalAlpha = 1;
+        }
+
+        // ===== ZEN GARDEN =====
+        let zenCanvas, zenCtx, zenDrawing = false, zenRocks = [];
+        let zenLastX, zenLastY;
+
+        function initZen() {
+            zenCanvas = document.getElementById('zen-canvas');
+            zenCtx = zenCanvas.getContext('2d');
+            zenCanvas.width = window.innerWidth;
+            zenCanvas.height = window.innerHeight - 200;
+
+            const sandColor = document.getElementById('zen-sand').value;
+            zenCtx.fillStyle = sandColor;
+            zenCtx.fillRect(0, 0, zenCanvas.width, zenCanvas.height);
+
+            // Add texture
+            zenCtx.globalAlpha = 0.1;
+            for (let i = 0; i < 5000; i++) {
+                zenCtx.fillStyle = Math.random() > 0.5 ? '#000' : '#fff';
+                zenCtx.fillRect(Math.random() * zenCanvas.width, Math.random() * zenCanvas.height, 1, 1);
+            }
+            zenCtx.globalAlpha = 1;
+
+            // Demo pattern
+            drawZenDemo();
+
+            zenCanvas.addEventListener('touchstart', zenStart);
+            zenCanvas.addEventListener('touchmove', zenMove);
+            zenCanvas.addEventListener('touchend', zenEnd);
+            zenCanvas.addEventListener('mousedown', zenStart);
+            zenCanvas.addEventListener('mousemove', zenMove);
+            zenCanvas.addEventListener('mouseup', zenEnd);
+
+            document.getElementById('zen-rake').addEventListener('input', e => {
+                document.getElementById('zen-rake-val').textContent = e.target.value;
+            });
+
+            document.getElementById('zen-clear').addEventListener('click', () => {
+                const sandColor = document.getElementById('zen-sand').value;
+                zenCtx.fillStyle = sandColor;
+                zenCtx.fillRect(0, 0, zenCanvas.width, zenCanvas.height);
+                zenCtx.globalAlpha = 0.1;
+                for (let i = 0; i < 5000; i++) {
+                    zenCtx.fillStyle = Math.random() > 0.5 ? '#000' : '#fff';
+                    zenCtx.fillRect(Math.random() * zenCanvas.width, Math.random() * zenCanvas.height, 1, 1);
+                }
+                zenCtx.globalAlpha = 1;
+                zenRocks = [];
+            });
+        }
+
+        function drawZenDemo() {
+            const centerX = zenCanvas.width / 2;
+            const centerY = zenCanvas.height / 2;
+
+            for (let r = 30; r < 120; r += 15) {
+                zenCtx.strokeStyle = 'rgba(100, 80, 60, 0.3)';
+                zenCtx.lineWidth = 2;
+                for (let i = 0; i < 3; i++) {
+                    zenCtx.beginPath();
+                    zenCtx.arc(centerX, centerY, r + i * 5, 0, Math.PI * 2);
+                    zenCtx.stroke();
+                }
+            }
+
+            // Rock
+            drawRock(centerX, centerY, 25);
+        }
+
+        function zenStart(e) {
+            e.preventDefault();
+            const pos = getCoords(zenCanvas, e);
+
+            // Check if tapping on empty space (short tap = rock)
+            setTimeout(() => {
+                if (!zenDrawing) {
+                    drawRock(pos.x, pos.y, 15 + Math.random() * 20);
+                }
+            }, 100);
+
+            zenDrawing = true;
+            zenLastX = pos.x;
+            zenLastY = pos.y;
+        }
+
+        function zenMove(e) {
+            if (!zenDrawing) return;
+            e.preventDefault();
+
+            const pos = getCoords(zenCanvas, e);
+            const rakeWidth = parseInt(document.getElementById('zen-rake').value);
+            const pattern = document.getElementById('zen-pattern').value;
+
+            drawRake(zenLastX, zenLastY, pos.x, pos.y, rakeWidth, pattern);
+
+            zenLastX = pos.x;
+            zenLastY = pos.y;
+        }
+
+        function zenEnd() {
+            zenDrawing = false;
+        }
+
+        function drawRake(x1, y1, x2, y2, width, pattern) {
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            const perpAngle = angle + Math.PI / 2;
+            const spacing = 8;
+
+            zenCtx.strokeStyle = 'rgba(100, 80, 60, 0.3)';
+            zenCtx.lineWidth = 2;
+
+            for (let i = -(width - 1); i <= (width - 1); i++) {
+                const offsetX = Math.cos(perpAngle) * i * spacing;
+                const offsetY = Math.sin(perpAngle) * i * spacing;
+
+                if (pattern === 'straight') {
+                    zenCtx.beginPath();
+                    zenCtx.moveTo(x1 + offsetX, y1 + offsetY);
+                    zenCtx.lineTo(x2 + offsetX, y2 + offsetY);
+                    zenCtx.stroke();
+                } else if (pattern === 'waves') {
+                    zenCtx.beginPath();
+                    const steps = 20;
+                    for (let s = 0; s <= steps; s++) {
+                        const t = s / steps;
+                        const x = x1 + (x2 - x1) * t + offsetX;
+                        const y = y1 + (y2 - y1) * t + offsetY;
+                        const wave = Math.sin(t * Math.PI * 4) * 5;
+                        const wx = x + Math.cos(perpAngle) * wave;
+                        const wy = y + Math.sin(perpAngle) * wave;
+                        if (s === 0) zenCtx.moveTo(wx, wy);
+                        else zenCtx.lineTo(wx, wy);
+                    }
+                    zenCtx.stroke();
+                } else if (pattern === 'circles') {
+                    const dist = Math.hypot(x2 - x1, y2 - y1);
+                    const steps = Math.floor(dist / 20);
+                    for (let s = 0; s <= steps; s++) {
+                        const t = s / steps;
+                        const x = x1 + (x2 - x1) * t + offsetX;
+                        const y = y1 + (y2 - y1) * t + offsetY;
+                        zenCtx.beginPath();
+                        zenCtx.arc(x, y, 8, 0, Math.PI * 2);
+                        zenCtx.stroke();
+                    }
+                }
+            }
+        }
+
+        function drawRock(x, y, size) {
+            zenCtx.fillStyle = '#6b6b6b';
+            zenCtx.strokeStyle = '#4a4a4a';
+            zenCtx.lineWidth = 2;
+
+            zenCtx.beginPath();
+            const points = 6 + Math.floor(Math.random() * 4);
+            for (let i = 0; i < points; i++) {
+                const angle = (i / points) * Math.PI * 2;
+                const radius = size * (0.8 + Math.random() * 0.4);
+                const px = x + Math.cos(angle) * radius;
+                const py = y + Math.sin(angle) * radius;
+                if (i === 0) zenCtx.moveTo(px, py);
+                else zenCtx.lineTo(px, py);
+            }
+            zenCtx.closePath();
+            zenCtx.fill();
+            zenCtx.stroke();
+
+            // Highlight
+            zenCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            zenCtx.beginPath();
+            zenCtx.arc(x - size * 0.2, y - size * 0.2, size * 0.3, 0, Math.PI * 2);
+            zenCtx.fill();
+        }
+
+        // ===== TESSELATION =====
+        let tessCanvas, tessCtx, tessTiles = [];
+
+        function initTesselation() {
+            tessCanvas = document.getElementById('tess-canvas');
+            tessCtx = tessCanvas.getContext('2d');
+            tessCanvas.width = window.innerWidth;
+            tessCanvas.height = window.innerHeight - 200;
+
+            drawTesselation();
+
+            tessCanvas.addEventListener('click', handleTessClick);
+            tessCanvas.addEventListener('touchstart', handleTessClick);
+
+            document.getElementById('tess-size').addEventListener('input', e => {
+                document.getElementById('tess-size-val').textContent = e.target.value;
+                drawTesselation();
+            });
+
+            document.getElementById('tess-rotation').addEventListener('input', e => {
+                document.getElementById('tess-rotation-val').textContent = e.target.value;
+                drawTesselation();
+            });
+
+            document.getElementById('tess-gap').addEventListener('input', e => {
+                document.getElementById('tess-gap-val').textContent = e.target.value;
+                drawTesselation();
+            });
+
+            document.getElementById('tess-shape').addEventListener('change', drawTesselation);
+            document.getElementById('tess-palette').addEventListener('change', drawTesselation);
+        }
+
+        function drawTesselation() {
+            const size = parseInt(document.getElementById('tess-size').value);
+            const rotation = parseInt(document.getElementById('tess-rotation').value) * Math.PI / 180;
+            const gap = parseInt(document.getElementById('tess-gap').value);
+            const shape = document.getElementById('tess-shape').value;
+            const paletteName = document.getElementById('tess-palette').value;
+
+            const palettes = {
+                pastel: ['#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#E0BBE4'],
+                vibrant: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'],
+                earth: ['#8B7355', '#A0826D', '#C9B79C', '#E5D4C1', '#F5E6D3'],
+                ocean: ['#006994', '#0099CC', '#66B2CC', '#99CCE5', '#CCE5F0']
+            };
+
+            const palette = palettes[paletteName];
+
+            tessCtx.fillStyle = '#f5f5f7';
+            tessCtx.fillRect(0, 0, tessCanvas.width, tessCanvas.height);
+
+            tessTiles = [];
+
+            if (shape === 'square') {
+                const cols = Math.ceil(tessCanvas.width / (size + gap)) + 1;
+                const rows = Math.ceil(tessCanvas.height / (size + gap)) + 1;
+
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const x = col * (size + gap);
+                        const y = row * (size + gap);
+                        const color = palette[(row + col) % palette.length];
+
+                        tessTiles.push({ x, y, size, color, shape: 'square' });
+
+                        tessCtx.save();
+                        tessCtx.translate(x + size / 2, y + size / 2);
+                        tessCtx.rotate(rotation);
+                        tessCtx.fillStyle = color;
+                        tessCtx.fillRect(-size / 2, -size / 2, size, size);
+                        tessCtx.restore();
+                    }
+                }
+            } else if (shape === 'triangle') {
+                const h = size * Math.sqrt(3) / 2;
+                const cols = Math.ceil(tessCanvas.width / size) + 1;
+                const rows = Math.ceil(tessCanvas.height / h) + 1;
+
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const x = col * size + (row % 2) * (size / 2);
+                        const y = row * h;
+                        const color = palette[(row + col) % palette.length];
+
+                        tessTiles.push({ x, y, size, color, shape: 'triangle', up: true });
+
+                        tessCtx.save();
+                        tessCtx.translate(x, y);
+                        tessCtx.rotate(rotation);
+                        tessCtx.fillStyle = color;
+                        tessCtx.beginPath();
+                        tessCtx.moveTo(0, 0);
+                        tessCtx.lineTo(size, 0);
+                        tessCtx.lineTo(size / 2, h);
+                        tessCtx.closePath();
+                        tessCtx.fill();
+                        tessCtx.restore();
+
+                        if (col < cols - 1) {
+                            const color2 = palette[(row + col + 1) % palette.length];
+                            tessTiles.push({ x: x + size / 2, y, size, color: color2, shape: 'triangle', up: false });
+
+                            tessCtx.save();
+                            tessCtx.translate(x + size / 2, y + h);
+                            tessCtx.rotate(rotation + Math.PI);
+                            tessCtx.fillStyle = color2;
+                            tessCtx.beginPath();
+                            tessCtx.moveTo(0, 0);
+                            tessCtx.lineTo(size, 0);
+                            tessCtx.lineTo(size / 2, h);
+                            tessCtx.closePath();
+                            tessCtx.fill();
+                            tessCtx.restore();
+                        }
+                    }
+                }
+            } else if (shape === 'hexagon') {
+                const w = size * 2;
+                const h = size * Math.sqrt(3);
+                const cols = Math.ceil(tessCanvas.width / (w * 0.75)) + 1;
+                const rows = Math.ceil(tessCanvas.height / h) + 1;
+
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const x = col * w * 0.75;
+                        const y = row * h + (col % 2) * (h / 2);
+                        const color = palette[(row + col) % palette.length];
+
+                        tessTiles.push({ x, y, size, color, shape: 'hexagon' });
+
+                        tessCtx.save();
+                        tessCtx.translate(x, y);
+                        tessCtx.rotate(rotation);
+                        tessCtx.fillStyle = color;
+                        tessCtx.beginPath();
+                        for (let i = 0; i < 6; i++) {
+                            const angle = (i / 6) * Math.PI * 2;
+                            const px = Math.cos(angle) * size;
+                            const py = Math.sin(angle) * size;
+                            if (i === 0) tessCtx.moveTo(px, py);
+                            else tessCtx.lineTo(px, py);
+                        }
+                        tessCtx.closePath();
+                        tessCtx.fill();
+                        tessCtx.restore();
+                    }
+                }
+            }
+        }
+
+        function handleTessClick(e) {
+            e.preventDefault();
+            const pos = getCoords(tessCanvas, e);
+
+            // Find clicked tile and cycle its color
+            const paletteName = document.getElementById('tess-palette').value;
+            const palettes = {
+                pastel: ['#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#E0BBE4'],
+                vibrant: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'],
+                earth: ['#8B7355', '#A0826D', '#C9B79C', '#E5D4C1', '#F5E6D3'],
+                ocean: ['#006994', '#0099CC', '#66B2CC', '#99CCE5', '#CCE5F0']
+            };
+            const palette = palettes[paletteName];
+
+            for (let tile of tessTiles) {
+                const dist = Math.hypot(pos.x - tile.x, pos.y - tile.y);
+                if (dist < tile.size * 1.5) {
+                    const currentIndex = palette.indexOf(tile.color);
+                    tile.color = palette[(currentIndex + 1) % palette.length];
+                    drawTesselation();
+                    break;
+                }
+            }
+        }
+
+        // ===== STRING ART =====
+        let stringCanvas, stringCtx, stringAnimFrame;
+
+        function initString() {
+            stringCanvas = document.getElementById('string-canvas');
+            stringCtx = stringCanvas.getContext('2d');
+            stringCanvas.width = window.innerWidth;
+            stringCanvas.height = window.innerHeight - 200;
+
+            drawStringArt();
+
+            document.getElementById('string-points').addEventListener('input', e => {
+                document.getElementById('string-points-val').textContent = e.target.value;
+                drawStringArt();
+            });
+
+            document.getElementById('string-step').addEventListener('input', e => {
+                document.getElementById('string-step-val').textContent = e.target.value;
+                drawStringArt();
+            });
+
+            document.getElementById('string-shape').addEventListener('change', drawStringArt);
+            document.getElementById('string-color').addEventListener('change', drawStringArt);
+            document.getElementById('string-animate').addEventListener('change', e => {
+                if (e.target.value === 'on') {
+                    animateString();
+                } else {
+                    cancelAnimationFrame(stringAnimFrame);
+                    drawStringArt();
+                }
+            });
+        }
+
+        function drawStringArt(offset = 0) {
+            const points = parseInt(document.getElementById('string-points').value);
+            const step = parseInt(document.getElementById('string-step').value);
+            const color = document.getElementById('string-color').value;
+            const shape = document.getElementById('string-shape').value;
+
+            stringCtx.fillStyle = '#f5f5f7';
+            stringCtx.fillRect(0, 0, stringCanvas.width, stringCanvas.height);
+
+            const centerX = stringCanvas.width / 2;
+            const centerY = stringCanvas.height / 2;
+            const radius = Math.min(centerX, centerY) * 0.8;
+
+            // Generate points
+            const pointCoords = [];
+            for (let i = 0; i < points; i++) {
+                if (shape === 'circle') {
+                    const angle = (i / points) * Math.PI * 2;
+                    pointCoords.push({
+                        x: centerX + Math.cos(angle) * radius,
+                        y: centerY + Math.sin(angle) * radius
+                    });
+                } else if (shape === 'square') {
+                    const side = Math.floor(i / (points / 4));
+                    const posInSide = (i % (points / 4)) / (points / 4);
+                    const sideLength = radius * 2;
+
+                    if (side === 0) {
+                        pointCoords.push({
+                            x: centerX - radius + posInSide * sideLength,
+                            y: centerY - radius
+                        });
+                    } else if (side === 1) {
+                        pointCoords.push({
+                            x: centerX + radius,
+                            y: centerY - radius + posInSide * sideLength
+                        });
+                    } else if (side === 2) {
+                        pointCoords.push({
+                            x: centerX + radius - posInSide * sideLength,
+                            y: centerY + radius
+                        });
+                    } else {
+                        pointCoords.push({
+                            x: centerX - radius,
+                            y: centerY + radius - posInSide * sideLength
+                        });
+                    }
+                } else if (shape === 'triangle') {
+                    const side = Math.floor(i / (points / 3));
+                    const posInSide = (i % (points / 3)) / (points / 3);
+
+                    const p1 = { x: centerX, y: centerY - radius };
+                    const p2 = { x: centerX + radius * Math.cos(Math.PI / 6), y: centerY + radius * Math.sin(Math.PI / 6) };
+                    const p3 = { x: centerX - radius * Math.cos(Math.PI / 6), y: centerY + radius * Math.sin(Math.PI / 6) };
+
+                    if (side === 0) {
+                        pointCoords.push({
+                            x: p1.x + (p2.x - p1.x) * posInSide,
+                            y: p1.y + (p2.y - p1.y) * posInSide
+                        });
+                    } else if (side === 1) {
+                        pointCoords.push({
+                            x: p2.x + (p3.x - p2.x) * posInSide,
+                            y: p2.y + (p3.y - p2.y) * posInSide
+                        });
+                    } else {
+                        pointCoords.push({
+                            x: p3.x + (p1.x - p3.x) * posInSide,
+                            y: p3.y + (p1.y - p3.y) * posInSide
+                        });
+                    }
+                }
+            }
+
+            // Draw connections
+            stringCtx.strokeStyle = color;
+            stringCtx.lineWidth = 0.5;
+            stringCtx.globalAlpha = 0.3;
+
+            for (let i = 0; i < points; i++) {
+                const target = (i + step + offset) % points;
+                stringCtx.beginPath();
+                stringCtx.moveTo(pointCoords[i].x, pointCoords[i].y);
+                stringCtx.lineTo(pointCoords[target].x, pointCoords[target].y);
+                stringCtx.stroke();
+            }
+
+            stringCtx.globalAlpha = 1;
+
+            // Draw points
+            stringCtx.fillStyle = color;
+            for (let point of pointCoords) {
+                stringCtx.beginPath();
+                stringCtx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+                stringCtx.fill();
+            }
+        }
+
+        let stringOffset = 0;
+        function animateString() {
+            const animate = document.getElementById('string-animate').value;
+            if (animate === 'off') return;
+
+            stringOffset = (stringOffset + 0.1) % parseInt(document.getElementById('string-points').value);
+            drawStringArt(Math.floor(stringOffset));
+
+            stringAnimFrame = requestAnimationFrame(animateString);
+        }
+
+        // Initialize first tab
+        initKaleidoscope();
+    </script>
+</body>
+</html>

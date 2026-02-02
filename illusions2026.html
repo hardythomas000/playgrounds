@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Optical Illusions 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 4px;
+        }
+
+        .nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav button {
+            padding: 8px 16px;
+            border: 1px solid #d2d2d7;
+            background: #ffffff;
+            color: #1d1d1f;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav button.active {
+            background: #0071e3;
+            color: #ffffff;
+            border-color: #0071e3;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .illusion-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .illusion-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .illusion-desc {
+            font-size: 14px;
+            color: #6e6e73;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            touch-action: none;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #6e6e73;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #d2d2d7;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0071e3;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0071e3;
+            cursor: pointer;
+            border: none;
+        }
+
+        select {
+            padding: 10px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            background: #ffffff;
+            font-size: 14px;
+            color: #1d1d1f;
+            font-family: inherit;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-btn.active {
+            border-color: #0071e3;
+            transform: scale(1.1);
+        }
+
+        .timer {
+            font-size: 32px;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+            color: #0071e3;
+        }
+
+        .instruction {
+            text-align: center;
+            font-size: 14px;
+            color: #6e6e73;
+            margin: 12px 0;
+            font-weight: 500;
+        }
+
+        button.primary {
+            width: 100%;
+            padding: 12px;
+            background: #0071e3;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        button.primary:active {
+            background: #0051ba;
+        }
+
+        .value-display {
+            display: inline-block;
+            margin-left: 8px;
+            color: #0071e3;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Optical Illusions 2026</h1>
+        <nav class="nav">
+            <button class="active" data-tab="snakes">Rotating Snakes</button>
+            <button data-tab="impossible">Impossible Shape</button>
+            <button data-tab="moire">Moire Patterns</button>
+            <button data-tab="afterimage">Afterimage</button>
+            <button data-tab="size">Size Illusion</button>
+            <button data-tab="motion">Motion Illusion</button>
+        </nav>
+    </div>
+
+    <div class="container">
+        <!-- Rotating Snakes -->
+        <div class="tab-content active" id="snakes">
+            <div class="illusion-card">
+                <h2 class="illusion-title">Rotating Snakes</h2>
+                <p class="illusion-desc">Stare at the center or look around the image. The rings appear to rotate, but they're completely static! This illusion exploits how our visual system processes contrast and color changes, triggering motion detectors in your brain when your eyes make small movements.</p>
+                <canvas id="snakesCanvas" width="500" height="500"></canvas>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Ring Count: <span class="value-display" id="ringCount">5</span></label>
+                        <input type="range" id="ringSlider" min="3" max="8" value="5">
+                    </div>
+                    <div class="control-group">
+                        <label>Size: <span class="value-display" id="sizeVal">100%</span></label>
+                        <input type="range" id="sizeSlider" min="50" max="150" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label>Color Scheme</label>
+                        <select id="colorScheme">
+                            <option value="classic">Classic (Blue/Yellow)</option>
+                            <option value="warm">Warm (Red/Orange)</option>
+                            <option value="cool">Cool (Blue/Green)</option>
+                            <option value="vibrant">Vibrant (Multi)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impossible Shape -->
+        <div class="tab-content" id="impossible">
+            <div class="illusion-card">
+                <h2 class="illusion-title">Impossible Shape</h2>
+                <p class="illusion-desc">Watch as an impossible object rotates before your eyes. These shapes can only exist in 2D drawings, not in real 3D space. The illusion works because your brain tries to interpret the 2D lines as a consistent 3D object, but the geometry is contradictory.</p>
+                <canvas id="impossibleCanvas" width="500" height="500"></canvas>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Shape</label>
+                        <select id="shapeType">
+                            <option value="triangle">Penrose Triangle</option>
+                            <option value="cube">Impossible Cube</option>
+                            <option value="staircase">Infinite Staircase</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Rotation Speed: <span class="value-display" id="rotSpeed">50%</span></label>
+                        <input type="range" id="rotSpeedSlider" min="0" max="100" value="50">
+                    </div>
+                    <div class="control-group">
+                        <label>Line Thickness: <span class="value-display" id="lineThick">3</span></label>
+                        <input type="range" id="lineThickSlider" min="1" max="8" value="3">
+                    </div>
+                    <div class="control-group">
+                        <label>Color</label>
+                        <div class="color-picker">
+                            <div class="color-btn active" data-color="#1d1d1f" style="background: #1d1d1f"></div>
+                            <div class="color-btn" data-color="#0071e3" style="background: #0071e3"></div>
+                            <div class="color-btn" data-color="#ff3b30" style="background: #ff3b30"></div>
+                            <div class="color-btn" data-color="#34c759" style="background: #34c759"></div>
+                            <div class="color-btn" data-color="#af52de" style="background: #af52de"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Moire Patterns -->
+        <div class="tab-content" id="moire">
+            <div class="illusion-card">
+                <h2 class="illusion-title">Moire Patterns</h2>
+                <p class="illusion-desc">Drag to move the top grid over the bottom one. The interference creates mesmerizing moire patterns. This happens when two repetitive patterns overlap at different angles or frequencies, creating a third "phantom" pattern that appears to move and shift.</p>
+                <p class="instruction">Touch and drag to move the pattern</p>
+                <canvas id="moireCanvas" width="500" height="500"></canvas>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Line Spacing: <span class="value-display" id="spacingVal">10</span></label>
+                        <input type="range" id="spacingSlider" min="5" max="30" value="10">
+                    </div>
+                    <div class="control-group">
+                        <label>Angle: <span class="value-display" id="angleVal">5°</span></label>
+                        <input type="range" id="angleSlider" min="0" max="45" value="5">
+                    </div>
+                    <div class="control-group">
+                        <label>Pattern Type</label>
+                        <select id="patternType">
+                            <option value="lines">Lines</option>
+                            <option value="circles">Circles</option>
+                            <option value="dots">Dots</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Color</label>
+                        <div class="color-picker">
+                            <div class="color-btn active" data-color-moire="#1d1d1f" style="background: #1d1d1f"></div>
+                            <div class="color-btn" data-color-moire="#0071e3" style="background: #0071e3"></div>
+                            <div class="color-btn" data-color-moire="#ff3b30" style="background: #ff3b30"></div>
+                            <div class="color-btn" data-color-moire="#34c759" style="background: #34c759"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Afterimage -->
+        <div class="tab-content" id="afterimage">
+            <div class="illusion-card">
+                <h2 class="illusion-title">Afterimage</h2>
+                <p class="illusion-desc">Stare at the colored dot for 15 seconds without moving your eyes. When it switches to gray, you'll see the complementary color! This happens because the cone cells in your retina become fatigued from staring at one color, and when you look at a neutral surface, the opposing color receptors fire more strongly.</p>
+                <canvas id="afterimageCanvas" width="500" height="500"></canvas>
+                <div class="timer" id="timer">15</div>
+                <p class="instruction" id="afterimageInstruction">Press Start and stare at the dot</p>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Color</label>
+                        <select id="afterimageColor">
+                            <option value="red">Red → Cyan</option>
+                            <option value="green">Green → Magenta</option>
+                            <option value="blue">Blue → Yellow</option>
+                            <option value="yellow">Yellow → Blue</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Dot Size: <span class="value-display" id="dotSize">50</span></label>
+                        <input type="range" id="dotSizeSlider" min="20" max="100" value="50">
+                    </div>
+                    <button class="primary" id="startAfterimage">Start</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Size Illusion -->
+        <div class="tab-content" id="size">
+            <div class="illusion-card">
+                <h2 class="illusion-title">Ebbinghaus Size Illusion</h2>
+                <p class="illusion-desc">The two orange circles are exactly the same size, but the one surrounded by large circles appears smaller! This illusion demonstrates contextual size perception—our brain judges size relative to surrounding objects rather than in absolute terms. Drag the surround circles to change the effect.</p>
+                <canvas id="sizeCanvas" width="500" height="500"></canvas>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Surround Count: <span class="value-display" id="surroundCount">6</span></label>
+                        <input type="range" id="surroundSlider" min="4" max="10" value="6">
+                    </div>
+                    <div class="control-group">
+                        <label>Size Difference: <span class="value-display" id="sizeDiff">150%</span></label>
+                        <input type="range" id="sizeDiffSlider" min="100" max="300" value="150">
+                    </div>
+                    <div class="control-group">
+                        <label>Color Scheme</label>
+                        <select id="sizeColorScheme">
+                            <option value="orange">Orange/Blue</option>
+                            <option value="red">Red/Green</option>
+                            <option value="purple">Purple/Yellow</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Motion Illusion -->
+        <div class="tab-content" id="motion">
+            <div class="illusion-card">
+                <h2 class="illusion-title">Motion Illusion</h2>
+                <p class="illusion-desc">Scroll the page or tilt your phone—the static shapes appear to pulse and breathe! This peripheral drift illusion occurs because the gradients and contrast patterns trigger motion-sensitive neurons in your visual cortex, especially in peripheral vision.</p>
+                <p class="instruction">Scroll or move to see the effect</p>
+                <canvas id="motionCanvas" width="500" height="500"></canvas>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Shape</label>
+                        <select id="motionShape">
+                            <option value="circles">Circles</option>
+                            <option value="squares">Squares</option>
+                            <option value="diamonds">Diamonds</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Grid Density: <span class="value-display" id="densityVal">6</span></label>
+                        <input type="range" id="densitySlider" min="4" max="10" value="6">
+                    </div>
+                    <div class="control-group">
+                        <label>Animation Speed: <span class="value-display" id="animSpeed">50%</span></label>
+                        <input type="range" id="animSpeedSlider" min="0" max="100" value="50">
+                    </div>
+                    <div class="control-group">
+                        <label>Color Scheme</label>
+                        <select id="motionColorScheme">
+                            <option value="blue">Blue Gradient</option>
+                            <option value="purple">Purple Gradient</option>
+                            <option value="green">Green Gradient</option>
+                            <option value="rainbow">Rainbow</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.nav button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tab).classList.add('active');
+            });
+        });
+
+        // ROTATING SNAKES
+        const snakesCanvas = document.getElementById('snakesCanvas');
+        const snakesCtx = snakesCanvas.getContext('2d');
+        let snakesConfig = {
+            rings: 5,
+            size: 100,
+            scheme: 'classic'
+        };
+
+        const colorSchemes = {
+            classic: ['#0071e3', '#ffd60a', '#1d1d1f', '#ffffff'],
+            warm: ['#ff3b30', '#ff9500', '#ffcc00', '#ffffff'],
+            cool: ['#0071e3', '#34c759', '#5ac8fa', '#ffffff'],
+            vibrant: ['#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#0071e3', '#af52de']
+        };
+
+        function drawRotatingSnakes() {
+            const w = snakesCanvas.width;
+            const h = snakesCanvas.height;
+            snakesCtx.fillStyle = '#f5f5f7';
+            snakesCtx.fillRect(0, 0, w, h);
+
+            const cx = w / 2;
+            const cy = h / 2;
+            const colors = colorSchemes[snakesConfig.scheme];
+            const scale = snakesConfig.size / 100;
+
+            for (let ring = 0; ring < snakesConfig.rings; ring++) {
+                const radius = (50 + ring * 40) * scale;
+                const segments = 16;
+                const segmentAngle = (Math.PI * 2) / segments;
+                const offset = ring * Math.PI / 8;
+
+                for (let seg = 0; seg < segments; seg++) {
+                    const angle = seg * segmentAngle + offset;
+                    const nextAngle = (seg + 1) * segmentAngle + offset;
+
+                    // Each segment has 4 color bands (Kitaoka pattern)
+                    for (let band = 0; band < 4; band++) {
+                        const innerR = radius + band * 8 * scale;
+                        const outerR = radius + (band + 1) * 8 * scale;
+
+                        snakesCtx.beginPath();
+                        snakesCtx.arc(cx, cy, outerR, angle, nextAngle);
+                        snakesCtx.arc(cx, cy, innerR, nextAngle, angle, true);
+                        snakesCtx.closePath();
+
+                        snakesCtx.fillStyle = colors[(seg * 4 + band) % colors.length];
+                        snakesCtx.fill();
+                    }
+                }
+            }
+        }
+
+        document.getElementById('ringSlider').addEventListener('input', (e) => {
+            snakesConfig.rings = parseInt(e.target.value);
+            document.getElementById('ringCount').textContent = snakesConfig.rings;
+            drawRotatingSnakes();
+        });
+
+        document.getElementById('sizeSlider').addEventListener('input', (e) => {
+            snakesConfig.size = parseInt(e.target.value);
+            document.getElementById('sizeVal').textContent = snakesConfig.size + '%';
+            drawRotatingSnakes();
+        });
+
+        document.getElementById('colorScheme').addEventListener('change', (e) => {
+            snakesConfig.scheme = e.target.value;
+            drawRotatingSnakes();
+        });
+
+        drawRotatingSnakes();
+
+        // IMPOSSIBLE SHAPE
+        const impossibleCanvas = document.getElementById('impossibleCanvas');
+        const impossibleCtx = impossibleCanvas.getContext('2d');
+        let impossibleConfig = {
+            shape: 'triangle',
+            speed: 0.5,
+            thickness: 3,
+            color: '#1d1d1f',
+            rotation: 0
+        };
+
+        function drawPenroseTriangle(ctx, cx, cy, size, rotation) {
+            const cos = Math.cos(rotation);
+            const sin = Math.sin(rotation);
+
+            function rotate(x, y) {
+                return {
+                    x: cx + (x * cos - y * sin),
+                    y: cy + (x * sin + y * cos)
+                };
+            }
+
+            const r = size;
+            const inner = size * 0.6;
+
+            const p1 = rotate(0, -r);
+            const p2 = rotate(r * Math.cos(Math.PI / 6), r * Math.sin(Math.PI / 6));
+            const p3 = rotate(-r * Math.cos(Math.PI / 6), r * Math.sin(Math.PI / 6));
+
+            const i1 = rotate(0, -inner);
+            const i2 = rotate(inner * Math.cos(Math.PI / 6), inner * Math.sin(Math.PI / 6));
+            const i3 = rotate(-inner * Math.cos(Math.PI / 6), inner * Math.sin(Math.PI / 6));
+
+            ctx.strokeStyle = impossibleConfig.color;
+            ctx.lineWidth = impossibleConfig.thickness;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Draw the three bars
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(i2.x, i2.y);
+            ctx.lineTo(i1.x, i1.y);
+            ctx.closePath();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.lineTo(i3.x, i3.y);
+            ctx.lineTo(i2.x, i2.y);
+            ctx.closePath();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(p3.x, p3.y);
+            ctx.lineTo(p1.x, p1.y);
+            ctx.lineTo(i1.x, i1.y);
+            ctx.lineTo(i3.x, i3.y);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawImpossibleCube(ctx, cx, cy, size, rotation) {
+            const cos = Math.cos(rotation);
+            const sin = Math.sin(rotation);
+
+            function rotate(x, y, z) {
+                const x1 = x * cos - z * sin;
+                const z1 = x * sin + z * cos;
+                return {
+                    x: cx + x1,
+                    y: cy + y * 0.7 - z1 * 0.3
+                };
+            }
+
+            const s = size;
+            const vertices = [
+                rotate(-s, -s, -s), rotate(s, -s, -s), rotate(s, s, -s), rotate(-s, s, -s),
+                rotate(-s, -s, s), rotate(s, -s, s), rotate(s, s, s), rotate(-s, s, s)
+            ];
+
+            ctx.strokeStyle = impossibleConfig.color;
+            ctx.lineWidth = impossibleConfig.thickness;
+            ctx.lineCap = 'round';
+
+            const edges = [
+                [0,1], [1,2], [2,3], [3,0],
+                [4,5], [5,6], [6,7], [7,4],
+                [0,4], [1,5], [2,6]
+            ];
+
+            edges.forEach(([a, b]) => {
+                ctx.beginPath();
+                ctx.moveTo(vertices[a].x, vertices[a].y);
+                ctx.lineTo(vertices[b].x, vertices[b].y);
+                ctx.stroke();
+            });
+
+            // Impossible edge (3,7)
+            ctx.beginPath();
+            ctx.moveTo(vertices[3].x, vertices[3].y);
+            ctx.lineTo(vertices[7].x - 20, vertices[7].y);
+            ctx.stroke();
+        }
+
+        function drawInfiniteStaircase(ctx, cx, cy, size, rotation) {
+            const cos = Math.cos(rotation);
+            const sin = Math.sin(rotation);
+
+            function rotate(x, y) {
+                return {
+                    x: cx + (x * cos - y * sin),
+                    y: cy + (x * sin + y * cos)
+                };
+            }
+
+            ctx.strokeStyle = impossibleConfig.color;
+            ctx.lineWidth = impossibleConfig.thickness;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            const step = size / 4;
+            const steps = [];
+
+            for (let i = 0; i < 4; i++) {
+                const x1 = -size + i * step;
+                const y1 = -size + i * step;
+                const x2 = x1 + step;
+                const y2 = y1;
+                const x3 = x2;
+                const y3 = y2 + step;
+                const x4 = x1;
+                const y4 = y3;
+
+                steps.push([rotate(x1, y1), rotate(x2, y2), rotate(x3, y3), rotate(x4, y4)]);
+            }
+
+            steps.forEach(step => {
+                ctx.beginPath();
+                ctx.moveTo(step[0].x, step[0].y);
+                step.forEach(p => ctx.lineTo(p.x, p.y));
+                ctx.closePath();
+                ctx.stroke();
+            });
+        }
+
+        function animateImpossible() {
+            const w = impossibleCanvas.width;
+            const h = impossibleCanvas.height;
+            impossibleCtx.fillStyle = '#f5f5f7';
+            impossibleCtx.fillRect(0, 0, w, h);
+
+            impossibleConfig.rotation += impossibleConfig.speed * 0.01;
+
+            const cx = w / 2;
+            const cy = h / 2;
+            const size = 80;
+
+            if (impossibleConfig.shape === 'triangle') {
+                drawPenroseTriangle(impossibleCtx, cx, cy, size, impossibleConfig.rotation);
+            } else if (impossibleConfig.shape === 'cube') {
+                drawImpossibleCube(impossibleCtx, cx, cy, size, impossibleConfig.rotation);
+            } else {
+                drawInfiniteStaircase(impossibleCtx, cx, cy, size, impossibleConfig.rotation);
+            }
+
+            requestAnimationFrame(animateImpossible);
+        }
+
+        document.getElementById('shapeType').addEventListener('change', (e) => {
+            impossibleConfig.shape = e.target.value;
+        });
+
+        document.getElementById('rotSpeedSlider').addEventListener('input', (e) => {
+            impossibleConfig.speed = parseInt(e.target.value) / 100;
+            document.getElementById('rotSpeed').textContent = e.target.value + '%';
+        });
+
+        document.getElementById('lineThickSlider').addEventListener('input', (e) => {
+            impossibleConfig.thickness = parseInt(e.target.value);
+            document.getElementById('lineThick').textContent = e.target.value;
+        });
+
+        document.querySelectorAll('[data-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-color]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                impossibleConfig.color = btn.dataset.color;
+            });
+        });
+
+        animateImpossible();
+
+        // MOIRE PATTERNS
+        const moireCanvas = document.getElementById('moireCanvas');
+        const moireCtx = moireCanvas.getContext('2d');
+        let moireConfig = {
+            spacing: 10,
+            angle: 5,
+            pattern: 'lines',
+            color: '#1d1d1f',
+            offsetX: 0,
+            offsetY: 0
+        };
+        let isDragging = false;
+        let lastTouch = { x: 0, y: 0 };
+
+        function drawMoire() {
+            const w = moireCanvas.width;
+            const h = moireCanvas.height;
+            moireCtx.fillStyle = '#f5f5f7';
+            moireCtx.fillRect(0, 0, w, h);
+
+            moireCtx.strokeStyle = moireConfig.color;
+            moireCtx.fillStyle = moireConfig.color;
+            moireCtx.lineWidth = 1;
+
+            // Bottom layer (static)
+            if (moireConfig.pattern === 'lines') {
+                for (let i = 0; i < w; i += moireConfig.spacing) {
+                    moireCtx.beginPath();
+                    moireCtx.moveTo(i, 0);
+                    moireCtx.lineTo(i, h);
+                    moireCtx.stroke();
+                }
+            } else if (moireConfig.pattern === 'circles') {
+                const cx = w / 2;
+                const cy = h / 2;
+                for (let r = moireConfig.spacing; r < w; r += moireConfig.spacing) {
+                    moireCtx.beginPath();
+                    moireCtx.arc(cx, cy, r, 0, Math.PI * 2);
+                    moireCtx.stroke();
+                }
+            } else { // dots
+                for (let x = 0; x < w; x += moireConfig.spacing) {
+                    for (let y = 0; y < h; y += moireConfig.spacing) {
+                        moireCtx.beginPath();
+                        moireCtx.arc(x, y, 1.5, 0, Math.PI * 2);
+                        moireCtx.fill();
+                    }
+                }
+            }
+
+            // Top layer (rotated/offset)
+            moireCtx.save();
+            moireCtx.globalAlpha = 0.5;
+            moireCtx.translate(w / 2 + moireConfig.offsetX, h / 2 + moireConfig.offsetY);
+            moireCtx.rotate(moireConfig.angle * Math.PI / 180);
+            moireCtx.translate(-w / 2, -h / 2);
+
+            if (moireConfig.pattern === 'lines') {
+                for (let i = -w; i < w * 2; i += moireConfig.spacing) {
+                    moireCtx.beginPath();
+                    moireCtx.moveTo(i, -h);
+                    moireCtx.lineTo(i, h * 2);
+                    moireCtx.stroke();
+                }
+            } else if (moireConfig.pattern === 'circles') {
+                const cx = w / 2;
+                const cy = h / 2;
+                for (let r = moireConfig.spacing; r < w * 1.5; r += moireConfig.spacing) {
+                    moireCtx.beginPath();
+                    moireCtx.arc(cx, cy, r, 0, Math.PI * 2);
+                    moireCtx.stroke();
+                }
+            } else { // dots
+                for (let x = -w; x < w * 2; x += moireConfig.spacing) {
+                    for (let y = -h; y < h * 2; y += moireConfig.spacing) {
+                        moireCtx.beginPath();
+                        moireCtx.arc(x, y, 1.5, 0, Math.PI * 2);
+                        moireCtx.fill();
+                    }
+                }
+            }
+
+            moireCtx.restore();
+        }
+
+        moireCanvas.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            const rect = moireCanvas.getBoundingClientRect();
+            lastTouch = {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top
+            };
+        });
+
+        moireCanvas.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const rect = moireCanvas.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            const y = e.touches[0].clientY - rect.top;
+            moireConfig.offsetX += (x - lastTouch.x);
+            moireConfig.offsetY += (y - lastTouch.y);
+            lastTouch = { x, y };
+            drawMoire();
+        });
+
+        moireCanvas.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        moireCanvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastTouch = { x: e.offsetX, y: e.offsetY };
+        });
+
+        moireCanvas.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            moireConfig.offsetX += (e.offsetX - lastTouch.x);
+            moireConfig.offsetY += (e.offsetY - lastTouch.y);
+            lastTouch = { x: e.offsetX, y: e.offsetY };
+            drawMoire();
+        });
+
+        moireCanvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        document.getElementById('spacingSlider').addEventListener('input', (e) => {
+            moireConfig.spacing = parseInt(e.target.value);
+            document.getElementById('spacingVal').textContent = e.target.value;
+            drawMoire();
+        });
+
+        document.getElementById('angleSlider').addEventListener('input', (e) => {
+            moireConfig.angle = parseInt(e.target.value);
+            document.getElementById('angleVal').textContent = e.target.value + '°';
+            drawMoire();
+        });
+
+        document.getElementById('patternType').addEventListener('change', (e) => {
+            moireConfig.pattern = e.target.value;
+            drawMoire();
+        });
+
+        document.querySelectorAll('[data-color-moire]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-color-moire]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                moireConfig.color = btn.dataset.colorMoire;
+                drawMoire();
+            });
+        });
+
+        drawMoire();
+
+        // AFTERIMAGE
+        const afterimageCanvas = document.getElementById('afterimageCanvas');
+        const afterimageCtx = afterimageCanvas.getContext('2d');
+        let afterimageConfig = {
+            color: 'red',
+            size: 50,
+            state: 'idle'
+        };
+        let afterimageTimer = null;
+        let timeLeft = 15;
+
+        const afterimageColors = {
+            red: { main: '#ff3b30', complement: '#00c8cf' },
+            green: { main: '#34c759', complement: '#ff38a6' },
+            blue: { main: '#0071e3', complement: '#ffd60a' },
+            yellow: { main: '#ffd60a', complement: '#0071e3' }
+        };
+
+        function drawAfterimage() {
+            const w = afterimageCanvas.width;
+            const h = afterimageCanvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+
+            if (afterimageConfig.state === 'staring') {
+                afterimageCtx.fillStyle = '#ffffff';
+                afterimageCtx.fillRect(0, 0, w, h);
+                afterimageCtx.fillStyle = afterimageColors[afterimageConfig.color].main;
+                afterimageCtx.beginPath();
+                afterimageCtx.arc(cx, cy, afterimageConfig.size, 0, Math.PI * 2);
+                afterimageCtx.fill();
+            } else if (afterimageConfig.state === 'afterimage') {
+                afterimageCtx.fillStyle = '#d0d0d0';
+                afterimageCtx.fillRect(0, 0, w, h);
+                // Draw a faint cross to help fixate
+                afterimageCtx.strokeStyle = '#b0b0b0';
+                afterimageCtx.lineWidth = 1;
+                afterimageCtx.beginPath();
+                afterimageCtx.moveTo(cx - 10, cy);
+                afterimageCtx.lineTo(cx + 10, cy);
+                afterimageCtx.moveTo(cx, cy - 10);
+                afterimageCtx.lineTo(cx, cy + 10);
+                afterimageCtx.stroke();
+            } else {
+                afterimageCtx.fillStyle = '#f5f5f7';
+                afterimageCtx.fillRect(0, 0, w, h);
+                afterimageCtx.fillStyle = afterimageColors[afterimageConfig.color].main;
+                afterimageCtx.beginPath();
+                afterimageCtx.arc(cx, cy, afterimageConfig.size, 0, Math.PI * 2);
+                afterimageCtx.fill();
+            }
+        }
+
+        function startAfterimage() {
+            afterimageConfig.state = 'staring';
+            timeLeft = 15;
+            document.getElementById('timer').textContent = timeLeft;
+            document.getElementById('afterimageInstruction').textContent = 'Stare at the center dot without moving your eyes!';
+            drawAfterimage();
+
+            afterimageTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                if (timeLeft === 0) {
+                    clearInterval(afterimageTimer);
+                    afterimageConfig.state = 'afterimage';
+                    document.getElementById('afterimageInstruction').textContent = 'Keep staring at the center—see the afterimage!';
+                    drawAfterimage();
+                    setTimeout(() => {
+                        afterimageConfig.state = 'idle';
+                        document.getElementById('timer').textContent = '15';
+                        document.getElementById('afterimageInstruction').textContent = 'Press Start and stare at the dot';
+                        drawAfterimage();
+                    }, 10000);
+                }
+            }, 1000);
+        }
+
+        document.getElementById('startAfterimage').addEventListener('click', startAfterimage);
+
+        document.getElementById('afterimageColor').addEventListener('change', (e) => {
+            afterimageConfig.color = e.target.value;
+            if (afterimageConfig.state === 'idle') drawAfterimage();
+        });
+
+        document.getElementById('dotSizeSlider').addEventListener('input', (e) => {
+            afterimageConfig.size = parseInt(e.target.value);
+            document.getElementById('dotSize').textContent = e.target.value;
+            if (afterimageConfig.state === 'idle') drawAfterimage();
+        });
+
+        drawAfterimage();
+
+        // SIZE ILLUSION
+        const sizeCanvas = document.getElementById('sizeCanvas');
+        const sizeCtx = sizeCanvas.getContext('2d');
+        let sizeConfig = {
+            surroundCount: 6,
+            sizeDiff: 150,
+            scheme: 'orange'
+        };
+
+        const sizeColorSchemes = {
+            orange: { center: '#ff9500', left: '#0071e3', right: '#0071e3' },
+            red: { center: '#ff3b30', left: '#34c759', right: '#34c759' },
+            purple: { center: '#af52de', left: '#ffd60a', right: '#ffd60a' }
+        };
+
+        function drawSizeIllusion() {
+            const w = sizeCanvas.width;
+            const h = sizeCanvas.height;
+            sizeCtx.fillStyle = '#f5f5f7';
+            sizeCtx.fillRect(0, 0, w, h);
+
+            const colors = sizeColorSchemes[sizeConfig.scheme];
+            const centerRadius = 30;
+            const leftCx = w * 0.3;
+            const rightCx = w * 0.7;
+            const cy = h / 2;
+
+            // Left side - small surrounds
+            const leftSurroundRadius = centerRadius * 0.5;
+            const leftDistance = centerRadius + leftSurroundRadius + 15;
+            sizeCtx.fillStyle = colors.left;
+            for (let i = 0; i < sizeConfig.surroundCount; i++) {
+                const angle = (i / sizeConfig.surroundCount) * Math.PI * 2;
+                const x = leftCx + Math.cos(angle) * leftDistance;
+                const y = cy + Math.sin(angle) * leftDistance;
+                sizeCtx.beginPath();
+                sizeCtx.arc(x, y, leftSurroundRadius, 0, Math.PI * 2);
+                sizeCtx.fill();
+            }
+
+            // Right side - large surrounds
+            const rightSurroundRadius = centerRadius * (sizeConfig.sizeDiff / 100);
+            const rightDistance = centerRadius + rightSurroundRadius + 15;
+            sizeCtx.fillStyle = colors.right;
+            for (let i = 0; i < sizeConfig.surroundCount; i++) {
+                const angle = (i / sizeConfig.surroundCount) * Math.PI * 2;
+                const x = rightCx + Math.cos(angle) * rightDistance;
+                const y = cy + Math.sin(angle) * rightDistance;
+                sizeCtx.beginPath();
+                sizeCtx.arc(x, y, rightSurroundRadius, 0, Math.PI * 2);
+                sizeCtx.fill();
+            }
+
+            // Center circles (same size!)
+            sizeCtx.fillStyle = colors.center;
+            sizeCtx.beginPath();
+            sizeCtx.arc(leftCx, cy, centerRadius, 0, Math.PI * 2);
+            sizeCtx.fill();
+            sizeCtx.beginPath();
+            sizeCtx.arc(rightCx, cy, centerRadius, 0, Math.PI * 2);
+            sizeCtx.fill();
+        }
+
+        document.getElementById('surroundSlider').addEventListener('input', (e) => {
+            sizeConfig.surroundCount = parseInt(e.target.value);
+            document.getElementById('surroundCount').textContent = e.target.value;
+            drawSizeIllusion();
+        });
+
+        document.getElementById('sizeDiffSlider').addEventListener('input', (e) => {
+            sizeConfig.sizeDiff = parseInt(e.target.value);
+            document.getElementById('sizeDiff').textContent = e.target.value + '%';
+            drawSizeIllusion();
+        });
+
+        document.getElementById('sizeColorScheme').addEventListener('change', (e) => {
+            sizeConfig.scheme = e.target.value;
+            drawSizeIllusion();
+        });
+
+        drawSizeIllusion();
+
+        // MOTION ILLUSION
+        const motionCanvas = document.getElementById('motionCanvas');
+        const motionCtx = motionCanvas.getContext('2d');
+        let motionConfig = {
+            shape: 'circles',
+            density: 6,
+            speed: 50,
+            scheme: 'blue',
+            time: 0
+        };
+
+        const motionColorSchemes = {
+            blue: ['#0051ba', '#0071e3', '#5ac8fa', '#64d2ff'],
+            purple: ['#5e2ca5', '#af52de', '#bf5af2', '#d896ff'],
+            green: ['#248a3d', '#34c759', '#63e178', '#98fb98'],
+            rainbow: ['#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#0071e3', '#af52de']
+        };
+
+        function drawMotionIllusion() {
+            const w = motionCanvas.width;
+            const h = motionCanvas.height;
+            motionCtx.fillStyle = '#f5f5f7';
+            motionCtx.fillRect(0, 0, w, h);
+
+            const colors = motionColorSchemes[motionConfig.scheme];
+            const cellSize = w / motionConfig.density;
+            motionConfig.time += motionConfig.speed / 1000;
+
+            for (let row = 0; row < motionConfig.density; row++) {
+                for (let col = 0; col < motionConfig.density; col++) {
+                    const cx = col * cellSize + cellSize / 2;
+                    const cy = row * cellSize + cellSize / 2;
+                    const offset = (row + col) * 0.5 + motionConfig.time;
+                    const colorIndex = Math.floor(offset) % colors.length;
+                    const nextColorIndex = (colorIndex + 1) % colors.length;
+                    const blend = (offset % 1);
+
+                    // Create gradient for each shape
+                    const gradient = motionCtx.createRadialGradient(cx, cy, 0, cx, cy, cellSize / 2.5);
+                    gradient.addColorStop(0, colors[colorIndex]);
+                    gradient.addColorStop(1, colors[nextColorIndex]);
+
+                    motionCtx.fillStyle = gradient;
+
+                    if (motionConfig.shape === 'circles') {
+                        motionCtx.beginPath();
+                        motionCtx.arc(cx, cy, cellSize / 2.5, 0, Math.PI * 2);
+                        motionCtx.fill();
+                    } else if (motionConfig.shape === 'squares') {
+                        const size = cellSize / 1.5;
+                        motionCtx.fillRect(cx - size / 2, cy - size / 2, size, size);
+                    } else { // diamonds
+                        const size = cellSize / 2.5;
+                        motionCtx.save();
+                        motionCtx.translate(cx, cy);
+                        motionCtx.rotate(Math.PI / 4);
+                        motionCtx.fillRect(-size, -size, size * 2, size * 2);
+                        motionCtx.restore();
+                    }
+                }
+            }
+
+            requestAnimationFrame(drawMotionIllusion);
+        }
+
+        document.getElementById('motionShape').addEventListener('change', (e) => {
+            motionConfig.shape = e.target.value;
+        });
+
+        document.getElementById('densitySlider').addEventListener('input', (e) => {
+            motionConfig.density = parseInt(e.target.value);
+            document.getElementById('densityVal').textContent = e.target.value;
+        });
+
+        document.getElementById('animSpeedSlider').addEventListener('input', (e) => {
+            motionConfig.speed = parseInt(e.target.value);
+            document.getElementById('animSpeed').textContent = e.target.value + '%';
+        });
+
+        document.getElementById('motionColorScheme').addEventListener('change', (e) => {
+            motionConfig.scheme = e.target.value;
+        });
+
+        drawMotionIllusion();
+    </script>
+</body>
+</html>
