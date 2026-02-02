@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>UI Patterns 2026</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        header {
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 8px;
+        }
+
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            border: none;
+            background: #f5f5f7;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6e6e73;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #007aff;
+            color: #fff;
+        }
+
+        /* Content Area */
+        .tab-content {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Styles */
+        .section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #6e6e73;
+            margin-bottom: 6px;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        input[type="range"] {
+            padding: 0;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 4px;
+        }
+
+        .btn-primary {
+            background: #007aff;
+            color: #fff;
+        }
+
+        .btn-success {
+            background: #34c759;
+            color: #fff;
+        }
+
+        .btn-error {
+            background: #ff3b30;
+            color: #fff;
+        }
+
+        .btn-warning {
+            background: #ff9500;
+            color: #fff;
+        }
+
+        .btn-info {
+            background: #5ac8fa;
+            color: #fff;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast-container.top-left { top: 20px; left: 20px; }
+        .toast-container.top-right { top: 20px; right: 20px; }
+        .toast-container.bottom-left { bottom: 20px; left: 20px; }
+        .toast-container.bottom-right { bottom: 20px; right: 20px; }
+        .toast-container.top { top: 20px; left: 50%; transform: translateX(-50%); }
+        .toast-container.bottom { bottom: 20px; left: 50%; transform: translateX(-50%); }
+
+        .toast {
+            background: #fff;
+            color: #1d1d1f;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            margin-bottom: 8px;
+            min-width: 280px;
+            max-width: 90vw;
+            pointer-events: all;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon { background: #34c759; color: #fff; }
+        .toast.error .toast-icon { background: #ff3b30; color: #fff; }
+        .toast.warning .toast-icon { background: #ff9500; color: #fff; }
+        .toast.info .toast-icon { background: #5ac8fa; color: #fff; }
+
+        .toast-message {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        /* Toast Animations */
+        .toast.slide-enter {
+            animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toast.fade-enter {
+            animation: fadeInToast 0.3s;
+        }
+
+        .toast.bounce-enter {
+            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeInToast {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Skeleton Loaders */
+        .skeleton-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            border-radius: 8px;
+        }
+
+        .skeleton.pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .skeleton.wave {
+            animation: wave 1.5s linear infinite;
+        }
+
+        .skeleton.shimmer {
+            animation: shimmer 2s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes wave {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-card {
+            padding: 16px;
+            background: #fff;
+            border-radius: 12px;
+        }
+
+        .skeleton-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 12px;
+        }
+
+        .skeleton-line {
+            height: 12px;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-line.short {
+            width: 60%;
+        }
+
+        .skeleton-image {
+            width: 100%;
+            height: 200px;
+        }
+
+        .loaded-content {
+            display: none;
+        }
+
+        .loaded .skeleton {
+            display: none;
+        }
+
+        .loaded .loaded-content {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-text {
+            font-size: 14px;
+            color: #6e6e73;
+            line-height: 1.5;
+        }
+
+        /* Drag & Drop */
+        .drag-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drag-item {
+            padding: 16px;
+            margin-bottom: 8px;
+            background: #fff;
+            border-radius: 12px;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            transition: all 0.2s;
+        }
+
+        .drag-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .drag-item.over {
+            border-top: 3px solid #007aff;
+        }
+
+        .drag-item.cards {
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .drag-item.pills {
+            border-radius: 24px;
+            padding: 12px 20px;
+        }
+
+        /* Accordions */
+        .accordion-item {
+            background: #fff;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+        }
+
+        .accordion-item.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 500px;
+        }
+
+        .accordion-body {
+            padding: 0 16px 16px;
+            color: #6e6e73;
+            line-height: 1.6;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            margin-top: 20px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid #e5e5e7;
+        }
+
+        .tabs-nav.pills {
+            border-bottom: none;
+            gap: 8px;
+        }
+
+        .tabs-nav.cards {
+            border-bottom: none;
+            gap: 8px;
+        }
+
+        .tab-item {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6e6e73;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .tabs-nav.underline .tab-item.active {
+            color: #007aff;
+        }
+
+        .tabs-nav.underline .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #007aff;
+        }
+
+        .tabs-nav.pills .tab-item {
+            border-radius: 20px;
+        }
+
+        .tabs-nav.pills .tab-item.active {
+            background: #007aff;
+            color: #fff;
+        }
+
+        .tabs-nav.cards .tab-item {
+            background: #f5f5f7;
+            border-radius: 10px;
+        }
+
+        .tabs-nav.cards .tab-item.active {
+            background: #007aff;
+            color: #fff;
+        }
+
+        .tab-pane {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        /* Modals */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .overlay.blur {
+            backdrop-filter: blur(8px);
+        }
+
+        .modal {
+            position: fixed;
+            z-index: 1001;
+            background: #fff;
+            display: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .modal.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .modal.center {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            max-width: 90%;
+            width: 400px;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .modal.center.active {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal.bottom-sheet {
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            transform: translateY(100%);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal.bottom-sheet.active {
+            transform: translateY(0);
+        }
+
+        .modal.side-drawer {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 80%;
+            max-width: 300px;
+            padding: 24px;
+            transform: translateX(100%);
+            overflow-y: auto;
+        }
+
+        .modal.side-drawer.active {
+            transform: translateX(0);
+        }
+
+        .modal.fullscreen {
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 24px;
+            transform: scale(0.95);
+            overflow-y: auto;
+        }
+
+        .modal.fullscreen.active {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .modal-body {
+            color: #6e6e73;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            padding: 12px 24px;
+            background: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: #d2d2d7;
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        /* Micro-interactions */
+        .micro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .micro-item {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .micro-label {
+            font-size: 13px;
+            color: #6e6e73;
+            text-align: center;
+        }
+
+        /* Like Button */
+        .like-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            background: #f5f5f7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .like-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #6e6e73;
+            transition: all 0.3s;
+        }
+
+        .like-btn.liked {
+            background: #ff3b30;
+        }
+
+        .like-btn.liked svg {
+            fill: #fff;
+            animation: heartBeat 0.3s;
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            width: 56px;
+            height: 32px;
+            background: #e5e5e7;
+            border-radius: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.on {
+            background: #34c759;
+        }
+
+        .toggle-knob {
+            width: 28px;
+            height: 28px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.on .toggle-knob {
+            transform: translateX(24px);
+        }
+
+        /* Checkbox */
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #d2d2d7;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox.checked {
+            background: #007aff;
+            border-color: #007aff;
+        }
+
+        .checkmark {
+            stroke-dasharray: 20;
+            stroke-dashoffset: 20;
+            transition: stroke-dashoffset 0.3s;
+        }
+
+        .checkbox.checked .checkmark {
+            stroke-dashoffset: 0;
+        }
+
+        /* Star Rating */
+        .star-rating {
+            display: flex;
+            gap: 8px;
+        }
+
+        .star {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .star svg {
+            width: 100%;
+            height: 100%;
+            fill: #e5e5e7;
+            transition: fill 0.2s;
+        }
+
+        .star.active svg {
+            fill: #ff9500;
+            animation: starPop 0.3s;
+        }
+
+        @keyframes starPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Pull to Refresh */
+        .pull-container {
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+            border-radius: 12px;
+            height: 200px;
+        }
+
+        .pull-indicator {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: top 0.3s;
+        }
+
+        .pull-indicator.visible {
+            top: 20px;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e5e5e7;
+            border-top-color: #007aff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .pull-content {
+            padding: 60px 20px 20px;
+            text-align: center;
+            color: #6e6e73;
+        }
+
+        /* Swipe to Delete */
+        .swipe-list {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .swipe-item {
+            position: relative;
+            background: #fff;
+            transition: transform 0.3s;
+        }
+
+        .swipe-content {
+            padding: 16px;
+            border-bottom: 1px solid #f5f5f7;
+            background: #fff;
+            position: relative;
+            z-index: 2;
+        }
+
+        .swipe-actions {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: #ff3b30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 24px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* Long Press Menu */
+        .longpress-item {
+            padding: 16px;
+            background: #007aff;
+            color: #fff;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .context-menu {
+            position: fixed;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            min-width: 180px;
+            overflow: hidden;
+        }
+
+        .context-menu.active {
+            display: block;
+            animation: scaleIn 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .context-menu-item {
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .context-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .context-menu-item:active {
+            background: #f5f5f7;
+        }
+
+        /* Counter */
+        .counter-display {
+            width: 80px;
+            height: 80px;
+            background: #007aff;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .counter-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .counter-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f5f5f7;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Progress Button */
+        .progress-btn {
+            position: relative;
+            padding: 12px 32px;
+            background: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: rgba(255,255,255,0.2);
+            width: 0;
+            transition: width 2s linear;
+        }
+
+        .progress-btn.loading .progress-fill {
+            width: 100%;
+        }
+
+        .progress-text {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>UI Patterns 2026</h1>
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="toast">Toast</button>
+            <button class="tab-btn" data-tab="skeleton">Skeleton</button>
+            <button class="tab-btn" data-tab="drag">Drag & Drop</button>
+            <button class="tab-btn" data-tab="accordion">Accordions</button>
+            <button class="tab-btn" data-tab="modals">Modals</button>
+            <button class="tab-btn" data-tab="micro">Micro-interactions</button>
+        </nav>
+    </header>
+
+    <!-- Toast Tab -->
+    <div class="tab-content active" id="toast">
+        <div class="section">
+            <h2 class="section-title">Toast Notifications</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Position</label>
+                    <select id="toast-position">
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="top">Top Center</option>
+                        <option value="bottom">Bottom Center</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Animation</label>
+                    <select id="toast-animation">
+                        <option value="slide">Slide</option>
+                        <option value="fade">Fade</option>
+                        <option value="bounce">Bounce</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Duration (ms)</label>
+                    <input type="range" id="toast-duration" min="1000" max="5000" value="3000" step="500">
+                    <span id="toast-duration-value">3000</span>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Max Visible</label>
+                    <input type="range" id="toast-max" min="1" max="5" value="3">
+                    <span id="toast-max-value">3</span>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-success" onclick="showToast('success', 'Operation completed successfully!')">Success</button>
+                <button class="btn btn-error" onclick="showToast('error', 'An error occurred. Please try again.')">Error</button>
+                <button class="btn btn-warning" onclick="showToast('warning', 'Warning: This action cannot be undone.')">Warning</button>
+                <button class="btn btn-info" onclick="showToast('info', 'New features are now available.')">Info</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skeleton Tab -->
+    <div class="tab-content" id="skeleton">
+        <div class="section">
+            <h2 class="section-title">Skeleton Loaders</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Animation Style</label>
+                    <select id="skeleton-style">
+                        <option value="pulse">Pulse</option>
+                        <option value="wave">Wave</option>
+                        <option value="shimmer">Shimmer</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Speed (s)</label>
+                    <input type="range" id="skeleton-speed" min="0.5" max="3" value="1.5" step="0.5">
+                    <span id="skeleton-speed-value">1.5</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="loadSkeletonContent()">Load Content</button>
+            <div class="skeleton-grid" id="skeleton-container">
+                <!-- Profile Card -->
+                <div class="skeleton-card" id="skeleton-profile">
+                    <div class="skeleton skeleton-avatar pulse"></div>
+                    <div class="skeleton skeleton-line pulse"></div>
+                    <div class="skeleton skeleton-line short pulse"></div>
+                    <div class="loaded-content">
+                        <div class="avatar"></div>
+                        <div class="card-title">Sarah Johnson</div>
+                        <div class="card-text">Senior Product Designer</div>
+                    </div>
+                </div>
+                <!-- Article List -->
+                <div class="skeleton-card" id="skeleton-article">
+                    <div class="skeleton skeleton-line pulse"></div>
+                    <div class="skeleton skeleton-line pulse"></div>
+                    <div class="skeleton skeleton-line short pulse"></div>
+                    <div class="loaded-content">
+                        <div class="card-title">The Future of Design Systems</div>
+                        <div class="card-text">Exploring the latest trends in component libraries and design tokens for modern web applications.</div>
+                    </div>
+                </div>
+                <!-- Image Gallery -->
+                <div class="skeleton-card" id="skeleton-image">
+                    <div class="skeleton skeleton-image pulse"></div>
+                    <div class="loaded-content">
+                        <div style="width:100%;height:200px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:8px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drag & Drop Tab -->
+    <div class="tab-content" id="drag">
+        <div class="section">
+            <h2 class="section-title">Drag & Drop</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Item Count</label>
+                    <input type="range" id="drag-count" min="5" max="12" value="8">
+                    <span id="drag-count-value">8</span>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Style</label>
+                    <select id="drag-style">
+                        <option value="cards">Cards</option>
+                        <option value="pills">Pills</option>
+                        <option value="rows">Rows</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Gap Size</label>
+                    <input type="range" id="drag-gap" min="4" max="16" value="8" step="4">
+                    <span id="drag-gap-value">8px</span>
+                </div>
+            </div>
+            <div class="drag-list" id="drag-container"></div>
+        </div>
+    </div>
+
+    <!-- Accordion Tab -->
+    <div class="tab-content" id="accordion">
+        <div class="section">
+            <h2 class="section-title">Accordions</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Allow Multiple Open</label>
+                    <select id="accordion-multiple">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+            </div>
+            <div id="accordion-container">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>What is a design system?</span>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            A design system is a collection of reusable components, guided by clear standards, that can be assembled together to build applications. It includes UI patterns, design tokens, guidelines, and documentation.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Why use component libraries?</span>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            Component libraries accelerate development, ensure consistency across products, reduce code duplication, and make it easier to maintain and scale applications over time.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>How to implement accessibility?</span>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            Implement WCAG guidelines, use semantic HTML, ensure keyboard navigation, provide ARIA labels, maintain sufficient color contrast, and test with screen readers.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Tabs</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Tab Style</label>
+                    <select id="tab-style">
+                        <option value="underline">Underline</option>
+                        <option value="pills">Pills</option>
+                        <option value="cards">Cards</option>
+                    </select>
+                </div>
+            </div>
+            <div class="tabs-container">
+                <div class="tabs-nav underline" id="demo-tabs">
+                    <button class="tab-item active" data-pane="pane1">Overview</button>
+                    <button class="tab-item" data-pane="pane2">Features</button>
+                    <button class="tab-item" data-pane="pane3">Pricing</button>
+                </div>
+                <div class="tab-pane active" id="pane1">
+                    <div class="card-text">
+                        Welcome to our product overview. Here you'll find comprehensive information about what we offer and how it can help transform your workflow.
+                    </div>
+                </div>
+                <div class="tab-pane" id="pane2">
+                    <div class="card-text">
+                        Our features include real-time collaboration, advanced analytics, seamless integrations, and enterprise-grade security to keep your data safe.
+                    </div>
+                </div>
+                <div class="tab-pane" id="pane3">
+                    <div class="card-text">
+                        Flexible pricing plans designed for teams of all sizes. Start free and scale as you grow. No hidden fees or surprise charges.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals Tab -->
+    <div class="tab-content" id="modals">
+        <div class="section">
+            <h2 class="section-title">Modals & Sheets</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Backdrop Blur</label>
+                    <select id="modal-blur">
+                        <option value="true">On</option>
+                        <option value="false">Off</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Corner Radius</label>
+                    <input type="range" id="modal-radius" min="8" max="32" value="16" step="4">
+                    <span id="modal-radius-value">16px</span>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="openModal('center')">Center Modal</button>
+                <button class="btn btn-primary" onclick="openModal('bottom-sheet')">Bottom Sheet</button>
+                <button class="btn btn-primary" onclick="openModal('side-drawer')">Side Drawer</button>
+                <button class="btn btn-primary" onclick="openModal('fullscreen')">Fullscreen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Micro-interactions Tab -->
+    <div class="tab-content" id="micro">
+        <div class="section">
+            <h2 class="section-title">Micro-interactions</h2>
+            <div class="micro-grid">
+                <!-- Like Button -->
+                <div class="micro-item">
+                    <button class="like-btn" id="like-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </button>
+                    <div class="micro-label">Like Button</div>
+                </div>
+
+                <!-- Toggle Switch -->
+                <div class="micro-item">
+                    <div class="toggle-switch" id="toggle">
+                        <div class="toggle-knob"></div>
+                    </div>
+                    <div class="micro-label">Toggle Switch</div>
+                </div>
+
+                <!-- Checkbox -->
+                <div class="micro-item">
+                    <div class="checkbox" id="checkbox">
+                        <svg width="16" height="16" viewBox="0 0 16 16" style="display:none;">
+                            <path class="checkmark" d="M3 8l3 3 7-7" stroke="#fff" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="micro-label">Checkbox</div>
+                </div>
+
+                <!-- Star Rating -->
+                <div class="micro-item">
+                    <div class="star-rating" id="stars">
+                        <div class="star" data-rating="1">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        </div>
+                        <div class="star" data-rating="2">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        </div>
+                        <div class="star" data-rating="3">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        </div>
+                        <div class="star" data-rating="4">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        </div>
+                        <div class="star" data-rating="5">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="micro-label">Star Rating</div>
+                </div>
+
+                <!-- Pull to Refresh -->
+                <div class="micro-item" style="grid-column: span 2;">
+                    <div class="pull-container" id="pull-container">
+                        <div class="pull-indicator" id="pull-indicator">
+                            <div class="spinner"></div>
+                        </div>
+                        <div class="pull-content" id="pull-content">
+                            Drag down to refresh
+                        </div>
+                    </div>
+                    <div class="micro-label">Pull to Refresh</div>
+                </div>
+
+                <!-- Swipe to Delete -->
+                <div class="micro-item" style="grid-column: span 2;">
+                    <div class="swipe-list">
+                        <div class="swipe-item" id="swipe-item-1">
+                            <div class="swipe-content">Swipe left to delete</div>
+                            <div class="swipe-actions">Delete</div>
+                        </div>
+                    </div>
+                    <div class="micro-label">Swipe to Delete</div>
+                </div>
+
+                <!-- Long Press Menu -->
+                <div class="micro-item">
+                    <div class="longpress-item" id="longpress">
+                        Long Press
+                    </div>
+                    <div class="micro-label">Long Press Menu</div>
+                </div>
+
+                <!-- Counter -->
+                <div class="micro-item">
+                    <div class="counter-display" id="counter-display">0</div>
+                    <div class="counter-controls">
+                        <button class="counter-btn" onclick="updateCounter(-1)">−</button>
+                        <button class="counter-btn" onclick="updateCounter(1)">+</button>
+                    </div>
+                    <div class="micro-label">Counter</div>
+                </div>
+
+                <!-- Progress Button -->
+                <div class="micro-item" style="grid-column: span 2;">
+                    <button class="progress-btn" id="progress-btn">
+                        <div class="progress-fill"></div>
+                        <span class="progress-text">Start Upload</span>
+                    </button>
+                    <div class="micro-label">Progress Button</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Containers -->
+    <div class="toast-container top-right" id="toast-container"></div>
+
+    <!-- Modal Overlay & Modals -->
+    <div class="overlay" id="overlay" onclick="closeModal()"></div>
+
+    <div class="modal center" id="modal-center">
+        <div class="modal-header">Center Modal</div>
+        <div class="modal-body">
+            This is a centered modal dialog. It appears in the middle of the screen with a smooth scale animation.
+        </div>
+        <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+
+    <div class="modal bottom-sheet" id="modal-bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="modal-header">Bottom Sheet</div>
+        <div class="modal-body">
+            This is a bottom sheet that slides up from the bottom. Drag the handle down to dismiss, or tap outside.
+        </div>
+        <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+
+    <div class="modal side-drawer" id="modal-side-drawer">
+        <div class="modal-header">Side Drawer</div>
+        <div class="modal-body">
+            This is a side drawer that slides in from the right. Perfect for navigation menus or additional content.
+        </div>
+        <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+
+    <div class="modal fullscreen" id="modal-fullscreen">
+        <div class="modal-header">Fullscreen Modal</div>
+        <div class="modal-body">
+            This is a fullscreen modal that takes over the entire viewport. Great for immersive experiences or complex forms.
+        </div>
+        <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="context-menu">
+        <div class="context-menu-item" onclick="contextAction('copy')">Copy</div>
+        <div class="context-menu-item" onclick="contextAction('edit')">Edit</div>
+        <div class="context-menu-item" onclick="contextAction('delete')">Delete</div>
+        <div class="context-menu-item" onclick="contextAction('share')">Share</div>
+    </div>
+
+    <script>
+        // Tab Navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Toast Notifications
+        let toastQueue = [];
+        const maxToasts = () => parseInt(document.getElementById('toast-max').value);
+
+        function showToast(type, message) {
+            const container = document.getElementById('toast-container');
+            const position = document.getElementById('toast-position').value;
+            const animation = document.getElementById('toast-animation').value;
+            const duration = parseInt(document.getElementById('toast-duration').value);
+
+            // Update container position
+            container.className = `toast-container ${position}`;
+
+            // Remove excess toasts
+            while (toastQueue.length >= maxToasts()) {
+                const oldToast = toastQueue.shift();
+                oldToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type} ${animation}-enter`;
+
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'i'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div class="toast-message">${message}</div>
+            `;
+
+            container.appendChild(toast);
+            toastQueue.push(toast);
+
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s';
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.remove();
+                    toastQueue = toastQueue.filter(t => t !== toast);
+                }, 300);
+            }, duration);
+        }
+
+        // Toast Controls
+        document.getElementById('toast-duration').addEventListener('input', (e) => {
+            document.getElementById('toast-duration-value').textContent = e.target.value;
+        });
+
+        document.getElementById('toast-max').addEventListener('input', (e) => {
+            document.getElementById('toast-max-value').textContent = e.target.value;
+        });
+
+        // Skeleton Loaders
+        function updateSkeletonStyle() {
+            const style = document.getElementById('skeleton-style').value;
+            const speed = document.getElementById('skeleton-speed').value;
+
+            document.querySelectorAll('.skeleton').forEach(el => {
+                el.className = `skeleton ${style}`;
+                el.style.animationDuration = `${speed}s`;
+            });
+        }
+
+        document.getElementById('skeleton-style').addEventListener('change', updateSkeletonStyle);
+        document.getElementById('skeleton-speed').addEventListener('input', (e) => {
+            document.getElementById('skeleton-speed-value').textContent = e.target.value;
+            updateSkeletonStyle();
+        });
+
+        function loadSkeletonContent() {
+            document.querySelectorAll('.skeleton-card').forEach(card => {
+                setTimeout(() => {
+                    card.classList.add('loaded');
+                }, Math.random() * 1000);
+            });
+
+            setTimeout(() => {
+                document.querySelectorAll('.skeleton-card').forEach(card => {
+                    card.classList.remove('loaded');
+                });
+            }, 3000);
+        }
+
+        // Drag & Drop
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788', '#E07A5F', '#3D5A80'];
+
+        function createDragList() {
+            const container = document.getElementById('drag-container');
+            const count = parseInt(document.getElementById('drag-count').value);
+            const style = document.getElementById('drag-style').value;
+            const gap = parseInt(document.getElementById('drag-gap').value);
+
+            container.style.gap = `${gap}px`;
+            container.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                const item = document.createElement('div');
+                item.className = `drag-item ${style}`;
+                item.draggable = true;
+                item.textContent = `Item ${i + 1}`;
+                item.style.background = colors[i % colors.length];
+                item.style.color = '#fff';
+
+                // Touch events for mobile
+                let touchStartY = 0;
+                let touchStartX = 0;
+                let isDragging = false;
+
+                item.addEventListener('touchstart', (e) => {
+                    touchStartY = e.touches[0].clientY;
+                    touchStartX = e.touches[0].clientX;
+                    item.classList.add('dragging');
+                    isDragging = true;
+                });
+
+                item.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+
+                    const touch = e.touches[0];
+                    const moveY = touch.clientY - touchStartY;
+                    item.style.transform = `translateY(${moveY}px)`;
+
+                    // Find drop target
+                    const afterElement = getDragAfterElement(container, touch.clientY);
+                    if (afterElement == null) {
+                        container.appendChild(item);
+                    } else {
+                        container.insertBefore(item, afterElement);
+                    }
+                });
+
+                item.addEventListener('touchend', () => {
+                    isDragging = false;
+                    item.classList.remove('dragging');
+                    item.style.transform = '';
+                });
+
+                // Desktop drag events
+                item.addEventListener('dragstart', () => {
+                    item.classList.add('dragging');
+                });
+
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+
+                container.appendChild(item);
+            }
+
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const afterElement = getDragAfterElement(container, e.clientY);
+                const dragging = document.querySelector('.dragging');
+                if (afterElement == null) {
+                    container.appendChild(dragging);
+                } else {
+                    container.insertBefore(dragging, afterElement);
+                }
+            });
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.drag-item:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        document.getElementById('drag-count').addEventListener('input', (e) => {
+            document.getElementById('drag-count-value').textContent = e.target.value;
+            createDragList();
+        });
+
+        document.getElementById('drag-style').addEventListener('change', createDragList);
+        document.getElementById('drag-gap').addEventListener('input', (e) => {
+            document.getElementById('drag-gap-value').textContent = `${e.target.value}px`;
+            createDragList();
+        });
+
+        createDragList();
+
+        // Accordions
+        function setupAccordion() {
+            const allowMultiple = document.getElementById('accordion-multiple').value === 'true';
+
+            document.querySelectorAll('.accordion-item').forEach(item => {
+                const header = item.querySelector('.accordion-header');
+
+                header.onclick = () => {
+                    const isOpen = item.classList.contains('open');
+
+                    if (!allowMultiple) {
+                        document.querySelectorAll('.accordion-item').forEach(i => {
+                            i.classList.remove('open');
+                        });
+                    }
+
+                    if (!isOpen) {
+                        item.classList.add('open');
+                    } else {
+                        item.classList.remove('open');
+                    }
+                };
+            });
+        }
+
+        document.getElementById('accordion-multiple').addEventListener('change', setupAccordion);
+        setupAccordion();
+
+        // Tabs
+        document.getElementById('tab-style').addEventListener('change', (e) => {
+            const nav = document.getElementById('demo-tabs');
+            nav.className = `tabs-nav ${e.target.value}`;
+        });
+
+        document.querySelectorAll('#demo-tabs .tab-item').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('#demo-tabs .tab-item').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.pane).classList.add('active');
+            });
+        });
+
+        // Modals
+        let currentModal = null;
+
+        function openModal(type) {
+            const overlay = document.getElementById('overlay');
+            const blur = document.getElementById('modal-blur').value === 'true';
+            const radius = document.getElementById('modal-radius').value;
+
+            currentModal = document.getElementById(`modal-${type}`);
+
+            overlay.className = `overlay ${blur ? 'blur' : ''}`;
+            overlay.classList.add('active');
+
+            currentModal.style.borderRadius = type === 'bottom-sheet' ? `${radius}px ${radius}px 0 0` :
+                                             type === 'side-drawer' || type === 'fullscreen' ? '0' :
+                                             `${radius}px`;
+
+            setTimeout(() => {
+                currentModal.classList.add('active');
+            }, 10);
+        }
+
+        function closeModal() {
+            if (currentModal) {
+                currentModal.classList.remove('active');
+                document.getElementById('overlay').classList.remove('active');
+                setTimeout(() => {
+                    currentModal = null;
+                }, 300);
+            }
+        }
+
+        document.getElementById('modal-radius').addEventListener('input', (e) => {
+            document.getElementById('modal-radius-value').textContent = `${e.target.value}px`;
+        });
+
+        // Bottom sheet drag to dismiss
+        let sheetStartY = 0;
+        let sheetStartTouch = 0;
+
+        document.getElementById('modal-bottom-sheet').addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            sheetStartTouch = touch.clientY;
+            sheetStartY = 0;
+        });
+
+        document.getElementById('modal-bottom-sheet').addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            const moveY = touch.clientY - sheetStartTouch;
+
+            if (moveY > 0) {
+                e.preventDefault();
+                sheetStartY = moveY;
+                document.getElementById('modal-bottom-sheet').style.transform = `translateY(${moveY}px)`;
+            }
+        });
+
+        document.getElementById('modal-bottom-sheet').addEventListener('touchend', () => {
+            if (sheetStartY > 100) {
+                closeModal();
+            }
+            document.getElementById('modal-bottom-sheet').style.transform = '';
+        });
+
+        // Micro-interactions
+
+        // Like Button
+        document.getElementById('like-btn').addEventListener('click', function() {
+            this.classList.toggle('liked');
+        });
+
+        // Toggle Switch
+        document.getElementById('toggle').addEventListener('click', function() {
+            this.classList.toggle('on');
+        });
+
+        // Checkbox
+        const checkbox = document.getElementById('checkbox');
+        checkbox.addEventListener('click', function() {
+            this.classList.toggle('checked');
+            const svg = this.querySelector('svg');
+            if (this.classList.contains('checked')) {
+                svg.style.display = 'block';
+            } else {
+                svg.style.display = 'none';
+            }
+        });
+
+        // Star Rating
+        let currentRating = 0;
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = parseInt(star.dataset.rating);
+                currentRating = rating;
+
+                document.querySelectorAll('.star').forEach((s, i) => {
+                    if (i < rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // Pull to Refresh
+        let pullStart = 0;
+        let isPulling = false;
+
+        const pullContainer = document.getElementById('pull-container');
+        const pullIndicator = document.getElementById('pull-indicator');
+        const pullContent = document.getElementById('pull-content');
+
+        pullContainer.addEventListener('touchstart', (e) => {
+            if (pullContainer.scrollTop === 0) {
+                pullStart = e.touches[0].clientY;
+                isPulling = true;
+            }
+        });
+
+        pullContainer.addEventListener('touchmove', (e) => {
+            if (!isPulling) return;
+
+            const pullDistance = e.touches[0].clientY - pullStart;
+
+            if (pullDistance > 0 && pullDistance < 100) {
+                e.preventDefault();
+                pullIndicator.style.top = `${pullDistance - 60}px`;
+            }
+        });
+
+        pullContainer.addEventListener('touchend', (e) => {
+            if (!isPulling) return;
+
+            const pullDistance = e.changedTouches[0].clientY - pullStart;
+
+            if (pullDistance > 60) {
+                pullIndicator.classList.add('visible');
+                pullContent.textContent = 'Refreshing...';
+
+                setTimeout(() => {
+                    pullIndicator.classList.remove('visible');
+                    pullIndicator.style.top = '-60px';
+                    pullContent.textContent = 'Drag down to refresh';
+                    isPulling = false;
+                }, 1500);
+            } else {
+                pullIndicator.style.top = '-60px';
+                isPulling = false;
+            }
+        });
+
+        // Swipe to Delete
+        let swipeStart = 0;
+        let swipeDistance = 0;
+
+        const swipeItem = document.getElementById('swipe-item-1');
+        const swipeContent = swipeItem.querySelector('.swipe-content');
+
+        swipeItem.addEventListener('touchstart', (e) => {
+            swipeStart = e.touches[0].clientX;
+        });
+
+        swipeItem.addEventListener('touchmove', (e) => {
+            const currentX = e.touches[0].clientX;
+            swipeDistance = currentX - swipeStart;
+
+            if (swipeDistance < 0 && swipeDistance > -100) {
+                swipeContent.style.transform = `translateX(${swipeDistance}px)`;
+            }
+        });
+
+        swipeItem.addEventListener('touchend', () => {
+            if (swipeDistance < -60) {
+                swipeContent.style.transform = 'translateX(-80px)';
+            } else {
+                swipeContent.style.transform = 'translateX(0)';
+            }
+            swipeDistance = 0;
+        });
+
+        // Long Press Menu
+        let longPressTimer;
+        const longpress = document.getElementById('longpress');
+        const contextMenu = document.getElementById('context-menu');
+
+        longpress.addEventListener('touchstart', (e) => {
+            longPressTimer = setTimeout(() => {
+                const touch = e.touches[0];
+                contextMenu.style.left = `${touch.clientX - 90}px`;
+                contextMenu.style.top = `${touch.clientY + 10}px`;
+                contextMenu.classList.add('active');
+            }, 500);
+        });
+
+        longpress.addEventListener('touchend', () => {
+            clearTimeout(longPressTimer);
+        });
+
+        longpress.addEventListener('touchmove', () => {
+            clearTimeout(longPressTimer);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!contextMenu.contains(e.target) && e.target !== longpress) {
+                contextMenu.classList.remove('active');
+            }
+        });
+
+        function contextAction(action) {
+            showToast('info', `${action.charAt(0).toUpperCase() + action.slice(1)} action triggered`);
+            contextMenu.classList.remove('active');
+        }
+
+        // Counter
+        let counterValue = 0;
+        const counterDisplay = document.getElementById('counter-display');
+
+        function updateCounter(change) {
+            counterValue += change;
+            counterDisplay.textContent = counterValue;
+            counterDisplay.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                counterDisplay.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // Progress Button
+        let isLoading = false;
+        const progressBtn = document.getElementById('progress-btn');
+        const progressText = progressBtn.querySelector('.progress-text');
+
+        progressBtn.addEventListener('click', function() {
+            if (isLoading) return;
+
+            isLoading = true;
+            this.classList.add('loading');
+            progressText.textContent = 'Uploading...';
+
+            setTimeout(() => {
+                this.classList.remove('loading');
+                progressText.textContent = 'Complete!';
+
+                setTimeout(() => {
+                    progressText.textContent = 'Start Upload';
+                    isLoading = false;
+                }, 1000);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

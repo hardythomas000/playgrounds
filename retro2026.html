@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Retro 2026 Playground</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+        }
+
+        .nav {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            border-bottom: 1px solid #d2d2d7;
+            z-index: 100;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-inner {
+            display: flex;
+            min-width: min-content;
+            padding: 0 12px;
+        }
+
+        .nav button {
+            flex: 0 0 auto;
+            padding: 16px 20px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6e6e73;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav button.active {
+            color: #1d1d1f;
+            border-bottom-color: #0071e3;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .controls {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #6e6e73;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #d2d2d7;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #0071e3;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #0071e3;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #0071e3;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+            touch-action: manipulation;
+        }
+
+        .btn:active {
+            background: #0077ed;
+        }
+
+        .btn.secondary {
+            background: #e8e8ed;
+            color: #1d1d1f;
+        }
+
+        .btn.secondary:active {
+            background: #d2d2d7;
+        }
+
+        .btn.small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .canvas-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+        }
+
+        canvas {
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            touch-action: none;
+            max-width: 100%;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .color-swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            border: 2px solid #d2d2d7;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-swatch.active {
+            border-color: #0071e3;
+            border-width: 3px;
+        }
+
+        .pixel-preview {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .preview-box {
+            text-align: center;
+        }
+
+        .preview-box label {
+            display: block;
+            font-size: 12px;
+            color: #6e6e73;
+            margin-bottom: 8px;
+        }
+
+        .ascii-output {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-top: 16px;
+        }
+
+        .ascii-output pre {
+            font-family: monospace;
+            font-size: 10px;
+            line-height: 1;
+            overflow-x: auto;
+            white-space: pre;
+            color: #1d1d1f;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: system-ui;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .dark-canvas {
+            background: #1d1d1f !important;
+        }
+
+        canvas.dark-canvas {
+            border-color: #1d1d1f;
+        }
+
+        .crt-container {
+            position: relative;
+            display: inline-block;
+            background: #000;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .crt-screen {
+            position: relative;
+            background: #0a0a0a;
+            padding: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .crt-content {
+            background: #1a1a1a;
+            color: #0f0;
+            padding: 20px;
+            border-radius: 4px;
+            font-family: monospace;
+            position: relative;
+            z-index: 1;
+        }
+
+        .crt-scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            background: linear-gradient(
+                transparent 50%,
+                rgba(0, 0, 0, 0.3) 50%
+            );
+            background-size: 100% 4px;
+            opacity: 0;
+        }
+
+        .crt-scanlines.active {
+            opacity: 1;
+        }
+
+        .crt-screen.curved {
+            border-radius: 20px;
+            transform: perspective(500px) rotateX(0deg);
+        }
+
+        .crt-screen.vignette::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.6) 100%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.97; }
+        }
+
+        .crt-screen.flicker .crt-content {
+            animation: flicker 0.1s infinite;
+        }
+
+        .crt-screen.chromatic .crt-content {
+            text-shadow:
+                -2px 0 0 rgba(255, 0, 0, 0.5),
+                2px 0 0 rgba(0, 255, 255, 0.5);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .value-display {
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
+            font-weight: 600;
+            color: #0071e3;
+        }
+
+        .info-text {
+            font-size: 13px;
+            color: #6e6e73;
+            margin-top: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <button class="tab-btn active" data-tab="pixel">Pixel Editor</button>
+            <button class="tab-btn" data-tab="life">Conway's Life</button>
+            <button class="tab-btn" data-tab="ascii">ASCII Art</button>
+            <button class="tab-btn" data-tab="matrix">Matrix Rain</button>
+            <button class="tab-btn" data-tab="crt">CRT Effect</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Pixel Editor Tab -->
+        <div id="pixel-tab" class="tab-content active">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Grid Size: <span class="value-display" id="pixel-size-val">16</span>x<span class="value-display" id="pixel-size-val2">16</span></label>
+                    <input type="range" id="pixel-size" min="8" max="32" value="16" step="4">
+                </div>
+                <div class="control-group">
+                    <label>Color Palette</label>
+                    <div class="color-palette" id="color-palette"></div>
+                </div>
+                <div class="control-group button-row">
+                    <button class="btn secondary small" id="pixel-eraser">Eraser</button>
+                    <button class="btn secondary small" id="pixel-fill">Fill</button>
+                    <button class="btn secondary small" id="pixel-clear">Clear</button>
+                    <button class="btn small" id="pixel-download">Download</button>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <div class="pixel-preview">
+                    <div class="preview-box">
+                        <label>Edit (zoom)</label>
+                        <canvas id="pixel-canvas" width="512" height="512"></canvas>
+                    </div>
+                    <div class="preview-box">
+                        <label>Actual Size</label>
+                        <canvas id="pixel-preview" width="32" height="32"></canvas>
+                        <br><br>
+                        <label>8x Zoom</label>
+                        <canvas id="pixel-zoom" width="256" height="256"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conway's Life Tab -->
+        <div id="life-tab" class="tab-content">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Grid Size: <span class="value-display" id="life-size-val">40</span></label>
+                    <input type="range" id="life-size" min="20" max="80" value="40" step="10">
+                </div>
+                <div class="control-group">
+                    <label>Speed: <span class="value-display" id="life-speed-val">5</span></label>
+                    <input type="range" id="life-speed" min="1" max="20" value="5">
+                </div>
+                <div class="control-group button-row">
+                    <button class="btn" id="life-play">Play</button>
+                    <button class="btn secondary" id="life-step">Step</button>
+                    <button class="btn secondary" id="life-clear">Clear</button>
+                    <button class="btn secondary" id="life-random">Random</button>
+                </div>
+                <div class="control-group">
+                    <label>Presets</label>
+                    <div class="button-row">
+                        <button class="btn small secondary" data-preset="glider">Glider</button>
+                        <button class="btn small secondary" data-preset="blinker">Blinker</button>
+                        <button class="btn small secondary" data-preset="pulsar">Pulsar</button>
+                        <button class="btn small secondary" data-preset="gun">Glider Gun</button>
+                    </div>
+                </div>
+                <div class="info-text">Generation: <strong id="life-gen">0</strong></div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="life-canvas" width="600" height="600"></canvas>
+            </div>
+        </div>
+
+        <!-- ASCII Art Tab -->
+        <div id="ascii-tab" class="tab-content">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Enter Text</label>
+                    <textarea id="ascii-input" placeholder="Type something...">RETRO</textarea>
+                </div>
+                <div class="control-group">
+                    <label>Font Style</label>
+                    <select id="ascii-font">
+                        <option value="block">Block</option>
+                        <option value="shadow">Shadow</option>
+                        <option value="outline">Outline</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <button class="btn" id="ascii-copy">Copy to Clipboard</button>
+                </div>
+            </div>
+            <div class="ascii-output">
+                <pre id="ascii-result"></pre>
+            </div>
+        </div>
+
+        <!-- Matrix Rain Tab -->
+        <div id="matrix-tab" class="tab-content">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Speed: <span class="value-display" id="matrix-speed-val">5</span></label>
+                    <input type="range" id="matrix-speed" min="1" max="10" value="5">
+                </div>
+                <div class="control-group">
+                    <label>Density: <span class="value-display" id="matrix-density-val">5</span></label>
+                    <input type="range" id="matrix-density" min="1" max="10" value="5">
+                </div>
+                <div class="control-group">
+                    <label>Font Size: <span class="value-display" id="matrix-font-val">14</span></label>
+                    <input type="range" id="matrix-font" min="10" max="24" value="14">
+                </div>
+                <div class="control-group">
+                    <label>Color</label>
+                    <select id="matrix-color">
+                        <option value="#0f0">Green (Classic)</option>
+                        <option value="#00f">Blue</option>
+                        <option value="#f00">Red</option>
+                        <option value="#ffd700">Gold</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Character Set</label>
+                    <select id="matrix-charset">
+                        <option value="katakana">Katakana</option>
+                        <option value="latin">Latin</option>
+                        <option value="binary">Binary</option>
+                    </select>
+                </div>
+            </div>
+            <div class="canvas-container dark-canvas">
+                <canvas id="matrix-canvas" width="600" height="400" class="dark-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- CRT Effect Tab -->
+        <div id="crt-tab" class="tab-content">
+            <div class="controls">
+                <div class="control-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="crt-scanlines">
+                        <span>Scanlines</span>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="crt-curvature">
+                        <span>Screen Curvature</span>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="crt-chromatic">
+                        <span>Chromatic Aberration</span>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="crt-flicker">
+                        <span>Flicker</span>
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="crt-vignette">
+                        <span>Vignette</span>
+                    </label>
+                </div>
+            </div>
+            <div class="canvas-container dark-canvas">
+                <div class="crt-container">
+                    <div class="crt-screen" id="crt-screen">
+                        <div class="crt-scanlines" id="crt-scanlines-el"></div>
+                        <div class="crt-content">
+                            <h2 style="margin-bottom: 10px;">RETRO TERMINAL</h2>
+                            <p style="margin-bottom: 8px;">> SYSTEM READY_</p>
+                            <p style="margin-bottom: 8px;">> LOAD "RETRO2026"</p>
+                            <p style="margin-bottom: 8px;">> SEARCHING...</p>
+                            <p style="margin-bottom: 8px;">> LOADING...</p>
+                            <p style="color: #0f0; font-weight: bold;">OK</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+                btn.classList.add('active');
+                document.getElementById(tab + '-tab').classList.add('active');
+
+                // Initialize tab-specific animations
+                if (tab === 'matrix' && !matrixRunning) {
+                    initMatrix();
+                }
+            });
+        });
+
+        // ===== PIXEL EDITOR =====
+        const pixelCanvas = document.getElementById('pixel-canvas');
+        const pixelPreview = document.getElementById('pixel-preview');
+        const pixelZoom = document.getElementById('pixel-zoom');
+        const pixelCtx = pixelCanvas.getContext('2d');
+        const previewCtx = pixelPreview.getContext('2d');
+        const zoomCtx = pixelZoom.getContext('2d');
+
+        const colors = [
+            '#000000', '#ffffff', '#ff0000', '#00ff00',
+            '#0000ff', '#ffff00', '#ff00ff', '#00ffff',
+            '#ff8800', '#88ff00', '#0088ff', '#ff0088',
+            '#8800ff', '#00ff88', '#888888', '#ff8888'
+        ];
+
+        let currentColor = colors[0];
+        let gridSize = 16;
+        let eraserMode = false;
+        let fillMode = false;
+        let pixelData = [];
+
+        function initPixelEditor() {
+            const palette = document.getElementById('color-palette');
+            palette.innerHTML = '';
+            colors.forEach((color, i) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch' + (i === 0 ? ' active' : '');
+                swatch.style.background = color;
+                swatch.addEventListener('click', () => {
+                    currentColor = color;
+                    eraserMode = false;
+                    fillMode = false;
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                });
+                palette.appendChild(swatch);
+            });
+
+            pixelData = Array(gridSize).fill().map(() => Array(gridSize).fill('#ffffff'));
+            drawPixelGrid();
+        }
+
+        function drawPixelGrid() {
+            const cellSize = 512 / gridSize;
+            pixelCtx.fillStyle = '#ffffff';
+            pixelCtx.fillRect(0, 0, 512, 512);
+
+            // Draw pixels
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    pixelCtx.fillStyle = pixelData[y][x];
+                    pixelCtx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+            }
+
+            // Draw grid lines
+            pixelCtx.strokeStyle = '#e0e0e0';
+            pixelCtx.lineWidth = 1;
+            for (let i = 0; i <= gridSize; i++) {
+                pixelCtx.beginPath();
+                pixelCtx.moveTo(i * cellSize, 0);
+                pixelCtx.lineTo(i * cellSize, 512);
+                pixelCtx.stroke();
+
+                pixelCtx.beginPath();
+                pixelCtx.moveTo(0, i * cellSize);
+                pixelCtx.lineTo(512, i * cellSize);
+                pixelCtx.stroke();
+            }
+
+            updatePreviews();
+        }
+
+        function updatePreviews() {
+            // Actual size
+            pixelPreview.width = gridSize;
+            pixelPreview.height = gridSize;
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    previewCtx.fillStyle = pixelData[y][x];
+                    previewCtx.fillRect(x, y, 1, 1);
+                }
+            }
+
+            // 8x zoom
+            zoomCtx.imageSmoothingEnabled = false;
+            zoomCtx.clearRect(0, 0, 256, 256);
+            zoomCtx.drawImage(pixelPreview, 0, 0, 256, 256);
+        }
+
+        function floodFill(startX, startY, targetColor, fillColor) {
+            if (targetColor === fillColor) return;
+
+            const stack = [[startX, startY]];
+            while (stack.length) {
+                const [x, y] = stack.pop();
+                if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) continue;
+                if (pixelData[y][x] !== targetColor) continue;
+
+                pixelData[y][x] = fillColor;
+                stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+            }
+        }
+
+        function handlePixelClick(e) {
+            const rect = pixelCanvas.getBoundingClientRect();
+            const scaleX = pixelCanvas.width / rect.width;
+            const scaleY = pixelCanvas.height / rect.height;
+            const x = Math.floor((e.clientX - rect.left) * scaleX / (512 / gridSize));
+            const y = Math.floor((e.clientY - rect.top) * scaleY / (512 / gridSize));
+
+            if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+                if (fillMode) {
+                    floodFill(x, y, pixelData[y][x], currentColor);
+                } else {
+                    pixelData[y][x] = eraserMode ? '#ffffff' : currentColor;
+                }
+                drawPixelGrid();
+            }
+        }
+
+        let isDrawing = false;
+        pixelCanvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            handlePixelClick(e);
+        });
+        pixelCanvas.addEventListener('mousemove', (e) => {
+            if (isDrawing && !fillMode) handlePixelClick(e);
+        });
+        pixelCanvas.addEventListener('mouseup', () => isDrawing = false);
+
+        // Touch support
+        pixelCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            const touch = e.touches[0];
+            handlePixelClick(touch);
+        });
+        pixelCanvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (isDrawing && !fillMode) {
+                const touch = e.touches[0];
+                handlePixelClick(touch);
+            }
+        });
+        pixelCanvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isDrawing = false;
+        });
+
+        document.getElementById('pixel-size').addEventListener('input', (e) => {
+            gridSize = parseInt(e.target.value);
+            document.getElementById('pixel-size-val').textContent = gridSize;
+            document.getElementById('pixel-size-val2').textContent = gridSize;
+            pixelData = Array(gridSize).fill().map(() => Array(gridSize).fill('#ffffff'));
+            drawPixelGrid();
+        });
+
+        document.getElementById('pixel-eraser').addEventListener('click', () => {
+            eraserMode = !eraserMode;
+            fillMode = false;
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        });
+
+        document.getElementById('pixel-fill').addEventListener('click', () => {
+            fillMode = !fillMode;
+            eraserMode = false;
+        });
+
+        document.getElementById('pixel-clear').addEventListener('click', () => {
+            pixelData = Array(gridSize).fill().map(() => Array(gridSize).fill('#ffffff'));
+            drawPixelGrid();
+        });
+
+        document.getElementById('pixel-download').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'pixel-art.png';
+            link.href = pixelZoom.toDataURL();
+            link.click();
+        });
+
+        initPixelEditor();
+
+        // ===== CONWAY'S GAME OF LIFE =====
+        const lifeCanvas = document.getElementById('life-canvas');
+        const lifeCtx = lifeCanvas.getContext('2d');
+        let lifeSize = 40;
+        let lifeSpeed = 5;
+        let lifeGrid = [];
+        let lifeRunning = false;
+        let lifeInterval = null;
+        let generation = 0;
+
+        function initLife() {
+            lifeGrid = Array(lifeSize).fill().map(() => Array(lifeSize).fill(false));
+            generation = 0;
+            document.getElementById('life-gen').textContent = generation;
+            drawLife();
+        }
+
+        function drawLife() {
+            const cellSize = 600 / lifeSize;
+            lifeCtx.fillStyle = '#f5f5f7';
+            lifeCtx.fillRect(0, 0, 600, 600);
+
+            lifeCtx.fillStyle = '#1d1d1f';
+            for (let y = 0; y < lifeSize; y++) {
+                for (let x = 0; x < lifeSize; x++) {
+                    if (lifeGrid[y][x]) {
+                        lifeCtx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+                    }
+                }
+            }
+        }
+
+        function stepLife() {
+            const newGrid = Array(lifeSize).fill().map(() => Array(lifeSize).fill(false));
+
+            for (let y = 0; y < lifeSize; y++) {
+                for (let x = 0; x < lifeSize; x++) {
+                    let neighbors = 0;
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            if (dx === 0 && dy === 0) continue;
+                            const ny = (y + dy + lifeSize) % lifeSize;
+                            const nx = (x + dx + lifeSize) % lifeSize;
+                            if (lifeGrid[ny][nx]) neighbors++;
+                        }
+                    }
+
+                    if (lifeGrid[y][x]) {
+                        newGrid[y][x] = neighbors === 2 || neighbors === 3;
+                    } else {
+                        newGrid[y][x] = neighbors === 3;
+                    }
+                }
+            }
+
+            lifeGrid = newGrid;
+            generation++;
+            document.getElementById('life-gen').textContent = generation;
+            drawLife();
+        }
+
+        function handleLifeClick(e) {
+            const rect = lifeCanvas.getBoundingClientRect();
+            const scaleX = lifeCanvas.width / rect.width;
+            const scaleY = lifeCanvas.height / rect.height;
+            const x = Math.floor((e.clientX - rect.left) * scaleX / (600 / lifeSize));
+            const y = Math.floor((e.clientY - rect.top) * scaleY / (600 / lifeSize));
+
+            if (x >= 0 && x < lifeSize && y >= 0 && y < lifeSize) {
+                lifeGrid[y][x] = !lifeGrid[y][x];
+                drawLife();
+            }
+        }
+
+        lifeCanvas.addEventListener('click', handleLifeClick);
+        lifeCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            handleLifeClick(touch);
+        });
+
+        document.getElementById('life-size').addEventListener('input', (e) => {
+            lifeSize = parseInt(e.target.value);
+            document.getElementById('life-size-val').textContent = lifeSize;
+            initLife();
+        });
+
+        document.getElementById('life-speed').addEventListener('input', (e) => {
+            lifeSpeed = parseInt(e.target.value);
+            document.getElementById('life-speed-val').textContent = lifeSpeed;
+            if (lifeRunning) {
+                clearInterval(lifeInterval);
+                lifeInterval = setInterval(stepLife, 1000 / lifeSpeed);
+            }
+        });
+
+        document.getElementById('life-play').addEventListener('click', () => {
+            lifeRunning = !lifeRunning;
+            const btn = document.getElementById('life-play');
+            if (lifeRunning) {
+                btn.textContent = 'Pause';
+                lifeInterval = setInterval(stepLife, 1000 / lifeSpeed);
+            } else {
+                btn.textContent = 'Play';
+                clearInterval(lifeInterval);
+            }
+        });
+
+        document.getElementById('life-step').addEventListener('click', stepLife);
+        document.getElementById('life-clear').addEventListener('click', initLife);
+        document.getElementById('life-random').addEventListener('click', () => {
+            for (let y = 0; y < lifeSize; y++) {
+                for (let x = 0; x < lifeSize; x++) {
+                    lifeGrid[y][x] = Math.random() < 0.3;
+                }
+            }
+            drawLife();
+        });
+
+        // Presets
+        const presets = {
+            glider: [[0,1],[1,2],[2,0],[2,1],[2,2]],
+            blinker: [[0,1],[1,1],[2,1]],
+            pulsar: [
+                [2,4],[2,5],[2,6],[2,10],[2,11],[2,12],
+                [4,2],[4,7],[4,9],[4,14],
+                [5,2],[5,7],[5,9],[5,14],
+                [6,2],[6,7],[6,9],[6,14],
+                [7,4],[7,5],[7,6],[7,10],[7,11],[7,12],
+                [9,4],[9,5],[9,6],[9,10],[9,11],[9,12],
+                [10,2],[10,7],[10,9],[10,14],
+                [11,2],[11,7],[11,9],[11,14],
+                [12,2],[12,7],[12,9],[12,14],
+                [14,4],[14,5],[14,6],[14,10],[14,11],[14,12]
+            ],
+            gun: [
+                [5,1],[5,2],[6,1],[6,2],
+                [5,11],[6,11],[7,11],[4,12],[8,12],[3,13],[9,13],[3,14],[9,14],
+                [6,15],[4,16],[8,16],[5,17],[6,17],[7,17],[6,18],
+                [3,21],[4,21],[5,21],[3,22],[4,22],[5,22],[2,23],[6,23],
+                [1,25],[2,25],[6,25],[7,25],
+                [3,35],[4,35],[3,36],[4,36]
+            ]
+        };
+
+        document.querySelectorAll('[data-preset]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                initLife();
+                const preset = presets[btn.dataset.preset];
+                const offsetX = Math.floor(lifeSize / 2) - 10;
+                const offsetY = Math.floor(lifeSize / 2) - 10;
+                preset.forEach(([y, x]) => {
+                    const ny = y + offsetY;
+                    const nx = x + offsetX;
+                    if (ny >= 0 && ny < lifeSize && nx >= 0 && nx < lifeSize) {
+                        lifeGrid[ny][nx] = true;
+                    }
+                });
+                drawLife();
+            });
+        });
+
+        initLife();
+
+        // ===== ASCII ART =====
+        const asciiInput = document.getElementById('ascii-input');
+        const asciiFontSelect = document.getElementById('ascii-font');
+        const asciiResult = document.getElementById('ascii-result');
+
+        const fonts = {
+            block: {
+                'A': ['  ##  ', ' #  # ', '######', '#    #', '#    #'],
+                'B': ['##### ', '#    #', '##### ', '#    #', '##### '],
+                'C': [' #### ', '#    #', '#     ', '#    #', ' #### '],
+                'D': ['##### ', '#    #', '#    #', '#    #', '##### '],
+                'E': ['######', '#     ', '##### ', '#     ', '######'],
+                'F': ['######', '#     ', '##### ', '#     ', '#     '],
+                'G': [' #### ', '#     ', '#  ###', '#    #', ' #### '],
+                'H': ['#    #', '#    #', '######', '#    #', '#    #'],
+                'I': ['######', '  ##  ', '  ##  ', '  ##  ', '######'],
+                'J': ['######', '   ## ', '   ## ', '#  ## ', ' ###  '],
+                'K': ['#   # ', '#  #  ', '###   ', '#  #  ', '#   # '],
+                'L': ['#     ', '#     ', '#     ', '#     ', '######'],
+                'M': ['#    #', '##  ##', '# ## #', '#    #', '#    #'],
+                'N': ['#    #', '##   #', '# #  #', '#  # #', '#   ##'],
+                'O': [' #### ', '#    #', '#    #', '#    #', ' #### '],
+                'P': ['##### ', '#    #', '##### ', '#     ', '#     '],
+                'Q': [' #### ', '#    #', '#    #', '#  # #', ' ### #'],
+                'R': ['##### ', '#    #', '##### ', '#  #  ', '#   # '],
+                'S': [' #### ', '#     ', ' #### ', '     #', ' #### '],
+                'T': ['######', '  ##  ', '  ##  ', '  ##  ', '  ##  '],
+                'U': ['#    #', '#    #', '#    #', '#    #', ' #### '],
+                'V': ['#    #', '#    #', '#    #', ' #  # ', '  ##  '],
+                'W': ['#    #', '#    #', '# ## #', '##  ##', '#    #'],
+                'X': ['#    #', ' #  # ', '  ##  ', ' #  # ', '#    #'],
+                'Y': ['#    #', ' #  # ', '  ##  ', '  ##  ', '  ##  '],
+                'Z': ['######', '    # ', '  ##  ', ' #    ', '######'],
+                '0': [' #### ', '#   ##', '# #  #', '##   #', ' #### '],
+                '1': ['  ##  ', ' ###  ', '  ##  ', '  ##  ', '######'],
+                '2': [' #### ', '#    #', '   ## ', ' ##   ', '######'],
+                '3': [' #### ', '#    #', '  ### ', '#    #', ' #### '],
+                '4': ['#   # ', '#   # ', '######', '    # ', '    # '],
+                '5': ['######', '#     ', '##### ', '     #', '##### '],
+                '6': [' #### ', '#     ', '##### ', '#    #', ' #### '],
+                '7': ['######', '    # ', '   #  ', '  #   ', ' #    '],
+                '8': [' #### ', '#    #', ' #### ', '#    #', ' #### '],
+                '9': [' #### ', '#    #', ' #####', '     #', ' #### '],
+                ' ': ['      ', '      ', '      ', '      ', '      '],
+                '!': ['  ##  ', '  ##  ', '  ##  ', '      ', '  ##  '],
+                '?': [' #### ', '#    #', '   ## ', '      ', '  ##  ']
+            },
+            shadow: {
+                'A': ['  ##    ', ' #  #   ', '######  ', '#    ## ', '#    ## '],
+                'B': ['#####   ', '#    ##  ', '#####   ', '#    ##  ', '#####   '],
+                'C': [' ####   ', '#    ##  ', '#       ', '#    ##  ', ' ####   '],
+                'D': ['#####   ', '#    ##  ', '#    ##  ', '#    ##  ', '#####   '],
+                'E': ['######  ', '#       ', '#####   ', '#       ', '######  '],
+                'R': ['#####   ', '#    ##  ', '#####   ', '#  ##   ', '#   ##  '],
+                'T': ['######  ', '  ##    ', '  ##    ', '  ##    ', '  ##    '],
+                'O': [' ####   ', '#    ##  ', '#    ##  ', '#    ##  ', ' ####   '],
+                ' ': ['        ', '        ', '        ', '        ', '        ']
+            },
+            outline: {
+                'A': ['  ##  ', ' #  # ', '# ## #', '#    #', '#    #'],
+                'B': ['#### ', '#   #', '#### ', '#   #', '#### '],
+                'C': [' ### ', '#   #', '#    ', '#   #', ' ### '],
+                'D': ['#### ', '#   #', '#   #', '#   #', '#### '],
+                'E': ['#####', '#    ', '#### ', '#    ', '#####'],
+                'R': ['#### ', '#   #', '#### ', '#  # ', '#   #'],
+                'T': ['#####', '  #  ', '  #  ', '  #  ', '  #  '],
+                'O': [' ### ', '#   #', '#   #', '#   #', ' ### '],
+                ' ': ['     ', '     ', '     ', '     ', '     ']
+            }
+        };
+
+        // Fill in missing letters for shadow and outline
+        for (let char in fonts.block) {
+            if (!fonts.shadow[char]) fonts.shadow[char] = fonts.block[char];
+            if (!fonts.outline[char]) fonts.outline[char] = fonts.block[char];
+        }
+
+        function generateASCII() {
+            const text = asciiInput.value.toUpperCase();
+            const font = fonts[asciiFontSelect.value];
+            const lines = ['', '', '', '', ''];
+
+            for (let char of text) {
+                const charData = font[char] || font[' '];
+                for (let i = 0; i < 5; i++) {
+                    lines[i] += charData[i] + ' ';
+                }
+            }
+
+            asciiResult.textContent = lines.join('\n');
+        }
+
+        asciiInput.addEventListener('input', generateASCII);
+        asciiFontSelect.addEventListener('change', generateASCII);
+        document.getElementById('ascii-copy').addEventListener('click', () => {
+            navigator.clipboard.writeText(asciiResult.textContent).then(() => {
+                const btn = document.getElementById('ascii-copy');
+                const oldText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = oldText, 2000);
+            });
+        });
+
+        generateASCII();
+
+        // ===== MATRIX RAIN =====
+        const matrixCanvas = document.getElementById('matrix-canvas');
+        const matrixCtx = matrixCanvas.getContext('2d');
+        let matrixRunning = false;
+        let matrixColumns = [];
+        let matrixChars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        let matrixColor = '#0f0';
+        let matrixFontSize = 14;
+        let matrixSpeed = 5;
+        let matrixDensity = 5;
+
+        function initMatrix() {
+            matrixCanvas.width = 600;
+            matrixCanvas.height = 400;
+            const cols = Math.floor(matrixCanvas.width / matrixFontSize);
+            matrixColumns = Array(cols).fill().map(() => ({
+                y: Math.random() * matrixCanvas.height,
+                speed: Math.random() * matrixSpeed + 1
+            }));
+
+            if (!matrixRunning) {
+                matrixRunning = true;
+                animateMatrix();
+            }
+        }
+
+        function animateMatrix() {
+            if (!matrixRunning) return;
+
+            matrixCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+            matrixCtx.fillStyle = matrixColor;
+            matrixCtx.font = matrixFontSize + 'px monospace';
+
+            for (let i = 0; i < matrixColumns.length; i++) {
+                if (Math.random() < matrixDensity / 100) {
+                    const char = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
+                    const x = i * matrixFontSize;
+                    const y = matrixColumns[i].y;
+
+                    matrixCtx.fillText(char, x, y);
+
+                    matrixColumns[i].y += matrixColumns[i].speed;
+
+                    if (matrixColumns[i].y > matrixCanvas.height && Math.random() > 0.975) {
+                        matrixColumns[i].y = 0;
+                    }
+                }
+            }
+
+            requestAnimationFrame(animateMatrix);
+        }
+
+        document.getElementById('matrix-speed').addEventListener('input', (e) => {
+            matrixSpeed = parseInt(e.target.value);
+            document.getElementById('matrix-speed-val').textContent = matrixSpeed;
+            matrixColumns.forEach(col => col.speed = Math.random() * matrixSpeed + 1);
+        });
+
+        document.getElementById('matrix-density').addEventListener('input', (e) => {
+            matrixDensity = parseInt(e.target.value);
+            document.getElementById('matrix-density-val').textContent = matrixDensity;
+        });
+
+        document.getElementById('matrix-font').addEventListener('input', (e) => {
+            matrixFontSize = parseInt(e.target.value);
+            document.getElementById('matrix-font-val').textContent = matrixFontSize;
+            initMatrix();
+        });
+
+        document.getElementById('matrix-color').addEventListener('change', (e) => {
+            matrixColor = e.target.value;
+        });
+
+        document.getElementById('matrix-charset').addEventListener('change', (e) => {
+            const charsets = {
+                katakana: 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン',
+                latin: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*',
+                binary: '01'
+            };
+            matrixChars = charsets[e.target.value];
+        });
+
+        // ===== CRT EFFECT =====
+        const crtScreen = document.getElementById('crt-screen');
+        const crtScanlinesEl = document.getElementById('crt-scanlines-el');
+
+        document.getElementById('crt-scanlines').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                crtScanlinesEl.classList.add('active');
+            } else {
+                crtScanlinesEl.classList.remove('active');
+            }
+        });
+
+        document.getElementById('crt-curvature').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                crtScreen.classList.add('curved');
+            } else {
+                crtScreen.classList.remove('curved');
+            }
+        });
+
+        document.getElementById('crt-chromatic').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                crtScreen.classList.add('chromatic');
+            } else {
+                crtScreen.classList.remove('chromatic');
+            }
+        });
+
+        document.getElementById('crt-flicker').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                crtScreen.classList.add('flicker');
+            } else {
+                crtScreen.classList.remove('flicker');
+            }
+        });
+
+        document.getElementById('crt-vignette').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                crtScreen.classList.add('vignette');
+            } else {
+                crtScreen.classList.remove('vignette');
+            }
+        });
+    </script>
+</body>
+</html>
