@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Typography Playground 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            padding-bottom: 3rem;
+        }
+
+        header {
+            background: #fff;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 0.5rem;
+        }
+
+        nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        nav button {
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
+            background: #f5f5f7;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        nav button.active {
+            background: #1d1d1f;
+            color: #fff;
+            border-color: #1d1d1f;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .controls {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .control-group {
+            margin-bottom: 1rem;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1d1d1f;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #d2d2d7;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1d1d1f;
+            cursor: pointer;
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1d1d1f;
+            cursor: pointer;
+            border: none;
+        }
+
+        .control-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .control-value {
+            display: inline-block;
+            font-size: 0.875rem;
+            color: #6e6e73;
+            margin-left: 0.5rem;
+        }
+
+        .preview {
+            background: #fff;
+            padding: 2rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Type Scale Styles */
+        .type-scale-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .type-scale-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .type-meta {
+            font-size: 0.75rem;
+            color: #6e6e73;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Font Pairing Styles */
+        .pairing-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .pairing-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid #e8e8ed;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pairing-card:hover {
+            border-color: #d2d2d7;
+        }
+
+        .pairing-card.selected {
+            border-color: #1d1d1f;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .pairing-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6e6e73;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .pairing-heading {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .pairing-body {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #1d1d1f;
+        }
+
+        /* Paragraph Tuner Styles */
+        .stats {
+            font-size: 0.875rem;
+            color: #6e6e73;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f5f5f7;
+        }
+
+        /* Vertical Rhythm Styles */
+        .rhythm-container {
+            position: relative;
+        }
+
+        .baseline-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+            display: none;
+        }
+
+        .baseline-grid.show {
+            display: block;
+        }
+
+        .rhythm-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Responsive Type Styles */
+        .viewport-simulator {
+            background: #fff;
+            border: 2px solid #1d1d1f;
+            border-radius: 8px;
+            padding: 2rem 1.5rem;
+            margin: 0 auto;
+            transition: width 0.3s;
+            overflow: hidden;
+        }
+
+        .viewport-info {
+            font-size: 0.75rem;
+            color: #6e6e73;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .button-group button {
+            flex: 1;
+            min-width: 80px;
+            padding: 0.5rem;
+            background: #f5f5f7;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .button-group button.active {
+            background: #1d1d1f;
+            color: #fff;
+            border-color: #1d1d1f;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Typography Playground</h1>
+        <nav>
+            <button class="tab-btn active" data-tab="type-scale">Type Scale</button>
+            <button class="tab-btn" data-tab="font-pairing">Font Pairing</button>
+            <button class="tab-btn" data-tab="paragraph-tuner">Paragraph Tuner</button>
+            <button class="tab-btn" data-tab="vertical-rhythm">Vertical Rhythm</button>
+            <button class="tab-btn" data-tab="responsive-type">Responsive Type</button>
+        </nav>
+    </header>
+
+    <!-- Type Scale Tab -->
+    <div id="type-scale" class="tab-content active">
+        <div class="controls">
+            <div class="control-group">
+                <label>
+                    Base Size: <span class="control-value" id="base-size-value">16px</span>
+                </label>
+                <input type="range" id="base-size" min="12" max="20" value="16" step="1">
+            </div>
+            <div class="control-group">
+                <label>Scale Ratio</label>
+                <select id="scale-ratio">
+                    <option value="1.125">1.125 - Major Second</option>
+                    <option value="1.2">1.2 - Minor Third</option>
+                    <option value="1.25" selected>1.25 - Major Third</option>
+                    <option value="1.333">1.333 - Perfect Fourth</option>
+                    <option value="1.414">1.414 - Augmented Fourth</option>
+                    <option value="1.5">1.5 - Perfect Fifth</option>
+                    <option value="1.618">1.618 - Golden Ratio</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Font Family</label>
+                <select id="font-family">
+                    <option value="system-ui, -apple-system, sans-serif">System Sans</option>
+                    <option value="Georgia, 'Times New Roman', serif">Serif (Georgia)</option>
+                    <option value="'Palatino Linotype', Palatino, serif">Serif (Palatino)</option>
+                    <option value="'Courier New', Courier, monospace">Monospace</option>
+                    <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>
+                    Line Height: <span class="control-value" id="line-height-value">1.5</span>
+                </label>
+                <input type="range" id="line-height" min="1" max="2" value="1.5" step="0.05">
+            </div>
+        </div>
+        <div class="preview" id="type-scale-preview"></div>
+    </div>
+
+    <!-- Font Pairing Tab -->
+    <div id="font-pairing" class="tab-content">
+        <div class="pairing-grid" id="pairing-grid"></div>
+    </div>
+
+    <!-- Paragraph Tuner Tab -->
+    <div id="paragraph-tuner" class="tab-content">
+        <div class="controls">
+            <div class="control-group">
+                <label>
+                    Font Size: <span class="control-value" id="para-size-value">16px</span>
+                </label>
+                <input type="range" id="para-size" min="12" max="24" value="16" step="1">
+            </div>
+            <div class="control-group">
+                <label>
+                    Line Height: <span class="control-value" id="para-line-height-value">1.6</span>
+                </label>
+                <input type="range" id="para-line-height" min="1" max="2.5" value="1.6" step="0.05">
+            </div>
+            <div class="control-group">
+                <label>
+                    Letter Spacing: <span class="control-value" id="para-letter-spacing-value">0em</span>
+                </label>
+                <input type="range" id="para-letter-spacing" min="-0.05" max="0.2" value="0" step="0.005">
+            </div>
+            <div class="control-group">
+                <label>
+                    Word Spacing: <span class="control-value" id="para-word-spacing-value">0em</span>
+                </label>
+                <input type="range" id="para-word-spacing" min="-0.1" max="0.5" value="0" step="0.05">
+            </div>
+            <div class="control-group">
+                <label>
+                    Max Width (Measure): <span class="control-value" id="para-max-width-value">65ch</span>
+                </label>
+                <input type="range" id="para-max-width" min="45" max="90" value="65" step="5">
+            </div>
+            <div class="control-group">
+                <label>
+                    Text Indent: <span class="control-value" id="para-indent-value">0em</span>
+                </label>
+                <input type="range" id="para-indent" min="0" max="3" value="0" step="0.25">
+            </div>
+            <div class="control-group">
+                <label>Text Align</label>
+                <div class="button-group">
+                    <button class="align-btn active" data-align="left">Left</button>
+                    <button class="align-btn" data-align="center">Center</button>
+                    <button class="align-btn" data-align="right">Right</button>
+                    <button class="align-btn" data-align="justify">Justify</button>
+                </div>
+            </div>
+        </div>
+        <div class="preview">
+            <p id="tuner-paragraph">
+                Typography is the art and technique of arranging type to make written language legible, readable, and appealing when displayed. The arrangement of type involves selecting typefaces, point sizes, line lengths, line-spacing (leading), and letter-spacing (tracking), as well as adjusting the space between pairs of letters (kerning). The term typography is also applied to the style, arrangement, and appearance of the letters, numbers, and symbols created by the process. Type design is a closely related craft, sometimes considered part of typography; most typographers do not design typefaces, and some type designers do not consider themselves typographers.
+            </p>
+            <div class="stats" id="para-stats"></div>
+        </div>
+    </div>
+
+    <!-- Vertical Rhythm Tab -->
+    <div id="vertical-rhythm" class="tab-content">
+        <div class="controls">
+            <div class="control-group">
+                <label>Base Unit (Grid)</label>
+                <div class="button-group">
+                    <button class="base-unit-btn active" data-unit="4">4px</button>
+                    <button class="base-unit-btn" data-unit="6">6px</button>
+                    <button class="base-unit-btn" data-unit="8">8px</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="show-grid" checked>
+                    <label for="show-grid">Show Baseline Grid</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>
+                    Heading Spacing: <span class="control-value" id="heading-spacing-value">3 units</span>
+                </label>
+                <input type="range" id="heading-spacing" min="1" max="8" value="3" step="1">
+            </div>
+            <div class="control-group">
+                <label>
+                    Paragraph Spacing: <span class="control-value" id="paragraph-spacing-value">4 units</span>
+                </label>
+                <input type="range" id="paragraph-spacing" min="1" max="8" value="4" step="1">
+            </div>
+        </div>
+        <div class="preview">
+            <div class="rhythm-container">
+                <canvas class="baseline-grid show" id="baseline-canvas"></canvas>
+                <div class="rhythm-content" id="rhythm-content">
+                    <h2 style="font-size: 1.75rem; font-weight: 600;">The Principles of Vertical Rhythm</h2>
+                    <p>Vertical rhythm is a concept that helps you create balance and harmony in your designs. It's all about creating consistent spacing between elements on a page, especially text.</p>
+                    <p>By aligning all elements to a baseline grid, you create a sense of order and make your content easier to read. This technique has been used in print design for centuries and translates beautifully to the web.</p>
+                    <h3 style="font-size: 1.25rem; font-weight: 600;">Why It Matters</h3>
+                    <p>Consistent vertical rhythm improves readability and creates a professional, polished look. When text sits on a predictable baseline, the eye can move more smoothly down the page.</p>
+                    <p>The baseline grid acts as an invisible framework that guides the placement of all elements, ensuring mathematical precision in your layouts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Responsive Type Tab -->
+    <div id="responsive-type" class="tab-content">
+        <div class="controls">
+            <div class="control-group">
+                <label>
+                    Viewport Width: <span class="control-value" id="viewport-width-value">375px</span>
+                </label>
+                <input type="range" id="viewport-width" min="320" max="1200" value="375" step="10">
+            </div>
+            <div class="control-group">
+                <label>Scaling Method</label>
+                <div class="button-group">
+                    <button class="scaling-btn active" data-method="clamp">CSS Clamp</button>
+                    <button class="scaling-btn" data-method="viewport">Viewport Units</button>
+                    <button class="scaling-btn" data-method="media">Media Queries</button>
+                </div>
+            </div>
+        </div>
+        <div class="preview">
+            <div class="viewport-simulator" id="viewport-simulator">
+                <h2 id="responsive-heading">Responsive Typography</h2>
+                <p id="responsive-body">
+                    This text scales fluidly based on the viewport width. The heading uses CSS clamp() for smooth, controlled scaling between minimum and maximum sizes. This approach ensures optimal readability at all screen sizes, from mobile phones to desktop monitors.
+                </p>
+            </div>
+            <div class="viewport-info" id="viewport-info"></div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.dataset.tab;
+
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                btn.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Type Scale
+        const baseSize = document.getElementById('base-size');
+        const baseSizeValue = document.getElementById('base-size-value');
+        const scaleRatio = document.getElementById('scale-ratio');
+        const fontFamily = document.getElementById('font-family');
+        const lineHeight = document.getElementById('line-height');
+        const lineHeightValue = document.getElementById('line-height-value');
+        const typeScalePreview = document.getElementById('type-scale-preview');
+
+        function updateTypeScale() {
+            const base = parseInt(baseSize.value);
+            const ratio = parseFloat(scaleRatio.value);
+            const lh = parseFloat(lineHeight.value);
+            const font = fontFamily.value;
+
+            baseSizeValue.textContent = `${base}px`;
+            lineHeightValue.textContent = lh.toFixed(2);
+
+            const scales = [
+                { name: 'H1', level: 4 },
+                { name: 'H2', level: 3 },
+                { name: 'H3', level: 2 },
+                { name: 'H4', level: 1 },
+                { name: 'Body', level: 0 },
+                { name: 'Small', level: -1 },
+                { name: 'Caption', level: -2 }
+            ];
+
+            let html = '';
+            scales.forEach(scale => {
+                const size = Math.round(base * Math.pow(ratio, scale.level));
+                html += `
+                    <div class="type-scale-item">
+                        <div class="type-meta">${scale.name}: ${size}px (${ratio}^${scale.level})</div>
+                        <div style="font-size: ${size}px; line-height: ${lh}; font-family: ${font}; font-weight: ${scale.level >= 0 ? 600 : 400};">
+                            The quick brown fox jumps over the lazy dog
+                        </div>
+                    </div>
+                `;
+            });
+
+            typeScalePreview.innerHTML = html;
+        }
+
+        baseSize.addEventListener('input', updateTypeScale);
+        scaleRatio.addEventListener('change', updateTypeScale);
+        fontFamily.addEventListener('change', updateTypeScale);
+        lineHeight.addEventListener('input', updateTypeScale);
+
+        updateTypeScale();
+
+        // Font Pairing
+        const pairingGrid = document.getElementById('pairing-grid');
+        const pairings = [
+            {
+                name: 'Classic Editorial',
+                heading: 'Georgia, serif',
+                body: 'system-ui, sans-serif',
+                sample: 'The art of combining typefaces'
+            },
+            {
+                name: 'Modern Contrast',
+                heading: 'system-ui, sans-serif',
+                body: "'Courier New', monospace",
+                sample: 'Code meets clean design'
+            },
+            {
+                name: 'Traditional Elegance',
+                heading: "'Palatino Linotype', Palatino, serif",
+                body: 'Georgia, serif',
+                sample: 'Timeless typography pairing'
+            },
+            {
+                name: 'Tech Documentation',
+                heading: 'Verdana, sans-serif',
+                body: "'Courier New', monospace",
+                sample: 'Perfect for technical content'
+            },
+            {
+                name: 'Friendly Humanist',
+                heading: "'Trebuchet MS', sans-serif",
+                body: 'Verdana, sans-serif',
+                sample: 'Approachable and readable'
+            },
+            {
+                name: 'Monospace Minimalist',
+                heading: "'Courier New', monospace",
+                body: "'Courier New', monospace",
+                sample: 'Consistent terminal aesthetic'
+            }
+        ];
+
+        pairings.forEach((pairing, index) => {
+            const card = document.createElement('div');
+            card.className = 'pairing-card';
+            card.innerHTML = `
+                <div class="pairing-name">${pairing.name}</div>
+                <div class="pairing-heading" style="font-family: ${pairing.heading};">
+                    ${pairing.sample}
+                </div>
+                <div class="pairing-body" style="font-family: ${pairing.body};">
+                    This combination pairs ${pairing.heading.split(',')[0]} for headings with ${pairing.body.split(',')[0]} for body text, creating visual hierarchy and readability.
+                </div>
+            `;
+
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.pairing-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+
+            pairingGrid.appendChild(card);
+        });
+
+        // Paragraph Tuner
+        const paraSize = document.getElementById('para-size');
+        const paraSizeValue = document.getElementById('para-size-value');
+        const paraLineHeight = document.getElementById('para-line-height');
+        const paraLineHeightValue = document.getElementById('para-line-height-value');
+        const paraLetterSpacing = document.getElementById('para-letter-spacing');
+        const paraLetterSpacingValue = document.getElementById('para-letter-spacing-value');
+        const paraWordSpacing = document.getElementById('para-word-spacing');
+        const paraWordSpacingValue = document.getElementById('para-word-spacing-value');
+        const paraMaxWidth = document.getElementById('para-max-width');
+        const paraMaxWidthValue = document.getElementById('para-max-width-value');
+        const paraIndent = document.getElementById('para-indent');
+        const paraIndentValue = document.getElementById('para-indent-value');
+        const tunerParagraph = document.getElementById('tuner-paragraph');
+        const paraStats = document.getElementById('para-stats');
+        const alignBtns = document.querySelectorAll('.align-btn');
+
+        let currentAlign = 'left';
+
+        function updateParagraph() {
+            const size = parseInt(paraSize.value);
+            const lh = parseFloat(paraLineHeight.value);
+            const ls = parseFloat(paraLetterSpacing.value);
+            const ws = parseFloat(paraWordSpacing.value);
+            const mw = parseInt(paraMaxWidth.value);
+            const indent = parseFloat(paraIndent.value);
+
+            paraSizeValue.textContent = `${size}px`;
+            paraLineHeightValue.textContent = lh.toFixed(2);
+            paraLetterSpacingValue.textContent = `${ls.toFixed(3)}em`;
+            paraWordSpacingValue.textContent = `${ws.toFixed(2)}em`;
+            paraMaxWidthValue.textContent = `${mw}ch`;
+            paraIndentValue.textContent = `${indent.toFixed(2)}em`;
+
+            tunerParagraph.style.fontSize = `${size}px`;
+            tunerParagraph.style.lineHeight = lh;
+            tunerParagraph.style.letterSpacing = `${ls}em`;
+            tunerParagraph.style.wordSpacing = `${ws}em`;
+            tunerParagraph.style.maxWidth = `${mw}ch`;
+            tunerParagraph.style.textIndent = `${indent}em`;
+            tunerParagraph.style.textAlign = currentAlign;
+
+            // Calculate CPL (characters per line)
+            const text = tunerParagraph.textContent;
+            const words = text.split(' ');
+            const avgWordLength = text.replace(/\s/g, '').length / words.length;
+            const approxCPL = Math.round(mw / (1 + ws + ls));
+
+            paraStats.innerHTML = `
+                <strong>Readability Metrics:</strong><br>
+                Approximate CPL: ${approxCPL} (optimal: 45-75)<br>
+                Line height: ${(size * lh).toFixed(1)}px<br>
+                Max width: ${mw} characters
+            `;
+        }
+
+        paraSize.addEventListener('input', updateParagraph);
+        paraLineHeight.addEventListener('input', updateParagraph);
+        paraLetterSpacing.addEventListener('input', updateParagraph);
+        paraWordSpacing.addEventListener('input', updateParagraph);
+        paraMaxWidth.addEventListener('input', updateParagraph);
+        paraIndent.addEventListener('input', updateParagraph);
+
+        alignBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                alignBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentAlign = btn.dataset.align;
+                updateParagraph();
+            });
+        });
+
+        updateParagraph();
+
+        // Vertical Rhythm
+        const baseUnitBtns = document.querySelectorAll('.base-unit-btn');
+        const showGrid = document.getElementById('show-grid');
+        const headingSpacing = document.getElementById('heading-spacing');
+        const headingSpacingValue = document.getElementById('heading-spacing-value');
+        const paragraphSpacing = document.getElementById('paragraph-spacing');
+        const paragraphSpacingValue = document.getElementById('paragraph-spacing-value');
+        const baselineCanvas = document.getElementById('baseline-canvas');
+        const rhythmContent = document.getElementById('rhythm-content');
+
+        let currentBaseUnit = 4;
+
+        function updateVerticalRhythm() {
+            const hSpacing = parseInt(headingSpacing.value);
+            const pSpacing = parseInt(paragraphSpacing.value);
+
+            headingSpacingValue.textContent = `${hSpacing} units`;
+            paragraphSpacingValue.textContent = `${pSpacing} units`;
+
+            // Update content spacing
+            const headings = rhythmContent.querySelectorAll('h2, h3');
+            const paragraphs = rhythmContent.querySelectorAll('p');
+
+            headings.forEach(h => {
+                h.style.marginTop = `${hSpacing * currentBaseUnit}px`;
+                h.style.marginBottom = `${currentBaseUnit}px`;
+            });
+
+            paragraphs.forEach(p => {
+                p.style.marginBottom = `${pSpacing * currentBaseUnit}px`;
+            });
+
+            // Draw baseline grid
+            drawBaselineGrid();
+        }
+
+        function drawBaselineGrid() {
+            const container = baselineCanvas.parentElement;
+            const width = container.offsetWidth;
+            const height = container.offsetHeight;
+
+            baselineCanvas.width = width;
+            baselineCanvas.height = height;
+
+            if (!showGrid.checked) {
+                baselineCanvas.classList.remove('show');
+                return;
+            }
+
+            baselineCanvas.classList.add('show');
+
+            const ctx = baselineCanvas.getContext('2d');
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.strokeStyle = 'rgba(29, 29, 31, 0.1)';
+            ctx.lineWidth = 1;
+
+            for (let y = currentBaseUnit; y < height; y += currentBaseUnit) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+        }
+
+        baseUnitBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                baseUnitBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentBaseUnit = parseInt(btn.dataset.unit);
+                updateVerticalRhythm();
+            });
+        });
+
+        showGrid.addEventListener('change', updateVerticalRhythm);
+        headingSpacing.addEventListener('input', updateVerticalRhythm);
+        paragraphSpacing.addEventListener('input', updateVerticalRhythm);
+
+        // Redraw grid on window resize
+        window.addEventListener('resize', () => {
+            if (document.getElementById('vertical-rhythm').classList.contains('active')) {
+                updateVerticalRhythm();
+            }
+        });
+
+        updateVerticalRhythm();
+
+        // Responsive Type
+        const viewportWidth = document.getElementById('viewport-width');
+        const viewportWidthValue = document.getElementById('viewport-width-value');
+        const viewportSimulator = document.getElementById('viewport-simulator');
+        const responsiveHeading = document.getElementById('responsive-heading');
+        const responsiveBody = document.getElementById('responsive-body');
+        const viewportInfo = document.getElementById('viewport-info');
+        const scalingBtns = document.querySelectorAll('.scaling-btn');
+
+        let currentScaling = 'clamp';
+
+        function updateResponsiveType() {
+            const width = parseInt(viewportWidth.value);
+            viewportWidthValue.textContent = `${width}px`;
+            viewportSimulator.style.width = `${width}px`;
+
+            let headingSize, bodySize;
+
+            switch (currentScaling) {
+                case 'clamp':
+                    // CSS clamp: clamp(min, preferred, max)
+                    // Heading: 1.5rem to 3rem, scaling with viewport
+                    const headingVw = width * 0.04; // 4vw
+                    headingSize = Math.max(24, Math.min(48, headingVw));
+
+                    // Body: 1rem to 1.25rem
+                    const bodyVw = width * 0.02; // 2vw
+                    bodySize = Math.max(16, Math.min(20, bodyVw));
+
+                    responsiveHeading.style.fontSize = `${headingSize}px`;
+                    responsiveBody.style.fontSize = `${bodySize}px`;
+                    break;
+
+                case 'viewport':
+                    // Pure viewport units
+                    responsiveHeading.style.fontSize = `${width * 0.04}px`; // 4vw
+                    responsiveBody.style.fontSize = `${width * 0.02}px`; // 2vw
+                    headingSize = width * 0.04;
+                    bodySize = width * 0.02;
+                    break;
+
+                case 'media':
+                    // Media query breakpoints
+                    if (width < 480) {
+                        headingSize = 24;
+                        bodySize = 16;
+                    } else if (width < 768) {
+                        headingSize = 32;
+                        bodySize = 17;
+                    } else if (width < 1024) {
+                        headingSize = 40;
+                        bodySize = 18;
+                    } else {
+                        headingSize = 48;
+                        bodySize = 20;
+                    }
+                    responsiveHeading.style.fontSize = `${headingSize}px`;
+                    responsiveBody.style.fontSize = `${bodySize}px`;
+                    break;
+            }
+
+            viewportInfo.innerHTML = `
+                Viewport: ${width}px &nbsp;|&nbsp;
+                Heading: ${headingSize.toFixed(1)}px &nbsp;|&nbsp;
+                Body: ${bodySize.toFixed(1)}px &nbsp;|&nbsp;
+                Method: ${currentScaling}
+            `;
+        }
+
+        viewportWidth.addEventListener('input', updateResponsiveType);
+
+        scalingBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                scalingBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentScaling = btn.dataset.method;
+                updateResponsiveType();
+            });
+        });
+
+        updateResponsiveType();
+
+        // Trigger vertical rhythm redraw when switching to that tab
+        const verticalRhythmBtn = document.querySelector('[data-tab="vertical-rhythm"]');
+        verticalRhythmBtn.addEventListener('click', () => {
+            setTimeout(updateVerticalRhythm, 100);
+        });
+    </script>
+</body>
+</html>

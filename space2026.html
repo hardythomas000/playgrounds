@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Space Playground 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #f5f5f7;
+            overflow-x: hidden;
+            touch-action: pan-y;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid #d2d2d7;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .nav {
+            background: #ffffff;
+            border-bottom: 1px solid #d2d2d7;
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-items {
+            display: inline-flex;
+            padding: 0 8px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6e6e73;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav-btn.active {
+            color: #0071e3;
+            border-bottom-color: #0071e3;
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        canvas {
+            display: block;
+            background: #000000;
+            width: 100%;
+            flex: 1;
+            touch-action: none;
+        }
+
+        .controls {
+            background: #ffffff;
+            padding: 16px;
+            border-top: 1px solid #d2d2d7;
+            overflow-y: auto;
+            max-height: 40vh;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1d1d1f;
+            margin-bottom: 6px;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 32px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-track {
+            width: 100%;
+            height: 4px;
+            background: #d2d2d7;
+            border-radius: 2px;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #0071e3;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -10px;
+        }
+
+        .control-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-wrapper label {
+            margin: 0;
+        }
+
+        button.control-btn {
+            width: 100%;
+            padding: 12px;
+            background: #0071e3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.control-btn:active {
+            background: #0051a8;
+        }
+
+        .info-display {
+            background: rgba(245, 245, 247, 0.95);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+
+        .info-display strong {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .control-row > * {
+            flex: 1;
+        }
+
+        .value-display {
+            font-size: 13px;
+            color: #6e6e73;
+            min-width: 50px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Space Playground 2026</h1>
+    </div>
+
+    <nav class="nav">
+        <div class="nav-items">
+            <button class="nav-btn active" data-tab="solar">Solar System</button>
+            <button class="nav-btn" data-tab="stars">Star Map</button>
+            <button class="nav-btn" data-tab="gravity">Gravity Sim</button>
+            <button class="nav-btn" data-tab="rocket">Rocket Launch</button>
+            <button class="nav-btn" data-tab="nebula">Nebula Generator</button>
+        </div>
+    </nav>
+
+    <!-- Solar System Tab -->
+    <div class="tab-content active" id="solar">
+        <canvas id="solarCanvas"></canvas>
+        <div class="controls">
+            <div id="planetInfo" class="info-display" style="display: none;">
+                <strong id="planetName"></strong>
+                <span id="planetDesc"></span>
+            </div>
+            <div class="control-group">
+                <div class="control-row">
+                    <label>Speed</label>
+                    <span class="value-display" id="speedVal">1.0x</span>
+                </div>
+                <input type="range" id="solarSpeed" min="0" max="5" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <div class="control-row">
+                    <label>Zoom</label>
+                    <span class="value-display" id="zoomVal">1.0x</span>
+                </div>
+                <input type="range" id="solarZoom" min="0.3" max="2" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="showOrbits" checked>
+                    <label for="showOrbits">Show Orbits</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="showLabels" checked>
+                    <label for="showLabels">Show Labels</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Star Map Tab -->
+    <div class="tab-content" id="stars">
+        <canvas id="starCanvas"></canvas>
+        <div class="controls">
+            <div class="control-group">
+                <div class="control-row">
+                    <label>Star Density</label>
+                    <span class="value-display" id="densityVal">200</span>
+                </div>
+                <input type="range" id="starDensity" min="50" max="500" step="10" value="200">
+            </div>
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="showConstellations" checked>
+                    <label for="showConstellations">Show Constellations</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="showConstNames" checked>
+                    <label for="showConstNames">Show Names</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="twinkle" checked>
+                    <label for="twinkle">Twinkle Animation</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <button class="control-btn" id="regenerateStars">Regenerate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gravity Sim Tab -->
+    <div class="tab-content" id="gravity">
+        <canvas id="gravityCanvas"></canvas>
+        <div class="controls">
+            <div class="info-display">
+                Tap to place masses. They will attract each other and orbit.
+            </div>
+            <div class="control-group">
+                <div class="control-row">
+                    <label>Mass Size</label>
+                    <span class="value-display" id="massVal">Medium</span>
+                </div>
+                <input type="range" id="massSize" min="1" max="5" step="1" value="3">
+            </div>
+            <div class="control-group">
+                <div class="control-row">
+                    <label>Speed</label>
+                    <span class="value-display" id="gravSpeedVal">1.0x</span>
+                </div>
+                <input type="range" id="gravSpeed" min="0.1" max="3" step="0.1" value="1">
+            </div>
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="showTrails" checked>
+                    <label for="showTrails">Show Trails</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <button class="control-btn" id="clearGravity">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rocket Launch Tab -->
+    <div class="tab-content" id="rocket">
+        <canvas id="rocketCanvas"></canvas>
+        <div class="controls">
+            <div class="info-display">
+                <strong>Altitude</strong>
+                <span id="altitudeDisplay">0 km</span>
+            </div>
+            <div class="control-group">
+                <div class="control-row">
+                    <label>Thrust Power</label>
+                    <span class="value-display" id="thrustVal">100%</span>
+                </div>
+                <input type="range" id="thrustPower" min="50" max="150" step="5" value="100">
+            </div>
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="showAtmosphere" checked>
+                    <label for="showAtmosphere">Show Atmosphere Labels</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <button class="control-btn" id="launchRocket">Launch Rocket</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nebula Generator Tab -->
+    <div class="tab-content" id="nebula">
+        <canvas id="nebulaCanvas"></canvas>
+        <div class="controls">
+            <div class="control-group">
+                <label>Color Scheme</label>
+                <select id="nebulaScheme" style="width: 100%; padding: 8px; font-size: 15px; border: 1px solid #d2d2d7; border-radius: 6px;">
+                    <option value="emission">Emission Nebula</option>
+                    <option value="reflection">Reflection Nebula</option>
+                    <option value="dark">Dark Nebula</option>
+                    <option value="planetary">Planetary Nebula</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <div class="control-row">
+                    <label>Density</label>
+                    <span class="value-display" id="nebulaDensityVal">5</span>
+                </div>
+                <input type="range" id="nebulaDensity" min="3" max="10" step="1" value="5">
+            </div>
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="showStarBg" checked>
+                    <label for="showStarBg">Star Background</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <button class="control-btn" id="regenerateNebula">Regenerate</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.dataset.tab;
+                navBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                tabContents.forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.id === targetTab) {
+                        tab.classList.add('active');
+                        resizeCanvas(targetTab);
+                    }
+                });
+            });
+        });
+
+        // Canvas resize helper
+        function resizeCanvas(tabName) {
+            const canvas = document.getElementById(tabName === 'solar' ? 'solarCanvas' :
+                                                   tabName === 'stars' ? 'starCanvas' :
+                                                   tabName === 'gravity' ? 'gravityCanvas' :
+                                                   tabName === 'rocket' ? 'rocketCanvas' :
+                                                   'nebulaCanvas');
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight - document.querySelector('.controls').clientHeight;
+        }
+
+        // ========== SOLAR SYSTEM ==========
+        const solarCanvas = document.getElementById('solarCanvas');
+        const solarCtx = solarCanvas.getContext('2d');
+
+        const planets = [
+            { name: 'Mercury', distance: 0.4, speed: 4.74, size: 4, color: '#8c7853', desc: 'Smallest planet, closest to the Sun' },
+            { name: 'Venus', distance: 0.7, speed: 3.50, size: 9, color: '#ffc649', desc: 'Hottest planet, thick atmosphere' },
+            { name: 'Earth', distance: 1.0, speed: 2.98, size: 10, color: '#4a90e2', desc: 'Our home planet, has liquid water' },
+            { name: 'Mars', distance: 1.5, speed: 2.41, size: 6, color: '#cd5c5c', desc: 'The red planet, has polar ice caps' },
+            { name: 'Jupiter', distance: 5.2, speed: 1.31, size: 30, color: '#daa520', desc: 'Largest planet, has Great Red Spot' },
+            { name: 'Saturn', distance: 9.5, speed: 0.97, size: 25, color: '#f4a460', desc: 'Has prominent ring system' },
+            { name: 'Uranus', distance: 19.2, speed: 0.68, size: 15, color: '#4fd0e8', desc: 'Ice giant, rotates on its side' },
+            { name: 'Neptune', distance: 30.0, speed: 0.54, size: 14, color: '#4169e1', desc: 'Farthest planet, very windy' }
+        ];
+
+        let solarSpeed = 1;
+        let solarZoom = 1;
+        let showOrbits = true;
+        let showLabels = true;
+        let solarTime = 0;
+        let selectedPlanet = null;
+
+        document.getElementById('solarSpeed').addEventListener('input', e => {
+            solarSpeed = parseFloat(e.target.value);
+            document.getElementById('speedVal').textContent = solarSpeed.toFixed(1) + 'x';
+        });
+
+        document.getElementById('solarZoom').addEventListener('input', e => {
+            solarZoom = parseFloat(e.target.value);
+            document.getElementById('zoomVal').textContent = solarZoom.toFixed(1) + 'x';
+        });
+
+        document.getElementById('showOrbits').addEventListener('change', e => {
+            showOrbits = e.target.checked;
+        });
+
+        document.getElementById('showLabels').addEventListener('change', e => {
+            showLabels = e.target.checked;
+        });
+
+        solarCanvas.addEventListener('click', e => {
+            const rect = solarCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = solarCanvas.width / 2;
+            const centerY = solarCanvas.height / 2;
+            const scale = Math.min(solarCanvas.width, solarCanvas.height) / 70 * solarZoom;
+
+            selectedPlanet = null;
+            planets.forEach(planet => {
+                const angle = solarTime * planet.speed * 0.01;
+                const px = centerX + Math.cos(angle) * planet.distance * scale;
+                const py = centerY + Math.sin(angle) * planet.distance * scale;
+                const dist = Math.sqrt((x - px) ** 2 + (y - py) ** 2);
+                if (dist < planet.size + 10) {
+                    selectedPlanet = planet;
+                }
+            });
+
+            if (selectedPlanet) {
+                document.getElementById('planetInfo').style.display = 'block';
+                document.getElementById('planetName').textContent = selectedPlanet.name;
+                document.getElementById('planetDesc').textContent = selectedPlanet.desc;
+            } else {
+                document.getElementById('planetInfo').style.display = 'none';
+            }
+        });
+
+        function animateSolar() {
+            const centerX = solarCanvas.width / 2;
+            const centerY = solarCanvas.height / 2;
+            const scale = Math.min(solarCanvas.width, solarCanvas.height) / 70 * solarZoom;
+
+            solarCtx.fillStyle = '#000000';
+            solarCtx.fillRect(0, 0, solarCanvas.width, solarCanvas.height);
+
+            // Draw Sun
+            const gradient = solarCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 20);
+            gradient.addColorStop(0, '#fff5b1');
+            gradient.addColorStop(0.5, '#ffcc33');
+            gradient.addColorStop(1, '#ff9500');
+            solarCtx.fillStyle = gradient;
+            solarCtx.beginPath();
+            solarCtx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+            solarCtx.fill();
+
+            // Draw orbits and planets
+            planets.forEach(planet => {
+                const angle = solarTime * planet.speed * 0.01;
+                const x = centerX + Math.cos(angle) * planet.distance * scale;
+                const y = centerY + Math.sin(angle) * planet.distance * scale;
+
+                // Orbit
+                if (showOrbits) {
+                    solarCtx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                    solarCtx.lineWidth = 1;
+                    solarCtx.beginPath();
+                    solarCtx.arc(centerX, centerY, planet.distance * scale, 0, Math.PI * 2);
+                    solarCtx.stroke();
+                }
+
+                // Planet
+                solarCtx.fillStyle = planet.color;
+                solarCtx.beginPath();
+                solarCtx.arc(x, y, planet.size, 0, Math.PI * 2);
+                solarCtx.fill();
+
+                // Highlight if selected
+                if (selectedPlanet === planet) {
+                    solarCtx.strokeStyle = '#ffffff';
+                    solarCtx.lineWidth = 2;
+                    solarCtx.beginPath();
+                    solarCtx.arc(x, y, planet.size + 4, 0, Math.PI * 2);
+                    solarCtx.stroke();
+                }
+
+                // Label
+                if (showLabels) {
+                    solarCtx.fillStyle = '#ffffff';
+                    solarCtx.font = '12px system-ui';
+                    solarCtx.textAlign = 'center';
+                    solarCtx.fillText(planet.name, x, y + planet.size + 15);
+                }
+            });
+
+            solarTime += solarSpeed;
+            requestAnimationFrame(animateSolar);
+        }
+
+        // ========== STAR MAP ==========
+        const starCanvas = document.getElementById('starCanvas');
+        const starCtx = starCanvas.getContext('2d');
+
+        let stars = [];
+        let starDensity = 200;
+        let showConstellations = true;
+        let showConstNames = true;
+        let twinkle = true;
+
+        const constellations = [
+            { name: 'Orion', stars: [[0.3, 0.3], [0.35, 0.35], [0.4, 0.3], [0.35, 0.45], [0.3, 0.5], [0.4, 0.5], [0.35, 0.55]] },
+            { name: 'Big Dipper', stars: [[0.6, 0.2], [0.65, 0.22], [0.7, 0.2], [0.73, 0.24], [0.75, 0.3], [0.73, 0.35], [0.7, 0.38]] },
+            { name: 'Cassiopeia', stars: [[0.2, 0.6], [0.25, 0.63], [0.3, 0.6], [0.35, 0.65], [0.4, 0.62]] },
+            { name: 'Leo', stars: [[0.7, 0.7], [0.75, 0.68], [0.78, 0.72], [0.75, 0.78], [0.7, 0.8], [0.65, 0.75]] },
+            { name: 'Cygnus', stars: [[0.5, 0.6], [0.5, 0.7], [0.45, 0.65], [0.55, 0.65], [0.5, 0.75]] }
+        ];
+
+        function generateStars() {
+            stars = [];
+            for (let i = 0; i < starDensity; i++) {
+                stars.push({
+                    x: Math.random(),
+                    y: Math.random(),
+                    size: Math.random() * 2 + 0.5,
+                    brightness: Math.random(),
+                    twinklePhase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        document.getElementById('starDensity').addEventListener('input', e => {
+            starDensity = parseInt(e.target.value);
+            document.getElementById('densityVal').textContent = starDensity;
+            generateStars();
+        });
+
+        document.getElementById('showConstellations').addEventListener('change', e => {
+            showConstellations = e.target.checked;
+        });
+
+        document.getElementById('showConstNames').addEventListener('change', e => {
+            showConstNames = e.target.checked;
+        });
+
+        document.getElementById('twinkle').addEventListener('change', e => {
+            twinkle = e.target.checked;
+        });
+
+        document.getElementById('regenerateStars').addEventListener('click', generateStars);
+
+        let starTime = 0;
+
+        function animateStars() {
+            starCtx.fillStyle = '#000000';
+            starCtx.fillRect(0, 0, starCanvas.width, starCanvas.height);
+
+            // Draw stars
+            stars.forEach(star => {
+                let brightness = star.brightness;
+                if (twinkle) {
+                    brightness = (Math.sin(starTime * 0.05 + star.twinklePhase) + 1) / 2 * 0.5 + 0.5;
+                }
+                starCtx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+                starCtx.beginPath();
+                starCtx.arc(star.x * starCanvas.width, star.y * starCanvas.height, star.size, 0, Math.PI * 2);
+                starCtx.fill();
+            });
+
+            // Draw constellations
+            if (showConstellations) {
+                constellations.forEach(constellation => {
+                    starCtx.strokeStyle = 'rgba(100, 150, 255, 0.5)';
+                    starCtx.lineWidth = 1.5;
+                    starCtx.beginPath();
+                    constellation.stars.forEach((star, i) => {
+                        const x = star[0] * starCanvas.width;
+                        const y = star[1] * starCanvas.height;
+                        if (i === 0) starCtx.moveTo(x, y);
+                        else starCtx.lineTo(x, y);
+                    });
+                    starCtx.stroke();
+
+                    // Draw constellation stars
+                    constellation.stars.forEach(star => {
+                        const x = star[0] * starCanvas.width;
+                        const y = star[1] * starCanvas.height;
+                        starCtx.fillStyle = 'rgba(150, 200, 255, 0.9)';
+                        starCtx.beginPath();
+                        starCtx.arc(x, y, 3, 0, Math.PI * 2);
+                        starCtx.fill();
+                    });
+
+                    // Draw names
+                    if (showConstNames) {
+                        const centerX = constellation.stars.reduce((sum, s) => sum + s[0], 0) / constellation.stars.length * starCanvas.width;
+                        const centerY = constellation.stars.reduce((sum, s) => sum + s[1], 0) / constellation.stars.length * starCanvas.height;
+                        starCtx.fillStyle = 'rgba(150, 200, 255, 0.8)';
+                        starCtx.font = '14px system-ui';
+                        starCtx.textAlign = 'center';
+                        starCtx.fillText(constellation.name, centerX, centerY - 10);
+                    }
+                });
+            }
+
+            starTime++;
+            requestAnimationFrame(animateStars);
+        }
+
+        // ========== GRAVITY SIM ==========
+        const gravityCanvas = document.getElementById('gravityCanvas');
+        const gravityCtx = gravityCanvas.getContext('2d');
+
+        let bodies = [];
+        let massSize = 3;
+        let gravSpeed = 1;
+        let showTrails = true;
+        let trails = [];
+
+        const massSizes = ['Tiny', 'Small', 'Medium', 'Large', 'Huge'];
+
+        document.getElementById('massSize').addEventListener('input', e => {
+            massSize = parseInt(e.target.value);
+            document.getElementById('massVal').textContent = massSizes[massSize - 1];
+        });
+
+        document.getElementById('gravSpeed').addEventListener('input', e => {
+            gravSpeed = parseFloat(e.target.value);
+            document.getElementById('gravSpeedVal').textContent = gravSpeed.toFixed(1) + 'x';
+        });
+
+        document.getElementById('showTrails').addEventListener('change', e => {
+            showTrails = e.target.checked;
+            if (!showTrails) trails = [];
+        });
+
+        document.getElementById('clearGravity').addEventListener('click', () => {
+            bodies = [];
+            trails = [];
+            initDefaultBodies();
+        });
+
+        gravityCanvas.addEventListener('click', e => {
+            const rect = gravityCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const mass = massSize * 10000;
+            const radius = Math.sqrt(mass / 1000);
+            bodies.push({
+                x: x,
+                y: y,
+                vx: 0,
+                vy: 0,
+                mass: mass,
+                radius: radius,
+                color: `hsl(${Math.random() * 360}, 70%, 60%)`
+            });
+        });
+
+        function initDefaultBodies() {
+            const centerX = gravityCanvas.width / 2;
+            const centerY = gravityCanvas.height / 2;
+
+            // Central massive body
+            bodies.push({
+                x: centerX,
+                y: centerY,
+                vx: 0,
+                vy: 0,
+                mass: 50000,
+                radius: Math.sqrt(50000 / 1000),
+                color: '#ffcc00'
+            });
+
+            // Orbiting body
+            bodies.push({
+                x: centerX + 150,
+                y: centerY,
+                vx: 0,
+                vy: 4,
+                mass: 5000,
+                radius: Math.sqrt(5000 / 1000),
+                color: '#4a90e2'
+            });
+        }
+
+        function animateGravity() {
+            gravityCtx.fillStyle = showTrails ? 'rgba(0, 0, 0, 0.1)' : '#000000';
+            gravityCtx.fillRect(0, 0, gravityCanvas.width, gravityCanvas.height);
+
+            // Physics
+            for (let i = 0; i < gravSpeed; i++) {
+                bodies.forEach((body, idx) => {
+                    body.ax = 0;
+                    body.ay = 0;
+
+                    bodies.forEach((other, otherIdx) => {
+                        if (idx === otherIdx) return;
+
+                        const dx = other.x - body.x;
+                        const dy = other.y - body.y;
+                        const distSq = dx * dx + dy * dy;
+                        const dist = Math.sqrt(distSq);
+
+                        if (dist < body.radius + other.radius) return; // Collision prevention
+
+                        const force = 0.1 * other.mass / distSq;
+                        body.ax += force * dx / dist;
+                        body.ay += force * dy / dist;
+                    });
+                });
+
+                bodies.forEach(body => {
+                    body.vx += body.ax;
+                    body.vy += body.ay;
+                    body.x += body.vx;
+                    body.y += body.vy;
+
+                    // Bounce off walls
+                    if (body.x < body.radius) { body.x = body.radius; body.vx *= -0.8; }
+                    if (body.x > gravityCanvas.width - body.radius) { body.x = gravityCanvas.width - body.radius; body.vx *= -0.8; }
+                    if (body.y < body.radius) { body.y = body.radius; body.vy *= -0.8; }
+                    if (body.y > gravityCanvas.height - body.radius) { body.y = gravityCanvas.height - body.radius; body.vy *= -0.8; }
+                });
+            }
+
+            // Draw trails
+            if (showTrails) {
+                bodies.forEach(body => {
+                    trails.push({ x: body.x, y: body.y, color: body.color });
+                });
+                if (trails.length > 2000) trails = trails.slice(-2000);
+
+                trails.forEach((point, i) => {
+                    gravityCtx.fillStyle = point.color.replace('60%)', `${i / trails.length * 60}%)`);
+                    gravityCtx.fillRect(point.x, point.y, 2, 2);
+                });
+            }
+
+            // Draw bodies
+            bodies.forEach(body => {
+                gravityCtx.fillStyle = body.color;
+                gravityCtx.beginPath();
+                gravityCtx.arc(body.x, body.y, body.radius, 0, Math.PI * 2);
+                gravityCtx.fill();
+
+                // Glow
+                const gradient = gravityCtx.createRadialGradient(body.x, body.y, 0, body.x, body.y, body.radius * 2);
+                gradient.addColorStop(0, body.color.replace('60%)', '40%)'));
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                gravityCtx.fillStyle = gradient;
+                gravityCtx.beginPath();
+                gravityCtx.arc(body.x, body.y, body.radius * 2, 0, Math.PI * 2);
+                gravityCtx.fill();
+            });
+
+            requestAnimationFrame(animateGravity);
+        }
+
+        // ========== ROCKET LAUNCH ==========
+        const rocketCanvas = document.getElementById('rocketCanvas');
+        const rocketCtx = rocketCanvas.getContext('2d');
+
+        let rocketY = 0;
+        let rocketVel = 0;
+        let rocketActive = false;
+        let thrustPower = 100;
+        let showAtmosphere = true;
+        let flames = [];
+
+        const atmosphereLayers = [
+            { name: 'Troposphere', top: 12, color: 'rgba(135, 206, 250, 0.3)' },
+            { name: 'Stratosphere', top: 50, color: 'rgba(100, 150, 200, 0.2)' },
+            { name: 'Mesosphere', top: 85, color: 'rgba(70, 100, 150, 0.15)' },
+            { name: 'Space', top: 500, color: 'rgba(0, 0, 50, 0.1)' }
+        ];
+
+        document.getElementById('thrustPower').addEventListener('input', e => {
+            thrustPower = parseInt(e.target.value);
+            document.getElementById('thrustVal').textContent = thrustPower + '%';
+        });
+
+        document.getElementById('showAtmosphere').addEventListener('change', e => {
+            showAtmosphere = e.target.checked;
+        });
+
+        document.getElementById('launchRocket').addEventListener('click', () => {
+            if (!rocketActive) {
+                rocketActive = true;
+                rocketY = 0;
+                rocketVel = 0;
+                flames = [];
+            }
+        });
+
+        function animateRocket() {
+            const scale = rocketCanvas.height / 120; // 120km view
+
+            rocketCtx.fillStyle = '#000814';
+            rocketCtx.fillRect(0, 0, rocketCanvas.width, rocketCanvas.height);
+
+            // Draw atmosphere layers
+            if (showAtmosphere) {
+                atmosphereLayers.forEach(layer => {
+                    const y = rocketCanvas.height - layer.top * scale;
+                    rocketCtx.fillStyle = layer.color;
+                    rocketCtx.fillRect(0, y, rocketCanvas.width, rocketCanvas.height - y);
+
+                    rocketCtx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    rocketCtx.font = '12px system-ui';
+                    rocketCtx.fillText(layer.name, 10, y + 15);
+                    rocketCtx.fillText(layer.top + ' km', 10, y + 30);
+                });
+            }
+
+            // Stars
+            for (let i = 0; i < 50; i++) {
+                const x = (i * 123.456) % rocketCanvas.width;
+                const y = (i * 78.91) % (rocketCanvas.height * 0.3);
+                rocketCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                rocketCtx.fillRect(x, y, 1, 1);
+            }
+
+            if (rocketActive) {
+                // Physics
+                const thrust = thrustPower / 100 * 0.3;
+                const gravity = 0.05;
+                rocketVel += thrust - gravity;
+                rocketY += rocketVel;
+
+                if (rocketY < 0) {
+                    rocketY = 0;
+                    rocketVel = 0;
+                    rocketActive = false;
+                }
+
+                // Flames
+                if (rocketVel > 0) {
+                    flames.push({
+                        x: rocketCanvas.width / 2 + (Math.random() - 0.5) * 10,
+                        y: rocketCanvas.height - rocketY * scale + 30,
+                        size: Math.random() * 10 + 5,
+                        life: 20
+                    });
+                }
+
+                flames = flames.filter(f => f.life > 0);
+                flames.forEach(f => {
+                    f.y += 2;
+                    f.life--;
+                    f.size *= 0.95;
+
+                    const gradient = rocketCtx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.size);
+                    gradient.addColorStop(0, `rgba(255, 200, 0, ${f.life / 20})`);
+                    gradient.addColorStop(0.5, `rgba(255, 100, 0, ${f.life / 30})`);
+                    gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+                    rocketCtx.fillStyle = gradient;
+                    rocketCtx.beginPath();
+                    rocketCtx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+                    rocketCtx.fill();
+                });
+
+                // Draw rocket
+                const rocketX = rocketCanvas.width / 2;
+                const rocketDrawY = rocketCanvas.height - rocketY * scale;
+
+                rocketCtx.fillStyle = '#ffffff';
+                rocketCtx.beginPath();
+                rocketCtx.moveTo(rocketX, rocketDrawY - 25);
+                rocketCtx.lineTo(rocketX - 8, rocketDrawY - 5);
+                rocketCtx.lineTo(rocketX + 8, rocketDrawY - 5);
+                rocketCtx.closePath();
+                rocketCtx.fill();
+
+                rocketCtx.fillStyle = '#e0e0e0';
+                rocketCtx.fillRect(rocketX - 6, rocketDrawY - 5, 12, 25);
+
+                rocketCtx.fillStyle = '#ff6b6b';
+                rocketCtx.beginPath();
+                rocketCtx.moveTo(rocketX - 6, rocketDrawY + 20);
+                rocketCtx.lineTo(rocketX - 12, rocketDrawY + 30);
+                rocketCtx.lineTo(rocketX, rocketDrawY + 20);
+                rocketCtx.closePath();
+                rocketCtx.fill();
+
+                rocketCtx.beginPath();
+                rocketCtx.moveTo(rocketX + 6, rocketDrawY + 20);
+                rocketCtx.lineTo(rocketX + 12, rocketDrawY + 30);
+                rocketCtx.lineTo(rocketX, rocketDrawY + 20);
+                rocketCtx.closePath();
+                rocketCtx.fill();
+
+                document.getElementById('altitudeDisplay').textContent = rocketY.toFixed(1) + ' km';
+            }
+
+            requestAnimationFrame(animateRocket);
+        }
+
+        // ========== NEBULA GENERATOR ==========
+        const nebulaCanvas = document.getElementById('nebulaCanvas');
+        const nebulaCtx = nebulaCanvas.getContext('2d');
+
+        let nebulaScheme = 'emission';
+        let nebulaDensity = 5;
+        let showStarBg = true;
+
+        const colorSchemes = {
+            emission: [
+                ['rgba(255, 50, 100, 0.3)', 'rgba(255, 0, 0, 0)'],
+                ['rgba(150, 50, 255, 0.3)', 'rgba(100, 0, 200, 0)'],
+                ['rgba(100, 200, 255, 0.2)', 'rgba(0, 100, 255, 0)']
+            ],
+            reflection: [
+                ['rgba(100, 150, 255, 0.4)', 'rgba(50, 100, 200, 0)'],
+                ['rgba(150, 200, 255, 0.3)', 'rgba(100, 150, 255, 0)'],
+                ['rgba(200, 220, 255, 0.2)', 'rgba(150, 180, 255, 0)']
+            ],
+            dark: [
+                ['rgba(50, 30, 60, 0.5)', 'rgba(20, 10, 30, 0)'],
+                ['rgba(80, 50, 90, 0.4)', 'rgba(40, 20, 60, 0)'],
+                ['rgba(30, 20, 40, 0.3)', 'rgba(10, 5, 20, 0)']
+            ],
+            planetary: [
+                ['rgba(100, 255, 200, 0.4)', 'rgba(0, 200, 150, 0)'],
+                ['rgba(150, 255, 150, 0.3)', 'rgba(50, 200, 100, 0)'],
+                ['rgba(200, 255, 100, 0.2)', 'rgba(100, 200, 50, 0)']
+            ]
+        };
+
+        document.getElementById('nebulaScheme').addEventListener('change', e => {
+            nebulaScheme = e.target.value;
+            generateNebula();
+        });
+
+        document.getElementById('nebulaDensity').addEventListener('input', e => {
+            nebulaDensity = parseInt(e.target.value);
+            document.getElementById('nebulaDensityVal').textContent = nebulaDensity;
+            generateNebula();
+        });
+
+        document.getElementById('showStarBg').addEventListener('change', e => {
+            showStarBg = e.target.checked;
+            generateNebula();
+        });
+
+        document.getElementById('regenerateNebula').addEventListener('click', generateNebula);
+
+        function generateNebula() {
+            nebulaCtx.fillStyle = '#000000';
+            nebulaCtx.fillRect(0, 0, nebulaCanvas.width, nebulaCanvas.height);
+
+            // Star background
+            if (showStarBg) {
+                for (let i = 0; i < 200; i++) {
+                    const x = Math.random() * nebulaCanvas.width;
+                    const y = Math.random() * nebulaCanvas.height;
+                    const size = Math.random() * 1.5;
+                    nebulaCtx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.8 + 0.2})`;
+                    nebulaCtx.beginPath();
+                    nebulaCtx.arc(x, y, size, 0, Math.PI * 2);
+                    nebulaCtx.fill();
+                }
+            }
+
+            // Nebula clouds
+            const colors = colorSchemes[nebulaScheme];
+            const cloudCount = nebulaDensity * 3;
+
+            for (let i = 0; i < cloudCount; i++) {
+                const x = Math.random() * nebulaCanvas.width;
+                const y = Math.random() * nebulaCanvas.height;
+                const radius = Math.random() * 150 + 50;
+                const colorSet = colors[Math.floor(Math.random() * colors.length)];
+
+                const gradient = nebulaCtx.createRadialGradient(x, y, 0, x, y, radius);
+                gradient.addColorStop(0, colorSet[0]);
+                gradient.addColorStop(1, colorSet[1]);
+
+                nebulaCtx.fillStyle = gradient;
+                nebulaCtx.beginPath();
+                nebulaCtx.arc(x, y, radius, 0, Math.PI * 2);
+                nebulaCtx.fill();
+            }
+
+            // Add some brighter spots
+            for (let i = 0; i < nebulaDensity; i++) {
+                const x = Math.random() * nebulaCanvas.width;
+                const y = Math.random() * nebulaCanvas.height;
+                const radius = Math.random() * 30 + 10;
+
+                const gradient = nebulaCtx.createRadialGradient(x, y, 0, x, y, radius);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                nebulaCtx.fillStyle = gradient;
+                nebulaCtx.beginPath();
+                nebulaCtx.arc(x, y, radius, 0, Math.PI * 2);
+                nebulaCtx.fill();
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            resizeCanvas('solar');
+            resizeCanvas('stars');
+            resizeCanvas('gravity');
+            resizeCanvas('rocket');
+            resizeCanvas('nebula');
+
+            generateStars();
+            initDefaultBodies();
+            generateNebula();
+
+            animateSolar();
+            animateStars();
+            animateGravity();
+            animateRocket();
+        });
+
+        window.addEventListener('resize', () => {
+            const activeTab = document.querySelector('.tab-content.active').id;
+            resizeCanvas(activeTab);
+        });
+    </script>
+</body>
+</html>
