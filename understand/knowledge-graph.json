@@ -1,0 +1,623 @@
+{
+  "version": "1.0",
+  "kind": "codebase",
+  "project": {
+    "name": "playgrounds",
+    "languages": [
+      "HTML",
+      "Markdown"
+    ],
+    "frameworks": [
+      "unknown"
+    ],
+    "description": "Generated static file-level graph for mobile viewing.",
+    "analyzedAt": "2026-05-08T13:18:54.7218928Z",
+    "gitCommitHash": "4575fb7b2231de60ab1347eb3f890791125a26ad"
+  },
+  "nodes": [
+    {
+      "id": "project:playgrounds",
+      "type": "module",
+      "name": "playgrounds",
+      "summary": "playgrounds project root",
+      "tags": [
+        "project"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:3dworld2026.html",
+      "type": "document",
+      "name": "3dworld2026.html",
+      "filePath": "3dworld2026.html",
+      "summary": "Project file: 3dworld2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Project file: README.md",
+      "tags": [
+        "root",
+        "Markdown"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:algorithms2026.html",
+      "type": "document",
+      "name": "algorithms2026.html",
+      "filePath": "algorithms2026.html",
+      "summary": "Project file: algorithms2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:audio2026.html",
+      "type": "document",
+      "name": "audio2026.html",
+      "filePath": "audio2026.html",
+      "summary": "Project file: audio2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:clocks2026.html",
+      "type": "document",
+      "name": "clocks2026.html",
+      "filePath": "clocks2026.html",
+      "summary": "Project file: clocks2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:colortools2026.html",
+      "type": "document",
+      "name": "colortools2026.html",
+      "filePath": "colortools2026.html",
+      "summary": "Project file: colortools2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:coolstuff2026.html",
+      "type": "document",
+      "name": "coolstuff2026.html",
+      "filePath": "coolstuff2026.html",
+      "summary": "Project file: coolstuff2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:creative2026.html",
+      "type": "document",
+      "name": "creative2026.html",
+      "filePath": "creative2026.html",
+      "summary": "Project file: creative2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:cssart2026.html",
+      "type": "document",
+      "name": "cssart2026.html",
+      "filePath": "cssart2026.html",
+      "summary": "Project file: cssart2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:dataviz2026.html",
+      "type": "document",
+      "name": "dataviz2026.html",
+      "filePath": "dataviz2026.html",
+      "summary": "Project file: dataviz2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:emojifun2026.html",
+      "type": "document",
+      "name": "emojifun2026.html",
+      "filePath": "emojifun2026.html",
+      "summary": "Project file: emojifun2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:games2026.html",
+      "type": "document",
+      "name": "games2026.html",
+      "filePath": "games2026.html",
+      "summary": "Project file: games2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:genart2026.html",
+      "type": "document",
+      "name": "genart2026.html",
+      "filePath": "genart2026.html",
+      "summary": "Project file: genart2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:illusions2026.html",
+      "type": "document",
+      "name": "illusions2026.html",
+      "filePath": "illusions2026.html",
+      "summary": "Project file: illusions2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:index.html",
+      "type": "document",
+      "name": "index.html",
+      "filePath": "index.html",
+      "summary": "Project file: index.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:mathviz2026.html",
+      "type": "document",
+      "name": "mathviz2026.html",
+      "filePath": "mathviz2026.html",
+      "summary": "Project file: mathviz2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:musictheory2026.html",
+      "type": "document",
+      "name": "musictheory2026.html",
+      "filePath": "musictheory2026.html",
+      "summary": "Project file: musictheory2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:nature2026.html",
+      "type": "document",
+      "name": "nature2026.html",
+      "filePath": "nature2026.html",
+      "summary": "Project file: nature2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:physics2026.html",
+      "type": "document",
+      "name": "physics2026.html",
+      "filePath": "physics2026.html",
+      "summary": "Project file: physics2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:puzzles2026.html",
+      "type": "document",
+      "name": "puzzles2026.html",
+      "filePath": "puzzles2026.html",
+      "summary": "Project file: puzzles2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:retro2026.html",
+      "type": "document",
+      "name": "retro2026.html",
+      "filePath": "retro2026.html",
+      "summary": "Project file: retro2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:space2026.html",
+      "type": "document",
+      "name": "space2026.html",
+      "filePath": "space2026.html",
+      "summary": "Project file: space2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:textfx2026.html",
+      "type": "document",
+      "name": "textfx2026.html",
+      "filePath": "textfx2026.html",
+      "summary": "Project file: textfx2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:trends2026.html",
+      "type": "document",
+      "name": "trends2026.html",
+      "filePath": "trends2026.html",
+      "summary": "Project file: trends2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:typography2026.html",
+      "type": "document",
+      "name": "typography2026.html",
+      "filePath": "typography2026.html",
+      "summary": "Project file: typography2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:uipatterns2026.html",
+      "type": "document",
+      "name": "uipatterns2026.html",
+      "filePath": "uipatterns2026.html",
+      "summary": "Project file: uipatterns2026.html",
+      "tags": [
+        "root",
+        "HTML"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "project:playgrounds",
+      "target": "file:3dworld2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains 3dworld2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:README.md",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains README.md",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:algorithms2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains algorithms2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:audio2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains audio2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:clocks2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains clocks2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:colortools2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains colortools2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:coolstuff2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains coolstuff2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:creative2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains creative2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:cssart2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains cssart2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:dataviz2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains dataviz2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:emojifun2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains emojifun2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:games2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains games2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:genart2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains genart2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:illusions2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains illusions2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:index.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains index.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:mathviz2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains mathviz2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:musictheory2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains musictheory2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:nature2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains nature2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:physics2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains physics2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:puzzles2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains puzzles2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:retro2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains retro2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:space2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains space2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:textfx2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains textfx2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:trends2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains trends2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:typography2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains typography2026.html",
+      "weight": 0.7
+    },
+    {
+      "source": "project:playgrounds",
+      "target": "file:uipatterns2026.html",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Project contains uipatterns2026.html",
+      "weight": 0.7
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:root",
+      "name": "root",
+      "description": "Files under root",
+      "nodeIds": [
+        "file:3dworld2026.html",
+        "file:README.md",
+        "file:algorithms2026.html",
+        "file:audio2026.html",
+        "file:clocks2026.html",
+        "file:colortools2026.html",
+        "file:coolstuff2026.html",
+        "file:creative2026.html",
+        "file:cssart2026.html",
+        "file:dataviz2026.html",
+        "file:emojifun2026.html",
+        "file:games2026.html",
+        "file:genart2026.html",
+        "file:illusions2026.html",
+        "file:index.html",
+        "file:mathviz2026.html",
+        "file:musictheory2026.html",
+        "file:nature2026.html",
+        "file:physics2026.html",
+        "file:puzzles2026.html",
+        "file:retro2026.html",
+        "file:space2026.html",
+        "file:textfx2026.html",
+        "file:trends2026.html",
+        "file:typography2026.html",
+        "file:uipatterns2026.html"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Project overview",
+      "description": "Start at the project node, then inspect major folders/files.",
+      "nodeIds": [
+        "project:playgrounds"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Source files",
+      "description": "Use search or the file explorer to jump into specific files.",
+      "nodeIds": [
+        "file:3dworld2026.html",
+        "file:README.md",
+        "file:algorithms2026.html",
+        "file:audio2026.html",
+        "file:clocks2026.html",
+        "file:colortools2026.html",
+        "file:coolstuff2026.html",
+        "file:creative2026.html",
+        "file:cssart2026.html",
+        "file:dataviz2026.html",
+        "file:emojifun2026.html",
+        "file:games2026.html",
+        "file:genart2026.html",
+        "file:illusions2026.html",
+        "file:index.html",
+        "file:mathviz2026.html",
+        "file:musictheory2026.html",
+        "file:nature2026.html",
+        "file:physics2026.html",
+        "file:puzzles2026.html"
+      ]
+    }
+  ]
+}
